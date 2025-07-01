@@ -6,8 +6,8 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
-COPY server.py .
-
-CMD python3 server.py
-
 EXPOSE 8765
+
+CMD ["python", "server.py"]
+
+COPY server.py .
