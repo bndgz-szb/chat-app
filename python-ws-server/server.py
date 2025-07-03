@@ -3,21 +3,41 @@ import asyncio
 import websockets
 
 CONNECTIONS = dict()
+HISTORY = dict()
 
+async def chat_key(a, b):
+	return tuple(sorted([a, b]))
+
+async def sendError(websocket, message):
+	await websocket.send(json.dumps({
+		"type": "error",
+		"message": message
+	}))
+
+async def sendMessage(sender, receiver, message):
+	# TODO validate message
+	jsonMessage = {
+		"type": "message",
+		"from": sender,
+		"to": receiver,
+		"message": message
+	}
+	await CONNECTIONS[receiver].send(json.dumps(jsonMessage))
+	HISTORY[chat_key] = jsonMessage
+
+# returns username on correct login
 async def login(websocket):
 	raw = await websocket.recv()
 	try:
 		data = json.loads(raw)
-	except:
-		await websocket.close(code=4000, reason="Login required")
-		return ""
-
-	if data.get("type") != "login" or not data.get("username"):
+		assert all(key in data for key in ("type", "username"))
+		assert data.get("type") == "login"
+	except (json.JSONDecodeError, AssertionError):
 		await websocket.close(code=4000, reason="Login required")
 		return ""
 
 	username = data["username"]
-	if username in CONNECTIONS:
+	if username in CONNECTIONS.keys():
 		await websocket.close(code=4001, reason="Username already taken")
 		return ""
 	
@@ -28,8 +48,30 @@ async def login(websocket):
 async def message_loop(websocket, username):
 	try:
 		async for message in websocket:
-			websockets.broadcast(CONNECTIONS.values(), message)
-	
+			# check message format
+			try:
+				data = json.loads(message)
+				assert all(key in data for key in ("type", "from", "to", "message"))
+			except (json.JSONDecodeError, AssertionError):
+				await sendError(websocket, "Invalid message format")
+				continue
+
+			sender = data["from"]
+			receiver = data["to"]
+
+			if websocket != CONNECTIONS[sender]: # check sender address
+				await websocket.close(code=4002, reason="Can't send messages in someone else's name")
+
+			elif receiver not in CONNECTIONS.keys(): # check if receiver is online
+				await sendError(websocket, "User currently offline")
+
+			else: # send message to receiver, save to history
+				try:
+					await sendMessage(sender, receiver, data["message"])
+				except:
+					await sendError(websocket, "User disconnected before receiving the message")
+	except:
+		print(f"[CLOSE] {username} closed connection")
 	finally:
 		print(f"[DISCONNECTED] {username} removed from active list")
 		del CONNECTIONS[username]
