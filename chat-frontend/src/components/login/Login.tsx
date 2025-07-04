@@ -1,14 +1,15 @@
 import InputField from '@/components/login/InputField';
+import useWebSocket from '@/hooks/useWebSocketHook';
 import { useState } from 'react';
 
 function Login() {
   const [username, setUsername] = useState<string>('');
+  const { sendLogin } = useWebSocket();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // TODO try login
-    // const { login } = useContext(UsernameContext);
+    sendLogin(username);
   };
 
   return (

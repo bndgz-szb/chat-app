@@ -11,7 +11,7 @@ type Props = {
 const UsernameContextProvider = ({ children }: Props) => {
   const [username, setUsername] = useState<string>('');
   const ctx: UsernameContextInterface = {
-    login: setUsername,
+    setUsername,
     username,
   };
 
