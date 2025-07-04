@@ -14,7 +14,7 @@ const InputField = ({ name, label, value, onChange, placeholder }: Props) => {
       </label>
 
       <input
-        type="email"
+        type="text"
         id={name}
         placeholder={placeholder}
         className="w-full px-4 py-2 rounded-md text-black outline-none bg-white"
