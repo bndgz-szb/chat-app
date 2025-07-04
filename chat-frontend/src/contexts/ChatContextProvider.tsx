@@ -8,12 +8,15 @@ type Props = {
 const ChatContextProvider = ({ children }: Props) => {
   const [username, setUsername] = useState<string>('');
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const ctx: ChatContextInterface = {
     username,
     setUsername,
     messageHistory,
     setMessageHistory,
+    onlineUsers,
+    setOnlineUsers,
   };
 
   return <ChatContext value={ctx}>{children}</ChatContext>;

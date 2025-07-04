@@ -5,6 +5,8 @@ export interface ChatContextInterface {
   setUsername: (newName: string) => void;
   messageHistory: string[];
   setMessageHistory: (callback: (messages: string[]) => string[]) => void;
+  onlineUsers: string[];
+  setOnlineUsers: (callback: (users: string[]) => string[]) => void;
 }
 
 export const ChatContext = createContext<ChatContextInterface>({
@@ -13,7 +15,11 @@ export const ChatContext = createContext<ChatContextInterface>({
     throw new Error('Function not implemented.');
   },
   messageHistory: [],
-  setMessageHistory: function (): string[] {
+  setMessageHistory: function (): void {
+    throw new Error('Function not implemented.');
+  },
+  onlineUsers: [],
+  setOnlineUsers: function (): void {
     throw new Error('Function not implemented.');
   },
 });

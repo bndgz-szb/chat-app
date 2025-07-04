@@ -5,8 +5,13 @@ function useWebSocket() {
   const ws = useRef<WebSocket | null>(null);
   const currentSocketId = useRef<number>(0);
 
-  const { setUsername, messageHistory, setMessageHistory } =
-    useContext(ChatContext);
+  const {
+    username,
+    setUsername,
+    messageHistory,
+    setMessageHistory,
+    setOnlineUsers,
+  } = useContext(ChatContext);
 
   const connect = (url: string, username: string) => {
     const socketId = ++currentSocketId.current;
@@ -17,7 +22,7 @@ function useWebSocket() {
     });
 
     ws.current.addEventListener('error', (error: Event) =>
-      console.error(`socketId: ${socketId}; error: ${error}`)
+      console.error(`closed socketId: ${socketId}; error: ${error}`)
     );
 
     ws.current.addEventListener('open', () => {
@@ -28,14 +33,26 @@ function useWebSocket() {
 
     ws.current.addEventListener('message', (event: MessageEvent) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'message') setMessageHistory((prev) => [...prev, data]);
+      if (data.type === 'message' || data.type === 'broadcast')
+        setMessageHistory((prev) => [...prev, data]);
+      else if (data.type === 'user_list') setOnlineUsers(() => data.users);
+      else if (data.type === 'user_login')
+        setOnlineUsers((prev) => [...prev, data.username]);
+      else if (data.type === 'user_logout')
+        setOnlineUsers((prev) => prev.filter((u) => u !== data.username));
+      else if (data.type === 'error') console.error(`error: ${data.message}`);
     });
   };
 
-  const sendMessage = (msg: string) => {
-    // TODO
-    ws.current?.send(msg);
-    setMessageHistory((prev) => [...prev, msg]);
+  const sendMessage = (messageContent: string, to: string) => {
+    const message = JSON.stringify({
+      type: 'message',
+      from: username,
+      to,
+      message: messageContent,
+    });
+    ws.current?.send(message);
+    setMessageHistory((prev) => [...prev, message]);
   };
 
   const sendLogin = (username: string) => {
