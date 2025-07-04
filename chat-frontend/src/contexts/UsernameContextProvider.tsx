@@ -1,7 +1,7 @@
 import {
   UsernameContext,
   type UsernameContextInterface,
-} from '@/context/UsernameContext';
+} from '@/contexts/UsernameContext';
 import { useState, type ReactNode } from 'react';
 
 type Props = {

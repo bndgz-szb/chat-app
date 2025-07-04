@@ -1,4 +1,4 @@
-import { UsernameContext } from '@/context/UsernameContext';
+import { UsernameContext } from '@/contexts/UsernameContext';
 import { useContext, type ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 
