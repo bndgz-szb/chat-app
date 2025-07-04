@@ -1,16 +1,24 @@
 import InputField from '@/components/login/InputField';
-import useWebSocket from '@/hooks/useWebSocketHook';
-import { useState } from 'react';
+import { ChatContext } from '@/contexts/ChatContext';
+import { WebSocketContext } from '@/contexts/WebSocketContext';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
-  const [username, setUsername] = useState<string>('');
-  const { sendLogin } = useWebSocket();
+  const [inputUsername, setInputUsername] = useState<string>('');
+  const { username } = useContext(ChatContext);
+  const { sendLogin } = useContext(WebSocketContext);
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    sendLogin(username);
+    sendLogin(inputUsername, () => navigate('/'));
   };
+
+  useEffect(() => {
+    if (username !== '') navigate('/', { replace: true });
+  }, [username, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 flex-col">
@@ -22,8 +30,8 @@ function Login() {
             name={'username'}
             label={'Username'}
             placeholder={'boti123'}
-            value={username}
-            onChange={setUsername}
+            value={inputUsername}
+            onChange={setInputUsername}
           />
 
           <button type="submit" className="w-full py-2">

@@ -1,7 +1,8 @@
 import { ChatContext } from '@/contexts/ChatContext';
+import type { WebSocketContextInterface } from '@/contexts/WebSocketContext';
 import { useContext, useRef } from 'react';
 
-function useWebSocket() {
+function useWebSocket(): WebSocketContextInterface {
   const ws = useRef<WebSocket | null>(null);
   const currentSocketId = useRef<number>(0);
 
@@ -13,7 +14,7 @@ function useWebSocket() {
     setOnlineUsers,
   } = useContext(ChatContext);
 
-  const connect = (url: string, username: string) => {
+  const connect = (url: string, username: string, onSuccess: () => void) => {
     const socketId = ++currentSocketId.current;
     ws.current = new WebSocket(url);
 
@@ -29,12 +30,13 @@ function useWebSocket() {
       if (socketId !== currentSocketId.current) return;
       ws.current!.send(JSON.stringify({ type: 'login', username }));
       setUsername(username);
+      onSuccess();
     });
 
     ws.current.addEventListener('message', (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       if (data.type === 'message' || data.type === 'broadcast')
-        setMessageHistory((prev) => [...prev, data]);
+        setMessageHistory((prev) => [...prev, event.data]);
       else if (data.type === 'user_list') setOnlineUsers(() => data.users);
       else if (data.type === 'user_login')
         setOnlineUsers((prev) => [...prev, data.username]);
@@ -55,9 +57,9 @@ function useWebSocket() {
     setMessageHistory((prev) => [...prev, message]);
   };
 
-  const sendLogin = (username: string) => {
+  const sendLogin = (username: string, onSuccess: () => void) => {
     ws.current?.close();
-    connect(import.meta.env.VITE_WS_URL, username);
+    connect(import.meta.env.VITE_WS_URL, username, onSuccess);
   };
 
   return { messageHistory, sendMessage, sendLogin };

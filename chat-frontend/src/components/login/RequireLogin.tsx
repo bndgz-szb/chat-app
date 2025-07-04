@@ -8,7 +8,7 @@ type Props = {
 
 function RequireLogin({ children }: Props) {
   const { username } = useContext(ChatContext);
-  return username === '' ? <Navigate to="/login" /> : children;
+  return username === '' ? <Navigate to="/login" replace/> : children;
 }
 
 export default RequireLogin;
