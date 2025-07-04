@@ -105,7 +105,7 @@ async def message_loop(websocket, username):
 	finally:
 		print(f"[DISCONNECTED] {username} removed from active list")
 		del CONNECTIONS[username]
-		broadcastConnectionsState("user_logoff", username)
+		broadcastConnectionsState("user_logout", username)
 
 async def handle(websocket):
 	username = await login(websocket)
