@@ -1,12 +1,12 @@
-import { UsernameContext } from '@/contexts/UsernameContext';
-import { useContext, useRef, useState } from 'react';
+import { ChatContext } from '@/contexts/ChatContext';
+import { useContext, useRef } from 'react';
 
 function useWebSocket() {
   const ws = useRef<WebSocket | null>(null);
   const currentSocketId = useRef<number>(0);
 
-  const [messages, setMessages] = useState<string[]>([]);
-  const { setUsername } = useContext(UsernameContext);
+  const { setUsername, messageHistory, setMessageHistory } =
+    useContext(ChatContext);
 
   const connect = (url: string, username: string) => {
     const socketId = ++currentSocketId.current;
@@ -27,14 +27,15 @@ function useWebSocket() {
     });
 
     ws.current.addEventListener('message', (event: MessageEvent) => {
-      // TODO
-      setMessages((prev) => [...prev, event.data]);
+      const data = JSON.parse(event.data);
+      if (data.type === 'message') setMessageHistory((prev) => [...prev, data]);
     });
   };
 
   const sendMessage = (msg: string) => {
+    // TODO
     ws.current?.send(msg);
-    setMessages((prev) => [...prev, msg]);
+    setMessageHistory((prev) => [...prev, msg]);
   };
 
   const sendLogin = (username: string) => {
@@ -42,7 +43,7 @@ function useWebSocket() {
     connect(import.meta.env.VITE_WS_URL, username);
   };
 
-  return { messages, sendMessage, sendLogin };
+  return { messageHistory, sendMessage, sendLogin };
 }
 
 export default useWebSocket;
