@@ -25,6 +25,20 @@ async def sendMessage(sender, receiver, message):
 	await CONNECTIONS[receiver].send(json.dumps(jsonMessage))
 	HISTORY[chat_key] = jsonMessage
 
+async def sendUserList(websocket):
+	jsonMessage = {
+		"type": "user_list",
+		"users": list(CONNECTIONS.keys())
+	}
+	await websocket.send(json.dumps(jsonMessage))
+
+async def broadcast(messageType, username):
+	jsonMessage = {
+		"type": messageType,
+		"username": username
+	}
+	websockets.broadcast(CONNECTIONS.values(), json.dumps(jsonMessage))
+
 # returns username on correct login
 async def login(websocket):
 	raw = await websocket.recv()
@@ -41,6 +55,9 @@ async def login(websocket):
 		await websocket.close(code=4001, reason="Username already taken")
 		return ""
 	
+	await sendUserList(websocket)
+	await broadcast("user_login", username)
+
 	CONNECTIONS[username] = websocket
 	print(f"[LOGIN] {username} connected")
 	return username
@@ -52,6 +69,7 @@ async def message_loop(websocket, username):
 			try:
 				data = json.loads(message)
 				assert all(key in data for key in ("type", "from", "to", "message"))
+				# TODO broadcast message if "to" isn't specified
 			except (json.JSONDecodeError, AssertionError):
 				await sendError(websocket, "Invalid message format")
 				continue
@@ -75,6 +93,7 @@ async def message_loop(websocket, username):
 	finally:
 		print(f"[DISCONNECTED] {username} removed from active list")
 		del CONNECTIONS[username]
+		await broadcast("user_logoff", username)
 
 async def handle(websocket):
 	username = await login(websocket)
