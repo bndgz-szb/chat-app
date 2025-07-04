@@ -32,10 +32,18 @@ async def sendUserList(websocket):
 	}
 	await websocket.send(json.dumps(jsonMessage))
 
-async def broadcast(messageType, username):
+def broadcastConnectionsState(messageType, username):
 	jsonMessage = {
 		"type": messageType,
 		"username": username
+	}
+	websockets.broadcast(CONNECTIONS.values(), json.dumps(jsonMessage))
+
+def broadcastMessage(sender, message):
+	jsonMessage = {
+		"type": "broadcast",
+		"from": sender,
+		"message": message
 	}
 	websockets.broadcast(CONNECTIONS.values(), json.dumps(jsonMessage))
 
@@ -56,7 +64,7 @@ async def login(websocket):
 		return ""
 	
 	await sendUserList(websocket)
-	await broadcast("user_login", username)
+	broadcastConnectionsState("user_login", username)
 
 	CONNECTIONS[username] = websocket
 	print(f"[LOGIN] {username} connected")
@@ -69,13 +77,17 @@ async def message_loop(websocket, username):
 			try:
 				data = json.loads(message)
 				assert all(key in data for key in ("type", "from", "to", "message"))
-				# TODO broadcast message if "to" isn't specified
 			except (json.JSONDecodeError, AssertionError):
 				await sendError(websocket, "Invalid message format")
 				continue
 
 			sender = data["from"]
 			receiver = data["to"]
+			message = data["message"]
+
+			if receiver == "":
+				broadcastMessage(sender, message)
+				continue
 
 			if websocket != CONNECTIONS[sender]: # check sender address
 				await websocket.close(code=4002, reason="Can't send messages in someone else's name")
@@ -85,7 +97,7 @@ async def message_loop(websocket, username):
 
 			else: # send message to receiver, save to history
 				try:
-					await sendMessage(sender, receiver, data["message"])
+					await sendMessage(sender, receiver, message)
 				except:
 					await sendError(websocket, "User disconnected before receiving the message")
 	except:
@@ -93,7 +105,7 @@ async def message_loop(websocket, username):
 	finally:
 		print(f"[DISCONNECTED] {username} removed from active list")
 		del CONNECTIONS[username]
-		await broadcast("user_logoff", username)
+		broadcastConnectionsState("user_logoff", username)
 
 async def handle(websocket):
 	username = await login(websocket)
