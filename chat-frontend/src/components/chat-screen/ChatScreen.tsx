@@ -31,8 +31,11 @@ function ChatScreen({ receiver }: Props) {
         {messageHistory
           .filter((messageJsonString) => {
             const message = JSON.parse(messageJsonString);
-            // TODO different filter for broadcast
-            return (message.from === username && message.to === receiver) || (message.from === receiver && message.to === username)
+            return (
+              (message.type === 'broadcast' && receiver === '') ||
+              (message.from === username && message.to === receiver) ||
+              (message.from === receiver && message.to === username)
+            );
           })
           .map((messageJsonString, i) => {
             const message = JSON.parse(messageJsonString);

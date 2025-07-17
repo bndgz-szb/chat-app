@@ -13,7 +13,7 @@ function SideBar({ selectChat, selectedChat }: Props) {
   return (
     <div className="w-1/5 bg-gray-800 outline-1 outline-solid outline-gray-900 overflow-y-scroll p-4">
       <UserChat
-        key=""
+        key="broadcast"
         name=""
         onClick={selectChat}
         selected={'' === selectedChat}

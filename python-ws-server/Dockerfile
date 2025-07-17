@@ -8,5 +8,3 @@ RUN pip install -r requirements.txt
 EXPOSE 8765
 
 CMD ["python", "-u", "server.py"]
-
-COPY server.py .

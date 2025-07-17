@@ -45,7 +45,8 @@ def broadcastMessage(sender, message):
 		"from": sender,
 		"message": message
 	}
-	websockets.broadcast(CONNECTIONS.values(), json.dumps(jsonMessage))
+
+	websockets.broadcast(filter(lambda websocket : websocket != CONNECTIONS[sender], CONNECTIONS.values()), json.dumps(jsonMessage))
 
 # returns username on correct login
 async def login(websocket):
@@ -58,6 +59,7 @@ async def login(websocket):
 		await websocket.close(code=4000, reason="Login required")
 		return ""
 
+	# TODO ban empty username
 	username = data["username"]
 	if username in CONNECTIONS.keys():
 		await websocket.close(code=4001, reason="Username already taken")
