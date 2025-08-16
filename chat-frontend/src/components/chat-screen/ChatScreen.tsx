@@ -1,6 +1,7 @@
 import Message from '@/components/chat-screen/Message';
 import { ChatContext } from '@/contexts/ChatContext';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
+import type { ChatMessage } from '@/resources/ServerMessages';
 import { useContext, useState } from 'react';
 
 type Props = {
@@ -30,15 +31,20 @@ function ChatScreen({ receiver }: Props) {
       <div className="flex flex-col gap-4 overflow-y-scroll p-8 mb-13">
         {messageHistory
           .filter((messageJsonString) => {
-            const message = JSON.parse(messageJsonString);
-            return (
-              (message.type === 'broadcast' && receiver === '') ||
-              (message.from === username && message.to === receiver) ||
-              (message.from === receiver && message.to === username)
-            );
+            const message: ChatMessage = JSON.parse(messageJsonString);
+
+            switch (message.type) {
+              case 'broadcast':
+                return receiver === '';
+              case 'message':
+                return (
+                  (message.from === username && message.to === receiver) ||
+                  (message.from === receiver && message.to === username)
+                );
+            }
           })
           .map((messageJsonString, i) => {
-            const message = JSON.parse(messageJsonString);
+            const message: ChatMessage = JSON.parse(messageJsonString);
             return (
               <Message
                 key={i}
