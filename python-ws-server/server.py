@@ -1,6 +1,7 @@
 import json
 import asyncio
 import websockets
+import signal
 
 CONNECTIONS = dict()
 HISTORY = dict()
