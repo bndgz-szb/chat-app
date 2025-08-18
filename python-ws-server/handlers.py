@@ -70,23 +70,21 @@ async def message_loop(websocket, username):
 				await sendError(websocket, "Invalid message format")
 				continue
 
-			sender = data["sender"]
-			receiver = data["target"]
-			message = data["message"]
+			parsed = UnicastMessage(**data)
 
-			if receiver == "":
-				broadcastMessage(sender, message)
+			if parsed.target == "":
+				broadcastMessage(parsed.sender, parsed.message)
 				continue
 
-			if websocket != CONNECTIONS[sender]: # check sender address
+			if websocket != CONNECTIONS[parsed.sender]: # check sender address
 				await websocket.close(code=4002, reason="Can't send messages in someone else's name")
 
-			elif receiver not in CONNECTIONS.keys(): # check if receiver is online
+			elif parsed.target not in CONNECTIONS.keys(): # check if receiver is online
 				await sendError(websocket, "User currently offline")
 
 			else: # send message to receiver, save to history
 				try:
-					await sendMessage(sender, receiver, message)
+					await sendMessage(parsed.sender, parsed.target, parsed.message)
 				except:
 					await sendError(websocket, "User disconnected before receiving the message")
 	except:
