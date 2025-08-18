@@ -1,6 +1,10 @@
 import { ChatContext } from '@/contexts/ChatContext';
 import type { WebSocketContextInterface } from '@/contexts/WebSocketContext';
-import type { ServerToClientMessage } from '@/resources/ServerMessages';
+import type {
+	LoginMessage,
+	ServerToClientMessage,
+	UnicastMessage,
+} from '@/resources/ServerMessages';
 import { useContext, useRef } from 'react';
 
 function useWebSocket(): WebSocketContextInterface {
@@ -29,7 +33,9 @@ function useWebSocket(): WebSocketContextInterface {
 
 		ws.current.addEventListener('open', () => {
 			if (socketId !== currentSocketId.current) return;
-			ws.current!.send(JSON.stringify({ msg_type: 'login', username }));
+
+			const login_msg: LoginMessage = { msg_type: 'login', username };
+			ws.current!.send(JSON.stringify(login_msg));
 			setUsername(username);
 			onSuccess();
 		});
@@ -65,14 +71,15 @@ function useWebSocket(): WebSocketContextInterface {
 	};
 
 	const sendMessage = (messageContent: string, target: string) => {
-		const message = JSON.stringify({
+		const message: UnicastMessage = {
 			msg_type: 'message',
 			sender: username,
 			target,
 			message: messageContent,
-		});
-		ws.current?.send(message);
-		setMessageHistory((prev) => [...prev, message]);
+		};
+		const jsonMessage = JSON.stringify(message);
+		ws.current?.send(jsonMessage);
+		setMessageHistory((prev) => [...prev, jsonMessage]);
 	};
 
 	const sendLogin = (username: string, onSuccess: () => void) => {

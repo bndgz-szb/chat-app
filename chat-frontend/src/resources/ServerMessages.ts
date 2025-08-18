@@ -1,47 +1,52 @@
 interface BaseMessage {
-  msg_type: string;
-  message: string;
+	msg_type: string;
+	message: string;
 }
 
 interface UserPresenceMessage {
-  msg_type: string;
-  username: string;
+	msg_type: string;
+	username: string;
 }
 
 export interface UnicastMessage extends BaseMessage {
-  msg_type: 'message';
-  sender: string;
-  target: string;
+	msg_type: 'message';
+	sender: string;
+	target: string;
 }
 
 export interface BroadcastMessage extends BaseMessage {
-  msg_type: 'broadcast';
-  sender: string;
+	msg_type: 'broadcast';
+	sender: string;
 }
 
 export interface ErrorMessage extends BaseMessage {
-  msg_type: 'error';
+	msg_type: 'error';
 }
 
 export interface UserListMessage {
-  msg_type: 'user_list';
-  users: string[];
+	msg_type: 'user_list';
+	users: string[];
 }
 
 export interface UserLoginMessage extends UserPresenceMessage {
-  msg_type: 'user_login';
+	msg_type: 'user_login';
 }
 
 export interface UserLogoutMessage extends UserPresenceMessage {
-  msg_type: 'user_logout';
+	msg_type: 'user_logout';
+}
+
+export interface LoginMessage {
+	msg_type: 'login';
+	username: string;
 }
 
 export type ServerToClientMessage =
-  | UnicastMessage
-  | BroadcastMessage
-  | ErrorMessage
-  | UserListMessage
-  | UserLoginMessage
-  | UserLogoutMessage;
+	| UnicastMessage
+	| BroadcastMessage
+	| ErrorMessage
+	| UserListMessage
+	| UserLoginMessage
+	| UserLogoutMessage;
 
 export type ChatMessage = UnicastMessage | BroadcastMessage;
