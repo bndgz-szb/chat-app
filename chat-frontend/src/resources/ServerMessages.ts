@@ -1,39 +1,39 @@
 interface BaseMessage {
-  type: string;
+  msg_type: string;
   message: string;
 }
 
 interface UserPresenceMessage {
-  type: string;
+  msg_type: string;
   username: string;
 }
 
 export interface UnicastMessage extends BaseMessage {
-  type: 'message';
-  from: string;
-  to: string;
+  msg_type: 'message';
+  sender: string;
+  target: string;
 }
 
 export interface BroadcastMessage extends BaseMessage {
-  type: 'broadcast';
-  from: string;
+  msg_type: 'broadcast';
+  sender: string;
 }
 
 export interface ErrorMessage extends BaseMessage {
-  type: 'error';
+  msg_type: 'error';
 }
 
 export interface UserListMessage {
-  type: 'user_list';
+  msg_type: 'user_list';
   users: string[];
 }
 
 export interface UserLoginMessage extends UserPresenceMessage {
-  type: 'user_login';
+  msg_type: 'user_login';
 }
 
 export interface UserLogoutMessage extends UserPresenceMessage {
-  type: 'user_logout';
+  msg_type: 'user_logout';
 }
 
 export type ServerToClientMessage =

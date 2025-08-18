@@ -23,13 +23,13 @@ function ChatScreen({ receiver }: Props) {
 	const filterMessageHistory = (messageJson: string): boolean => {
 		const message: ChatMessage = JSON.parse(messageJson);
 
-		switch (message.type) {
+		switch (message.msg_type) {
 			case 'broadcast':
 				return receiver === '';
 			case 'message':
 				return (
-					(message.from === username && message.to === receiver) ||
-					(message.from === receiver && message.to === username)
+					(message.sender === username && message.target === receiver) ||
+					(message.sender === receiver && message.target === username)
 				);
 		}
 	};
@@ -53,7 +53,7 @@ function ChatScreen({ receiver }: Props) {
 							<Message
 								key={i} // TODO have some kind of id as key, not array index
 								message={message.message}
-								mine={username === message.from}
+								mine={username === message.sender}
 							/>
 						);
 					})}

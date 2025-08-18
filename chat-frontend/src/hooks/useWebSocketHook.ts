@@ -29,7 +29,7 @@ function useWebSocket(): WebSocketContextInterface {
 
 		ws.current.addEventListener('open', () => {
 			if (socketId !== currentSocketId.current) return;
-			ws.current!.send(JSON.stringify({ type: 'login', username }));
+			ws.current!.send(JSON.stringify({ msg_type: 'login', username }));
 			setUsername(username);
 			onSuccess();
 		});
@@ -41,7 +41,7 @@ function useWebSocket(): WebSocketContextInterface {
 				throw new Error(`Didn't expect to get here: ${JSON.stringify(x)}`);
 			}
 
-			switch (parsed.type) {
+			switch (parsed.msg_type) {
 				case 'message':
 				case 'broadcast':
 					setMessageHistory((prev) => [...prev, event.data]);
@@ -64,11 +64,11 @@ function useWebSocket(): WebSocketContextInterface {
 		});
 	};
 
-	const sendMessage = (messageContent: string, to: string) => {
+	const sendMessage = (messageContent: string, target: string) => {
 		const message = JSON.stringify({
-			type: 'message',
-			from: username,
-			to,
+			msg_type: 'message',
+			sender: username,
+			target,
 			message: messageContent,
 		});
 		ws.current?.send(message);
