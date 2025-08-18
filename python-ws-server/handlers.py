@@ -28,7 +28,7 @@ async def sendUserList(websocket):
 	await websocket.send(json.dumps(msg.__dict__))
 
 def broadcastConnectionsState(messageType, username):
-	msg = UserLoginMessage(msg_type="user_login", username=username)
+	msg = UserLoginMessage(msg_type=messageType, username=username)
 	websockets.broadcast(CONNECTIONS.values(), json.dumps(msg.__dict__))
 
 def broadcastMessage(sender, message):
