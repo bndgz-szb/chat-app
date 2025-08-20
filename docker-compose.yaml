@@ -9,6 +9,8 @@ services:
       - "8765:8765"
     volumes:
       - "./python-ws-server:/app"
+    depends_on:
+      - db
 
   frontend:
     container_name: chat-frontend
@@ -18,3 +20,27 @@ services:
       - "3000:5173"
     volumes:
       - "./chat-frontend:/app"
+    depends_on:
+      - backend
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: chatuser
+      POSTGRES_PASSWORD: chatpass
+      POSTGRES_DB: chatapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
