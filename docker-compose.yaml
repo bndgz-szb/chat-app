@@ -5,6 +5,8 @@ services:
     container_name: chat-backend
     build:
       context: ./python-ws-server
+    environment:
+      DB_URL: postgresql+psycopg://chatuser:chatpass@db:5432/chatapp
     ports:
       - "8765:8765"
     volumes:
