@@ -14,7 +14,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
-from chatapp.models import Base
+from chatapp.db.models import Base
 
 # set target_metadata for 'autogenerate'
 target_metadata = Base.metadata

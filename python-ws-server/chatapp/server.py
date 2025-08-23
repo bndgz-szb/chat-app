@@ -1,9 +1,8 @@
 import websockets
 
-from handlers import login
+from services.auth import login
 from handlers import message_loop
-from global_variables import CONNECTIONS
-from global_variables import SHUTDOWN
+from global_variables import CONNECTIONS, SHUTDOWN
 
 async def handle(websocket):
 	username = await login(websocket)
