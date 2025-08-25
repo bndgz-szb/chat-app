@@ -2,7 +2,7 @@ import asyncio
 import signal
 import websockets
 
-from handlers import handle
+from handlers import handle_auth
 from global_variables import CONNECTIONS, SHUTDOWN
 
 def shutdown():
@@ -10,7 +10,7 @@ def shutdown():
   SHUTDOWN.set()
 
 async def main():
-	async with websockets.serve(handle, "0.0.0.0", 8765) as server:
+	async with websockets.serve(handle_auth, "0.0.0.0", 8765) as server:
 		print("WebSocket server started.")
 		await SHUTDOWN.wait()
 		print("Shutdown signal received, closing connections...")
