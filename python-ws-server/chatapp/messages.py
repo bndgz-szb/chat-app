@@ -38,3 +38,13 @@ class UserLoginMessage(UserPresenceMessage):
 @dataclass
 class UserLogoutMessage(UserPresenceMessage):
 	msg_type: Literal["user_logout"]
+
+@dataclass
+class LoginAttempt(UserPresenceMessage):
+	msg_type: Literal["login"]
+	password: str
+
+@dataclass
+class RegisterAttempt(UserPresenceMessage):
+	msg_type: Literal["register"]
+	password: str
