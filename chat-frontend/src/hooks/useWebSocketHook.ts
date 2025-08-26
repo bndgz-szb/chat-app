@@ -19,7 +19,12 @@ function useWebSocket(): WebSocketContextInterface {
 		setOnlineUsers,
 	} = useContext(ChatContext);
 
-	const connect = (url: string, username: string, onSuccess: () => void) => {
+	const connect = (
+		url: string,
+		username: string,
+		password: string,
+		onSuccess: () => void
+	) => {
 		const socketId = ++currentSocketId.current;
 		ws.current = new WebSocket(url);
 
@@ -34,7 +39,8 @@ function useWebSocket(): WebSocketContextInterface {
 		ws.current.addEventListener('open', () => {
 			if (socketId !== currentSocketId.current) return;
 
-			const login_msg: LoginMessage = { msg_type: 'login', username };
+			// TODO hash password
+			const login_msg: LoginMessage = { msg_type: 'login', username, password };
 			ws.current!.send(JSON.stringify(login_msg));
 			setUsername(username);
 			onSuccess();
@@ -82,9 +88,13 @@ function useWebSocket(): WebSocketContextInterface {
 		setMessageHistory((prev) => [...prev, jsonMessage]);
 	};
 
-	const sendLogin = (username: string, onSuccess: () => void) => {
+	const sendLogin = (
+		username: string,
+		password: string,
+		onSuccess: () => void
+	) => {
 		ws.current?.close();
-		connect(import.meta.env.VITE_WS_URL, username, onSuccess);
+		connect(import.meta.env.VITE_WS_URL, username, password, onSuccess);
 	};
 
 	return { messageHistory, sendMessage, sendLogin };
