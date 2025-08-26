@@ -36,9 +36,14 @@ export interface UserLogoutMessage extends UserPresenceMessage {
 	msg_type: 'user_logout';
 }
 
-export interface LoginMessage {
+export interface LoginMessage extends UserPresenceMessage {
 	msg_type: 'login';
-	username: string;
+	password: string;
+}
+
+export interface RegisterMessage extends UserPresenceMessage {
+	msg_type: 'regiser';
+	password: string;
 }
 
 export type ServerToClientMessage =
