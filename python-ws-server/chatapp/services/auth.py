@@ -46,6 +46,18 @@ async def register(register_attempt: RegisterAttempt) -> Response:
 		}
 
 async def login(login_attempt: LoginAttempt) -> Response:
-	# check credentials
-	# query user chats
+	with SessionLocal() as session:
+		user = get_user_by_username(session, login_attempt.username)
+		if user.password == login_attempt.password:
+			chats = get_chats_for_user(session, user.id)
+			return {
+				"status": "ok",
+				"username": user.username,
+				"chats": chats
+			}
+		else:
+			return {
+				"status": "error",
+				"error": "Wrong username or password"
+			}
 	pass
