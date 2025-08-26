@@ -2,7 +2,7 @@ import InputField from '@/components/auth/InputField';
 import { ChatContext } from '@/contexts/ChatContext';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
 import { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
 	const [inputUsername, setInputUsername] = useState<string>('');
@@ -11,15 +11,15 @@ function Login() {
 	const { sendLogin } = useContext(WebSocketContext);
 	const navigate = useNavigate();
 
+	useEffect(() => {
+		if (username !== '') navigate('/', { replace: true });
+	}, [username, navigate]);
+
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		sendLogin(inputUsername, inputPassword, () => navigate('/'));
 	};
-
-	useEffect(() => {
-		if (username !== '') navigate('/', { replace: true });
-	}, [username, navigate]);
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 flex-col">
@@ -39,7 +39,7 @@ function Login() {
 						type={'password'}
 						name={'password'}
 						label={'Password'}
-						placeholder={'sTrongPassw0rd'}
+						placeholder={'********'}
 						value={inputPassword}
 						onChange={setInputPassword}
 					/>
@@ -49,6 +49,10 @@ function Login() {
 					</button>
 				</form>
 			</div>
+
+			<Link to={'/register'} className="mt-1 text-center">
+				Sign up
+			</Link>
 		</div>
 	);
 }

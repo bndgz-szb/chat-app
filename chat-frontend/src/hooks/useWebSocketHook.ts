@@ -1,7 +1,9 @@
 import { ChatContext } from '@/contexts/ChatContext';
 import type { WebSocketContextInterface } from '@/contexts/WebSocketContext';
 import type {
+	AuthMessage,
 	LoginMessage,
+	RegisterMessage,
 	ServerToClientMessage,
 	UnicastMessage,
 } from '@/resources/ServerMessages';
@@ -21,8 +23,7 @@ function useWebSocket(): WebSocketContextInterface {
 
 	const connect = (
 		url: string,
-		username: string,
-		password: string,
+		authMessage: AuthMessage,
 		onSuccess: () => void
 	) => {
 		const socketId = ++currentSocketId.current;
@@ -39,10 +40,8 @@ function useWebSocket(): WebSocketContextInterface {
 		ws.current.addEventListener('open', () => {
 			if (socketId !== currentSocketId.current) return;
 
-			// TODO hash password
-			const login_msg: LoginMessage = { msg_type: 'login', username, password };
-			ws.current!.send(JSON.stringify(login_msg));
-			setUsername(username);
+			ws.current!.send(JSON.stringify(authMessage));
+			setUsername(authMessage.username);
 			onSuccess();
 		});
 
@@ -94,10 +93,31 @@ function useWebSocket(): WebSocketContextInterface {
 		onSuccess: () => void
 	) => {
 		ws.current?.close();
-		connect(import.meta.env.VITE_WS_URL, username, password, onSuccess);
+		// TODO hash password
+		const login_msg: LoginMessage = {
+			msg_type: 'login',
+			username,
+			password,
+		};
+		connect(import.meta.env.VITE_WS_URL, login_msg, onSuccess);
 	};
 
-	return { messageHistory, sendMessage, sendLogin };
+	const sendRegister = (
+		username: string,
+		password: string,
+		onSuccess: () => void
+	) => {
+		ws.current?.close();
+		// TODO hash password
+		const register_msg: RegisterMessage = {
+			msg_type: 'register',
+			username,
+			password,
+		};
+		connect(import.meta.env.VITE_WS_URL, register_msg, onSuccess);
+	};
+
+	return { messageHistory, sendMessage, sendLogin, sendRegister };
 }
 
 export default useWebSocket;

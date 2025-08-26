@@ -8,6 +8,11 @@ export interface WebSocketContextInterface {
 		password: string,
 		onSuccess: () => void
 	) => void;
+	sendRegister: (
+		username: string,
+		password: string,
+		onSuccess: () => void
+	) => void;
 }
 
 export const WebSocketContext = createContext<WebSocketContextInterface>({
@@ -16,6 +21,9 @@ export const WebSocketContext = createContext<WebSocketContextInterface>({
 		throw new Error('Function not implemented.');
 	},
 	sendLogin: function (): void {
+		throw new Error('Function not implemented.');
+	},
+	sendRegister: function (): void {
 		throw new Error('Function not implemented.');
 	},
 });

@@ -42,7 +42,7 @@ export interface LoginMessage extends UserPresenceMessage {
 }
 
 export interface RegisterMessage extends UserPresenceMessage {
-	msg_type: 'regiser';
+	msg_type: 'register';
 	password: string;
 }
 
@@ -55,3 +55,5 @@ export type ServerToClientMessage =
 	| UserLogoutMessage;
 
 export type ChatMessage = UnicastMessage | BroadcastMessage;
+
+export type AuthMessage = LoginMessage | RegisterMessage;
