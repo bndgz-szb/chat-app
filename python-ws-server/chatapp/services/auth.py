@@ -48,7 +48,7 @@ async def register(register_attempt: RegisterAttempt) -> Response:
 async def login(login_attempt: LoginAttempt) -> Response:
 	with SessionLocal() as session:
 		user = get_user_by_username(session, login_attempt.username)
-		if user.password == login_attempt.password:
+		if not user is None and user.password == login_attempt.password:
 			chats = get_chats_for_user(session, user.id)
 			return {
 				"status": "ok",
