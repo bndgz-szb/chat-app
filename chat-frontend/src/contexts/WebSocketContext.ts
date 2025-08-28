@@ -6,12 +6,14 @@ export interface WebSocketContextInterface {
 	sendLogin: (
 		username: string,
 		password: string,
-		onSuccess: () => void
+		onSuccess: () => void,
+		onError: (error: string) => void
 	) => void;
 	sendRegister: (
 		username: string,
 		password: string,
-		onSuccess: () => void
+		onSuccess: () => void,
+		onError: (error: string) => void
 	) => void;
 }
 

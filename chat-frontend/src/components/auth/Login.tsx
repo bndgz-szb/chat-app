@@ -1,3 +1,4 @@
+import ErrorDiv from '@/components/auth/ErrorDiv';
 import InputField from '@/components/auth/InputField';
 import { ChatContext } from '@/contexts/ChatContext';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
@@ -7,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 function Login() {
 	const [inputUsername, setInputUsername] = useState<string>('');
 	const [inputPassword, setInputPassword] = useState<string>('');
+	const [serverError, setServerError] = useState<string>('');
 	const { username } = useContext(ChatContext);
 	const { sendLogin } = useContext(WebSocketContext);
 	const navigate = useNavigate();
@@ -18,13 +20,20 @@ function Login() {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		sendLogin(inputUsername, inputPassword, () => navigate('/'));
+		sendLogin(
+			inputUsername,
+			inputPassword,
+			() => navigate('/'),
+			(error) => setServerError(error)
+		);
 	};
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 flex-col">
 			<div className="bg-gray-800/60 rounded-lg border border-white/20 p-10 w-full max-w-md text-white">
 				<h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+
+				{serverError && <ErrorDiv error={serverError} />}
 
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<InputField

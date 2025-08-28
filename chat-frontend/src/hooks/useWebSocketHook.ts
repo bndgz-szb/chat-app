@@ -24,7 +24,8 @@ function useWebSocket(): WebSocketContextInterface {
 	const connect = (
 		url: string,
 		authMessage: AuthMessage,
-		onSuccess: () => void
+		onSuccess: () => void,
+		onError: (error: string) => void
 	) => {
 		const socketId = ++currentSocketId.current;
 		ws.current = new WebSocket(url);
@@ -41,8 +42,6 @@ function useWebSocket(): WebSocketContextInterface {
 			if (socketId !== currentSocketId.current) return;
 
 			ws.current!.send(JSON.stringify(authMessage));
-			setUsername(authMessage.username);
-			onSuccess();
 		});
 
 		ws.current.addEventListener('message', (event: MessageEvent) => {
@@ -59,6 +58,8 @@ function useWebSocket(): WebSocketContextInterface {
 					break;
 				case 'user_list':
 					setOnlineUsers(() => parsed.users);
+					setUsername(authMessage.username);
+					onSuccess();
 					break;
 				case 'user_login':
 					setOnlineUsers((prev) => [...prev, parsed.username]);
@@ -68,6 +69,7 @@ function useWebSocket(): WebSocketContextInterface {
 					break;
 				case 'error':
 					console.error(`error: ${parsed.message}`);
+					onError(parsed.message);
 					break;
 				default:
 					return assertUnreachable(parsed);
@@ -90,7 +92,8 @@ function useWebSocket(): WebSocketContextInterface {
 	const sendLogin = (
 		username: string,
 		password: string,
-		onSuccess: () => void
+		onSuccess: () => void,
+		onError: (error: string) => void
 	) => {
 		ws.current?.close();
 		// TODO hash password
@@ -99,13 +102,14 @@ function useWebSocket(): WebSocketContextInterface {
 			username,
 			password,
 		};
-		connect(import.meta.env.VITE_WS_URL, login_msg, onSuccess);
+		connect(import.meta.env.VITE_WS_URL, login_msg, onSuccess, onError);
 	};
 
 	const sendRegister = (
 		username: string,
 		password: string,
-		onSuccess: () => void
+		onSuccess: () => void,
+		onError: (error: string) => void
 	) => {
 		ws.current?.close();
 		// TODO hash password
@@ -114,7 +118,7 @@ function useWebSocket(): WebSocketContextInterface {
 			username,
 			password,
 		};
-		connect(import.meta.env.VITE_WS_URL, register_msg, onSuccess);
+		connect(import.meta.env.VITE_WS_URL, register_msg, onSuccess, onError);
 	};
 
 	return { messageHistory, sendMessage, sendLogin, sendRegister };
