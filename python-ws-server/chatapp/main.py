@@ -2,8 +2,8 @@ import asyncio
 import signal
 import websockets
 
-from handlers import handle_auth
-from global_variables import CONNECTIONS, SHUTDOWN
+from chatapp.handlers import handle_auth
+from chatapp.global_variables import CONNECTIONS, SHUTDOWN
 
 def shutdown():
   print("Setting shutdown event")

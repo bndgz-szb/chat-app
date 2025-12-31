@@ -1,7 +1,7 @@
 import json
 
-from global_variables import CONNECTIONS, HISTORY
-from messages import UnicastMessage
+from chatapp.global_variables import CONNECTIONS, HISTORY
+from chatapp.messages import UnicastMessage
 
 async def chat_key(a, b):
 	return tuple(sorted([a, b]))

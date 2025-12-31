@@ -1,11 +1,11 @@
 import json
 import websockets
 
-from dataclasses import fields, is_dataclass
-from global_variables import CONNECTIONS
-from messages import *
-from services.auth import broadcastConnectionsState, login, register
 from typing import Type, TypeVar
+from dataclasses import fields, is_dataclass
+from chatapp.global_variables import CONNECTIONS
+from chatapp.messages import *
+from chatapp.services.auth import broadcastConnectionsState, login, register
 
 T = TypeVar("T")
 
