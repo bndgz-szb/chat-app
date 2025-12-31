@@ -14,7 +14,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
-from chatapp.db.models import Base
+from chatapp.db.db import Base
+from chatapp.db.models import *
 
 # set target_metadata for 'autogenerate'
 target_metadata = Base.metadata
@@ -26,7 +27,10 @@ target_metadata = Base.metadata
 
 # get DB URL
 def get_url() -> str:
-    return os.getenv("DB_URL")
+    db_url = os.getenv("DB_URL")
+    if db_url is None:
+        raise Exception("Could not find database url in environment variable DB_URL")
+    return db_url
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
