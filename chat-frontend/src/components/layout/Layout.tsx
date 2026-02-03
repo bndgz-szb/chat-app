@@ -1,16 +1,16 @@
-import ChatScreen from '@/components/chat-screen/ChatScreen';
-import SideBar from '@/components/sidebar/SideBar';
-import { useState } from 'react';
+import Header from '@/components/layout/Header';
 
-function Layout() {
-  const [receiver, setReceiver] = useState<string>('');
+type Props = {
+	children: React.ReactNode;
+};
 
-  return (
-    <div className="flex h-full w-full justify-between gap-1">
-      <SideBar selectChat={setReceiver} selectedChat={receiver} />
-      <ChatScreen receiver={receiver} />
-    </div>
-  );
+function Layout(props: Props) {
+	return (
+		<div className="flex flex-col h-full">
+			<Header />
+			{props.children}
+		</div>
+	);
 }
 
 export default Layout;

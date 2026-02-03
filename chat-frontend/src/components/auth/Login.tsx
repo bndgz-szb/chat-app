@@ -29,7 +29,7 @@ function Login() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 flex-col">
+		<div className="grow flex items-center justify-center p-4 flex-col">
 			<div className="bg-gray-800/60 rounded-lg border border-white/20 p-10 w-full max-w-md text-white">
 				<h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
