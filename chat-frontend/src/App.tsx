@@ -6,6 +6,7 @@ import ChatScreen from '@/components/chat-screen/ChatScreen';
 import SideBar from '@/components/sidebar/SideBar';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useState } from 'react';
+import Dashboard from '@/components/dashboard/Dashboard';
 
 function App() {
 	const [receiver, setReceiver] = useState<string>('');
@@ -24,6 +25,7 @@ function App() {
 							</RequireLogin>
 						}
 					/>
+					<Route path="/dashboard" element={<Dashboard />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
 				</Routes>
