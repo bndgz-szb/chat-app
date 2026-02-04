@@ -8,6 +8,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useState } from 'react';
 import Dashboard from '@/components/dashboard/Dashboard';
 import Topics from '@/components/dashboard/Topics';
+import TaskForm from '@/components/dashboard/TaskForm';
 
 function App() {
 	const [receiver, setReceiver] = useState<string>('');
@@ -30,6 +31,7 @@ function App() {
 					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/dashboard/topics" element={<Topics />} />
+					<Route path="/dashboard/create_task" element={<TaskForm />} />
 				</Routes>
 			</BrowserRouter>
 		</Layout>

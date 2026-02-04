@@ -11,7 +11,13 @@ function ButtonRow() {
 			>
 				Tematikák kezelése
 			</Link>
-			<div className="rounded-md p-4 bg-gray-900">Feladat létrehozása</div>
+			<Link
+				style={{ color: 'white' }}
+				to={'/dashboard/create_task'}
+				className="rounded-md p-4 bg-gray-900"
+			>
+				Feladat létrehozása
+			</Link>
 		</div>
 	);
 }
