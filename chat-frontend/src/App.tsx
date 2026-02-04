@@ -7,6 +7,7 @@ import SideBar from '@/components/sidebar/SideBar';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useState } from 'react';
 import Dashboard from '@/components/dashboard/Dashboard';
+import Topics from '@/components/dashboard/Topics';
 
 function App() {
 	const [receiver, setReceiver] = useState<string>('');
@@ -28,6 +29,7 @@ function App() {
 					<Route path="/dashboard" element={<Dashboard />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
+					<Route path="/dashboard/topics" element={<Topics />} />
 				</Routes>
 			</BrowserRouter>
 		</Layout>
