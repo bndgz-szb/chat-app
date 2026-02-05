@@ -14,6 +14,19 @@ services:
     depends_on:
       - db
 
+  backend-api:
+    container_name: api
+    build:
+      context: ./backend/python_api
+    environment:
+      DB_URL: postgresql+psycopg://chatuser:chatpass@db:5432/chatapp
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./backend/python_api:/app"
+    depends_on:
+      - db
+
   frontend:
     container_name: frontend
     build:
@@ -24,6 +37,7 @@ services:
       - "./frontend:/app"
     depends_on:
       - backend-ws
+      - backend-api
 
   adminer:
     container_name: adminer
