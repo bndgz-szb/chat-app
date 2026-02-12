@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8765
 
-CMD ["python", "-u", "-m", "chatapp.main.py"]
+CMD ["python", "-u", "-m", "python_ws_server.chatapp.main.py"]

@@ -2,11 +2,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from typing import List
 
-from chatapp.db.models import Chat, ChatParticipant
+from db.models import Chat, ChatParticipant
 
 def get_chats_for_user(session: Session, user_id: int) -> List[str]:
 	stmt = (
-		select(Chat.name)
+		select(Chat.id)
 		.join(ChatParticipant)
 		.where(ChatParticipant.user_id == user_id)
 	)

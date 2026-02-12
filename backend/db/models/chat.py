@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer
 
-from chatapp.db.db import Base, chat_tablename, participant_tablename
+from db.db import Base, chat_tablename, participant_tablename
 
 class Chat(Base):
 	__tablename__ = chat_tablename

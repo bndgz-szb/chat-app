@@ -1,7 +1,7 @@
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import String, ForeignKey, Integer, DateTime, func
 
-from chatapp.db.db import Base, participant_tablename, chat_tablename, user_tablename
+from db.db import Base, participant_tablename, chat_tablename, user_tablename
 
 class ChatParticipant(Base):
 	__tablename__ = participant_tablename

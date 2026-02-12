@@ -1,1 +1,5 @@
 fastapi[standard-no-fastapi-cloud-cli]==0.128.1
+PyJWT==2.11.0
+pwdlib[argon2]==0.3.0
+SQLAlchemy==2.0.43
+psycopg[binary]==3.2.9

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import Integer, ForeignKey
 
-from chatapp.db.db import Base, task_tablename, task_topic_tablename, topic_tablename
+from db.db import Base, task_tablename, task_topic_tablename, topic_tablename
 
 class TaskTopic(Base):
 	__tablename__ = task_topic_tablename

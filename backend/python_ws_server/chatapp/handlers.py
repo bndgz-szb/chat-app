@@ -3,9 +3,9 @@ import websockets
 
 from typing import Type, TypeVar
 from dataclasses import fields, is_dataclass
-from chatapp.global_variables import CONNECTIONS
-from chatapp.messages import *
-from chatapp.services.auth import broadcastConnectionsState, login, register
+from python_ws_server.chatapp.global_variables import CONNECTIONS
+from python_ws_server.chatapp.messages import *
+from python_ws_server.chatapp.services.auth import broadcastConnectionsState, login, register
 
 T = TypeVar("T")
 
