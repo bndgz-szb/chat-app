@@ -10,7 +10,7 @@ class User(Base):
 	id = mapped_column(Integer, primary_key=True)
 	username = mapped_column(String(50), unique=True, nullable=False)
 	email = mapped_column(String(50), unique=True, nullable=False) # validated
-	password = mapped_column(String(50), nullable=False)  # hashed
+	password = mapped_column(String(254), nullable=False)  # hashed
 	admin = mapped_column(Boolean, default=False, nullable=False)
 
 	chats: Mapped[List["Chat"]] = relationship(
