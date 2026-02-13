@@ -1,13 +1,19 @@
 import os
+import jwt
+from typing import Literal
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
-import jwt
 
+from db.models import User
+from db.crud.user import get_user_by_username
+from db.session import SessionLocal
 
 load_dotenv()
 password_hash = PasswordHash.recommended()
+DUMMY_HASH = password_hash.hash("dummypassword")
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
@@ -21,7 +27,7 @@ class Token(BaseModel):
 	token_type: str
 	access_token: str
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
 	to_encode = data.copy()
 	if expires_delta:
 		expire = datetime.now(timezone.utc) + expires_delta
@@ -36,3 +42,13 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
 	return password_hash.hash(password)
+
+def authenticate_user(username: str, password: str) -> User | Literal[False]:
+	with SessionLocal() as session:
+		user = get_user_by_username(session=session, username=username)
+		if not user:
+			password_hash.verify(password, DUMMY_HASH)
+			return False
+		if not password_hash.verify(password, user.password):
+			return False
+		return user

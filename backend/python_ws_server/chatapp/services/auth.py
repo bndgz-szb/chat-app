@@ -5,7 +5,7 @@ from typing import TypedDict, List
 from python_ws_server.chatapp.global_variables import CONNECTIONS
 from python_ws_server.chatapp.messages import UserListMessage, UserLoginMessage, RegisterAttempt, LoginAttempt
 from db.session import SessionLocal
-from db.crud.auth import get_user_by_username, create_user
+from db.crud.user import get_user_by_username, create_user
 from db.crud.chat import get_chats_for_user
 
 class SuccessResponse(TypedDict):
