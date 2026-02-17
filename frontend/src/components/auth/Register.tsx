@@ -1,17 +1,19 @@
 import ErrorDiv from '@/components/auth/ErrorDiv';
 import InputField from '@/components/auth/InputField';
-import { ChatContext } from '@/contexts/ChatContext';
-import { WebSocketContext } from '@/contexts/WebSocketContext';
-import { useContext, useEffect, useState } from 'react';
+import { useRegisterMutation } from '@/state/apiSlice';
+import { selectUser } from '@/state/authSlice';
+import { useAppSelector } from '@/state/hooks';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
 	const [inputUsername, setInputUsername] = useState<string>('');
+	const [inputEmail, setInputEmail] = useState<string>('');
 	const [inputPassword, setInputPassword] = useState<string>('');
 	const [serverError, setServerError] = useState<string>('');
 	const [confirmInputPassword, setConfirmInputPassword] = useState<string>('');
-	const { username } = useContext(ChatContext);
-	const { sendRegister } = useContext(WebSocketContext);
+	const username = useAppSelector(selectUser);
+	const [sendRegister] = useRegisterMutation();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -20,17 +22,31 @@ function Register() {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
-		if (inputPassword === confirmInputPassword) {
-			sendRegister(
-				inputUsername,
-				inputPassword,
-				() => navigate('/'),
-				(error) => setServerError(error)
-			);
-		} else {
+		if (inputPassword !== confirmInputPassword) {
 			setServerError('Passwords have to match!');
+			return;
 		}
+		if (inputUsername === '') {
+			setServerError('Username field is required!');
+			return;
+		}
+		if (inputEmail === '') {
+			setServerError('Email field is required!');
+			return;
+		}
+		if (inputPassword === '') {
+			setServerError('Password field is required!');
+			return;
+		}
+
+		sendRegister({
+			username: inputUsername,
+			email: inputEmail,
+			password: inputPassword,
+		})
+			.unwrap()
+			.then(() => navigate('/login'))
+			.catch((error) => setServerError(error.data?.detail));
 	};
 
 	return (
@@ -48,6 +64,14 @@ function Register() {
 						placeholder={'boti123'}
 						value={inputUsername}
 						onChange={setInputUsername}
+					/>
+					<InputField
+						type={'text'}
+						name={'email'}
+						label={'Email'}
+						placeholder={'boti123@boti.boti'}
+						value={inputEmail}
+						onChange={setInputEmail}
 					/>
 					<InputField
 						type="password"

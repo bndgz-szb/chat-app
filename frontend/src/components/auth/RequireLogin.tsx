@@ -1,14 +1,15 @@
-import { ChatContext } from '@/contexts/ChatContext';
-import { useContext, type ReactNode } from 'react';
+import { selectUser } from '@/state/authSlice';
+import { useAppSelector } from '@/state/hooks';
+import { type ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 
 type Props = {
-  children: ReactNode;
+	children: ReactNode;
 };
 
 function RequireLogin({ children }: Props) {
-  const { username } = useContext(ChatContext);
-  return username === '' ? <Navigate to="/login" replace/> : children;
+	const username = useAppSelector(selectUser);
+	return username === '' ? <Navigate to="/login" replace /> : children;
 }
 
 export default RequireLogin;

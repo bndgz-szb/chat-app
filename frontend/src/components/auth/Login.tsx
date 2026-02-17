@@ -1,19 +1,17 @@
 import ErrorDiv from '@/components/auth/ErrorDiv';
 import InputField from '@/components/auth/InputField';
-import { ChatContext } from '@/contexts/ChatContext';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '@/state/apiSlice';
-import { type FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import type { SerializedError } from '@reduxjs/toolkit';
-import { useAppDispatch } from '@/state/hooks';
-import { login } from '@/state/authSlice';
+import { useAppDispatch, useAppSelector } from '@/state/hooks';
+import { login, selectUser } from '@/state/authSlice';
 
 function Login() {
 	const [inputUsername, setInputUsername] = useState<string>('');
 	const [inputPassword, setInputPassword] = useState<string>('');
-	const { username } = useContext(ChatContext);
-	const [sendLogin, { error }] = useLoginMutation();
+	const [serverError, setServerError] = useState<string>('');
+	const username = useAppSelector(selectUser);
+	const [sendLogin] = useLoginMutation();
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 
@@ -23,12 +21,24 @@ function Login() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const result = await sendLogin({
+		if (inputUsername === '') {
+			setServerError('Username field is required!');
+			return;
+		}
+		if (inputPassword === '') {
+			setServerError('Password field is required!');
+			return;
+		}
+
+		sendLogin({
 			username: inputUsername,
 			password: inputPassword,
-		}).unwrap();
-
-		dispatch(login({ username: inputUsername, token: result.access_token }));
+		})
+			.unwrap()
+			.then((result) =>
+				dispatch(login({ username: inputUsername, token: result.access_token }))
+			)
+			.catch((error) => setServerError(error.data?.detail));
 	};
 
 	return (
@@ -36,15 +46,7 @@ function Login() {
 			<div className="bg-gray-800/60 rounded-lg border border-white/20 p-10 w-full max-w-md text-white">
 				<h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
-				{error && (
-					<ErrorDiv
-						error={
-							(error as FetchBaseQueryError).status !== undefined
-								? JSON.stringify((error as FetchBaseQueryError).data)
-								: (error as SerializedError).message
-						}
-					/>
-				)}
+				{serverError && <ErrorDiv error={serverError} />}
 
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<InputField

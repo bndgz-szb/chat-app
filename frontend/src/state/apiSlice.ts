@@ -16,6 +16,12 @@ type OAuth2PasswordRequestForm = {
 	client_secret?: string;
 };
 
+type RegisterRequest = {
+	username: string;
+	email: string;
+	password: string;
+};
+
 const convertObjectToFormDataString = (obj: Object): string =>
 	Object.entries(obj)
 		.reduce((prev, curr) => {
@@ -36,7 +42,14 @@ export const apiSlice = createApi({
 				body: convertObjectToFormDataString(formData),
 			}),
 		}),
+		register: build.mutation<String, RegisterRequest>({
+			query: (body) => ({
+				url: 'register',
+				method: 'POST',
+				body,
+			}),
+		}),
 	}),
 });
 
-export const { useLoginMutation } = apiSlice;
+export const { useLoginMutation, useRegisterMutation } = apiSlice;
