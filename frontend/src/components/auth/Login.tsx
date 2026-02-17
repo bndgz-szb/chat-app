@@ -3,16 +3,19 @@ import InputField from '@/components/auth/InputField';
 import { ChatContext } from '@/contexts/ChatContext';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLoginMutation } from '@/app/apiSlice';
+import { useLoginMutation } from '@/state/apiSlice';
 import { type FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import type { SerializedError } from '@reduxjs/toolkit';
+import { useAppDispatch } from '@/state/hooks';
+import { login } from '@/state/authSlice';
 
 function Login() {
 	const [inputUsername, setInputUsername] = useState<string>('');
 	const [inputPassword, setInputPassword] = useState<string>('');
 	const { username } = useContext(ChatContext);
-	const [login, { error }] = useLoginMutation();
+	const [sendLogin, { error }] = useLoginMutation();
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		if (username !== '') navigate('/', { replace: true });
@@ -20,12 +23,12 @@ function Login() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const result = await login({
+		const result = await sendLogin({
 			username: inputUsername,
 			password: inputPassword,
 		}).unwrap();
 
-		console.log(result); // TODO save in store
+		dispatch(login({ username: inputUsername, token: result.access_token }));
 	};
 
 	return (

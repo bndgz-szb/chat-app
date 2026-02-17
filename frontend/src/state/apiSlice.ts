@@ -3,20 +3,20 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 const API_BASE_URL = 'http://localhost:8000'; // TODO read from env
 
 type Token = {
-	token_type: String;
-	access_token: String;
+	token_type: string;
+	access_token: string;
 };
 
 type OAuth2PasswordRequestForm = {
-	grant_type?: String;
-	username: String;
-	password: String;
-	scope?: String;
-	client_id?: String;
-	client_secret?: String;
+	grant_type?: string;
+	username: string;
+	password: string;
+	scope?: string;
+	client_id?: string;
+	client_secret?: string;
 };
 
-const convertObjectToFormDataString = (obj: Object): String =>
+const convertObjectToFormDataString = (obj: Object): string =>
 	Object.entries(obj)
 		.reduce((prev, curr) => {
 			return `${prev}&${curr[0]}=${curr[1]}`;
