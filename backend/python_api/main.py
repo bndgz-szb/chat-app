@@ -1,12 +1,11 @@
-from typing import Annotated
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import timedelta
 
 from db.crud.user import create_user, get_user_by_username, get_user_by_email
 from db.session import SessionLocal
-from python_api.auth import get_password_hash, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, RegisterRequest
+from python_api.auth import get_password_hash, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, RegisterRequest, LoginRequest
 
 app = FastAPI()
 
@@ -46,10 +45,10 @@ def register(data: RegisterRequest) -> str:
 
 
 @app.post("/login")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+def login(data: LoginRequest) -> Token:
     with SessionLocal() as session:
         user = authenticate_user(
-            session, form_data.username, form_data.password)
+            session, data.username, data.password)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

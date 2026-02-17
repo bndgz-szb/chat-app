@@ -35,6 +35,11 @@ class RegisterRequest(BaseModel):
     password: str
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
     if expires_delta:

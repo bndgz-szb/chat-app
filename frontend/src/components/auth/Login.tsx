@@ -38,7 +38,7 @@ function Login() {
 			.then((result) =>
 				dispatch(login({ username: inputUsername, token: result.access_token }))
 			)
-			.catch((error) => setServerError(error.data?.detail));
+			.catch((error) => setServerError(error.data.detail));
 	};
 
 	return (

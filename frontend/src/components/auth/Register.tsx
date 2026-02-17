@@ -46,7 +46,7 @@ function Register() {
 		})
 			.unwrap()
 			.then(() => navigate('/login'))
-			.catch((error) => setServerError(error.data?.detail));
+			.catch((error) => setServerError(error.data.detail));
 	};
 
 	return (

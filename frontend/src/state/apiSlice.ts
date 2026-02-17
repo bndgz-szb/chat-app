@@ -7,39 +7,25 @@ type Token = {
 	access_token: string;
 };
 
-type OAuth2PasswordRequestForm = {
-	grant_type?: string;
-	username: string;
-	password: string;
-	scope?: string;
-	client_id?: string;
-	client_secret?: string;
-};
-
 type RegisterRequest = {
 	username: string;
 	email: string;
 	password: string;
 };
 
-const convertObjectToFormDataString = (obj: Object): string =>
-	Object.entries(obj)
-		.reduce((prev, curr) => {
-			return `${prev}&${curr[0]}=${curr[1]}`;
-		}, '')
-		.slice(1);
+type LoginRequest = {
+	username: string;
+	password: string;
+};
 
 export const apiSlice = createApi({
 	baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
 	endpoints: (build) => ({
-		login: build.mutation<Token, OAuth2PasswordRequestForm>({
-			query: (formData) => ({
+		login: build.mutation<Token, LoginRequest>({
+			query: (body) => ({
 				url: 'login',
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: convertObjectToFormDataString(formData),
+				body,
 			}),
 		}),
 		register: build.mutation<String, RegisterRequest>({
