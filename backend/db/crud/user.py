@@ -15,5 +15,4 @@ def create_user(session: Session, username: str, email: str, hashed_password: st
     user = User(username=username, email=email, password=hashed_password)
     session.add(user)
     session.commit()
-    session.refresh(user)
     return user

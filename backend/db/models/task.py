@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, Boolean, ForeignKey
+from sqlalchemy import Integer, Boolean, ForeignKey, String
 
 from db.db import Base, task_tablename, chat_tablename, task_topic_tablename
 
@@ -9,6 +9,7 @@ class Task(Base):
     __tablename__ = task_tablename
 
     id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(String(50), unique=True, nullable=False)
     chat_id = mapped_column(Integer, ForeignKey(
         f"{chat_tablename}.id"), nullable=False, unique=True)
     done = mapped_column(Boolean, default=False, nullable=False)

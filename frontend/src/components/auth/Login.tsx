@@ -16,7 +16,7 @@ function Login() {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		if (username !== '') navigate('/', { replace: true });
+		if (username !== '') navigate('/', { replace: true }); // TODO validate token against api
 	}, [username, navigate]);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

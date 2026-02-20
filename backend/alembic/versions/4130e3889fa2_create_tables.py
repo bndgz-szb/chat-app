@@ -1,8 +1,8 @@
-"""init
+"""Create tables
 
-Revision ID: f1dd38c0c868
+Revision ID: 4130e3889fa2
 Revises: 
-Create Date: 2025-12-31 12:43:12.428841
+Create Date: 2026-02-20 15:56:38.598032
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f1dd38c0c868'
+revision: str = '4130e3889fa2'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -61,11 +61,13 @@ def upgrade() -> None:
     )
     op.create_table('task',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('chat_id', sa.Integer(), nullable=False),
     sa.Column('done', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['chat_id'], ['chat.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('chat_id')
+    sa.UniqueConstraint('chat_id'),
+    sa.UniqueConstraint('name')
     )
     op.create_table('task_topic',
     sa.Column('task_id', sa.Integer(), nullable=False),
