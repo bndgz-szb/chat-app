@@ -5,7 +5,7 @@ from typing import Annotated, List, Tuple
 
 from db.models import User
 from db.crud.user import create_user, get_user_by_username, get_user_by_email
-from db.crud.chat import get_chats_for_user
+from db.crud.chat import get_chats_for_user, ChatResponse
 from db.session import SessionLocal
 from python_api.auth import (get_password_hash, create_access_token, Token,
                              ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user,
@@ -75,7 +75,7 @@ def login(data: LoginRequest) -> Token:
 @authenticated_router.get("/chat", response_model=None)
 def chat(
     user: Annotated[User, Depends(get_current_user)]
-) -> List[Tuple[int, str]]:
+) -> List[ChatResponse]:
     with SessionLocal() as session:
         return get_chats_for_user(session, user.id)
 

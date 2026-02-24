@@ -5,9 +5,18 @@ from typing import List, Tuple
 from db.models import Chat, ChatParticipant, User, Task
 
 
+class ChatResponse:
+    id: int
+    name: str
+
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+
 def get_chats_for_user(
     session: Session, user_id: int
-) -> List[Tuple[int, str]]:
+) -> List[ChatResponse]:
     stmt = (
         select(Chat.id, Task.name)
         .join(User.chats)
@@ -16,7 +25,7 @@ def get_chats_for_user(
     )
     result = []
     for row in session.execute(stmt):
-        result.append((row[0], row[1]))
+        result.append(ChatResponse(id=row[0], name=row[1]))
 
     return result
 
