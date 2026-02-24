@@ -14,7 +14,7 @@ def seed():
         fake = Faker()
 
         users = generate_users(session, fake, 10)
-        tasks, chats = generate_tasks_and_chats(session, fake, 10)
+        tasks, chats = generate_tasks_and_chats(session, fake, users, 10)
         topics = generate_topics(session, fake, 11)
         generate_task_topic_relations(session, tasks, topics)
         chat_to_list_of_users = generate_chat_user_relations(
@@ -31,18 +31,19 @@ def generate_users(session: Session, fake: Faker, number_of_users: int) -> List[
     session.refresh(admin)
     users = []
     for _ in range(number_of_users):
-        user = create_user(username=fake.name(), hashed_password=get_password_hash(
+        user = create_user(username=fake.user_name(), hashed_password=get_password_hash(
             'password'), email=fake.email(), session=session
         )
         users.append(user)
     return users
 
 
-def generate_tasks_and_chats(session: Session, fake: Faker, number_of_tasks: int) -> Tuple[List[Task], List[Chat]]:
+def generate_tasks_and_chats(session: Session, fake: Faker, users: List[User], number_of_tasks: int) -> Tuple[List[Task], List[Chat]]:
     chats, tasks = [], []
     for _ in range(number_of_tasks):
+        task_creator = random.choice(users)
         chat = create_chat(session)
-        task = create_task(session, fake.city(), chat)
+        task = create_task(session, fake.city(), chat, task_creator)
         chats.append(chat)
         tasks.append(task)
     return tasks, chats

@@ -14,9 +14,9 @@ class User(Base):
     password = mapped_column(String(254), nullable=False)  # hashed
     admin = mapped_column(Boolean, default=False, nullable=False)
 
+    tasks: Mapped[List["Task"]] = relationship(back_populates="creator")
     chats: Mapped[List["Chat"]] = relationship(
-        secondary=participant_tablename, back_populates="participants"
-    )
+        secondary=participant_tablename, back_populates="participants")
     messages: Mapped[List["Message"]] = relationship(back_populates="sender")
 
     def __repr__(self) -> str:
