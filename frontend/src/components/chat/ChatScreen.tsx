@@ -1,21 +1,21 @@
-import Message from '@/components/chat-screen/Message';
+import Message from '@/components/chat/Message';
 import { ChatContext } from '@/contexts/ChatContext';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
 import type { ChatMessage } from '@/resources/ServerMessages';
 import { useContext, useState } from 'react';
 
 type Props = {
-	receiver: string;
+	selectedChatId: number;
 };
 
-function ChatScreen({ receiver }: Props) {
+function ChatScreen({ selectedChatId }: Props) {
 	const [message, setMessage] = useState<string>('');
 	const { username, messageHistory } = useContext(ChatContext);
 	const { sendMessage } = useContext(WebSocketContext);
 
 	const onType = (e: React.KeyboardEvent<HTMLInputElement>): void => {
 		if (e.key === 'Enter') {
-			sendMessage(message, receiver);
+			sendMessage(message, selectedChatId);
 			setMessage('');
 		}
 	};
@@ -25,11 +25,11 @@ function ChatScreen({ receiver }: Props) {
 
 		switch (message.msg_type) {
 			case 'broadcast':
-				return receiver === '';
+				return selectedChatId === '';
 			case 'message':
 				return (
-					(message.sender === username && message.target === receiver) ||
-					(message.sender === receiver && message.target === username)
+					(message.sender === username && message.target === selectedChatId) ||
+					(message.sender === selectedChatId && message.target === username)
 				);
 		}
 	};

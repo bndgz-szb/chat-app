@@ -1,26 +1,28 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { RootState } from '@/state/store';
+import type { LoginRequest, RegisterRequest } from '@/state/requestTypes';
+import type { Chat, Token } from '@/state/responseTypes';
 
 const API_BASE_URL = 'http://localhost:8000'; // TODO read from env
 
-type Token = {
-	token_type: string;
-	access_token: string;
-};
-
-type RegisterRequest = {
-	username: string;
-	email: string;
-	password: string;
-};
-
-type LoginRequest = {
-	username: string;
-	password: string;
-};
-
 export const apiSlice = createApi({
-	baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
+	baseQuery: fetchBaseQuery({
+		baseUrl: API_BASE_URL,
+		prepareHeaders(headers, { getState }) {
+			const token = (getState() as RootState).auth.token;
+			if (token) {
+				headers.set('Authorization', `Bearer ${token}`);
+			}
+			return headers;
+		},
+	}),
 	endpoints: (build) => ({
+		chat: build.query<Chat[], void>({
+			query: () => ({
+				url: 'chat',
+				method: 'GET',
+			}),
+		}),
 		login: build.mutation<Token, LoginRequest>({
 			query: (body) => ({
 				url: 'login',
@@ -38,4 +40,4 @@ export const apiSlice = createApi({
 	}),
 });
 
-export const { useLoginMutation, useRegisterMutation } = apiSlice;
+export const { useChatQuery, useLoginMutation, useRegisterMutation } = apiSlice;
