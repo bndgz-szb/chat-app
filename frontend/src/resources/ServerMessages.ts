@@ -1,59 +1,40 @@
+import type { MessageWithUsername } from '@/state/responseTypes';
+
 interface BaseMessage {
 	msg_type: string;
-	message: string;
+	token: string;
+	chat_id: number;
 }
 
-interface UserPresenceMessage {
-	msg_type: string;
-	username: string;
+export interface Message {
+	id: number;
+	chat_id: number;
+	sender_id: number;
+	content: string;
+	sent_at: string;
+}
+
+export interface HelloMessage extends BaseMessage {
+	msg_type: 'hello';
 }
 
 export interface UnicastMessage extends BaseMessage {
 	msg_type: 'message';
 	sender: string;
-	target: string;
+	content: string;
 }
 
-export interface BroadcastMessage extends BaseMessage {
-	msg_type: 'broadcast';
-	sender: string;
-}
-
-export interface ErrorMessage extends BaseMessage {
+export interface ErrorMessage {
 	msg_type: 'error';
+	error: string;
 }
 
-export interface UserListMessage {
-	msg_type: 'user_list';
-	users: string[];
-}
-
-export interface UserLoginMessage extends UserPresenceMessage {
-	msg_type: 'user_login';
-}
-
-export interface UserLogoutMessage extends UserPresenceMessage {
-	msg_type: 'user_logout';
-}
-
-export interface LoginMessage extends UserPresenceMessage {
-	msg_type: 'login';
-	password: string;
-}
-
-export interface RegisterMessage extends UserPresenceMessage {
-	msg_type: 'register';
-	password: string;
+export interface HistoryMessage {
+	msg_type: 'history';
+	messages: MessageWithUsername[];
 }
 
 export type ServerToClientMessage =
 	| UnicastMessage
-	| BroadcastMessage
 	| ErrorMessage
-	| UserListMessage
-	| UserLoginMessage
-	| UserLogoutMessage;
-
-export type ChatMessage = UnicastMessage | BroadcastMessage;
-
-export type AuthMessage = LoginMessage | RegisterMessage;
+	| HistoryMessage;

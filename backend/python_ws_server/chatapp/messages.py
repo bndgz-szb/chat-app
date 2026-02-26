@@ -1,60 +1,33 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, List
+from db.crud.chat import MessageWithUsername
 
 
 @dataclass
-class BaseMessage:
-    msg_type: str
-    message: str
+class ClientMessage:
+    token: str
+    chat_id: int
 
 
 @dataclass
-class UserPresenceMessage:
-    msg_type: str
-    username: str
+class HelloMessage(ClientMessage):
+    msg_type: Literal["hello"]
 
 
 @dataclass
-class UnicastMessage(BaseMessage):
+class UnicastMessage(ClientMessage):
     msg_type: Literal["message"]
     sender: str
-    target: str
+    content: str
 
 
 @dataclass
-class BroadcastMessage(BaseMessage):
-    msg_type: Literal["broadcast"]
-    sender: str
-
-
-@dataclass
-class ErrorMessage(BaseMessage):
+class ErrorMessage:
     msg_type: Literal["error"]
+    error: str
 
 
 @dataclass
-class UserListMessage:
-    msg_type: Literal["user_list"]
-    users: list[str]
-
-
-@dataclass
-class UserLoginMessage(UserPresenceMessage):
-    msg_type: Literal["user_login"]
-
-
-@dataclass
-class UserLogoutMessage(UserPresenceMessage):
-    msg_type: Literal["user_logout"]
-
-
-@dataclass
-class LoginAttempt(UserPresenceMessage):
-    msg_type: Literal["login"]
-    password: str
-
-
-@dataclass
-class RegisterAttempt(UserPresenceMessage):
-    msg_type: Literal["register"]
-    password: str
+class HistoryMessage:
+    msg_type: Literal["history"]
+    messages: List[MessageWithUsername]

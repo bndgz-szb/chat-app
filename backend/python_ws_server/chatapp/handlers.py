@@ -1,12 +1,19 @@
 import json
-import websockets
-
+import requests
+import os
 from typing import Type, TypeVar
 from dataclasses import fields, is_dataclass
+from dotenv import load_dotenv
+from websockets.asyncio.server import ServerConnection
+
 from python_ws_server.chatapp.global_variables import CONNECTIONS
 from python_ws_server.chatapp.messages import *
-from python_ws_server.chatapp.services.auth import broadcastConnectionsState, login, register
+from python_api.auth import get_current_user
 
+load_dotenv()
+API_URL = os.getenv("API_URL")
+if API_URL == None:
+    raise Exception("Don't forget to create .env file")
 T = TypeVar("T")
 
 
@@ -19,64 +26,63 @@ def assert_has_keys(data: dict, model: Type[T]) -> None:
     assert not missing, f"Missing keys: {missing}"
 
 
-async def sendError(websocket, message):
-    msg = ErrorMessage(msg_type="error", message=message)
+async def sendError(websocket: ServerConnection, message: str) -> None:
+    msg = ErrorMessage(msg_type="error", error=message)
     await websocket.send(json.dumps(msg.__dict__))
 
 
-def broadcastMessage(sender, message):
-    msg = BroadcastMessage(msg_type="broadcast",
-                           sender=sender, message=message)
-    websockets.broadcast(filter(lambda websocket: websocket !=
-                         CONNECTIONS[sender], CONNECTIONS.values()), json.dumps(msg.__dict__))
+# save message in db, send message to active users
+async def sendMessage(
+        websocket: ServerConnection, message: UnicastMessage
+) -> None:
+    # TODO consume api
+    # if success, send message to every connection that has chat_id
+    for other_websocket in CONNECTIONS.keys():
+        if CONNECTIONS[other_websocket] == message.chat_id:
+            await other_websocket.send(json.dumps(message.__dict__))
+    # if error, notify client
+    await sendError(websocket, "Error")
+    pass
 
 
-async def message_loop(websocket, username):
+async def message_loop(websocket: ServerConnection) -> None:
     try:
         async for message in websocket:
-            # check message format
             try:
                 data = json.loads(message)
-                assert all(key in data for key in (
-                    "msg_type", "sender", "target", "message"))
+                assert_has_keys(data, UnicastMessage)
             except (json.JSONDecodeError, AssertionError):
                 await sendError(websocket, "Invalid message format")
                 continue
 
             parsed = UnicastMessage(**data)
+            user = await get_current_user(parsed.token)
+            if user is None:
+                await sendError(websocket, "Could not validate credentials")
+                return
 
-            if parsed.target == "":
-                broadcastMessage(parsed.sender, parsed.message)
-                continue
+            if user.username != parsed.sender:
+                await websocket.close(
+                    code=4002,
+                    reason="Can't send messages in someone else's name"
+                )
 
-            if websocket != CONNECTIONS[parsed.sender]:  # check sender address
-                await websocket.close(code=4002, reason="Can't send messages in someone else's name")
-
-            elif parsed.target not in CONNECTIONS.keys():  # check if receiver is online
-                await sendError(websocket, "User currently offline")
-
-            else:  # send message to receiver, save to history
-                try:
-                    await sendMessage(parsed.sender, parsed.target, parsed.message)
-                except:
-                    await sendError(websocket, "User disconnected before receiving the message")
+            else:
+                await sendMessage(websocket, parsed)
     except:
-        print(f"[CLOSE] {username} closed connection")
+        print(f"[CLOSE] {websocket.remote_address} closed connection")
     finally:
-        print(f"[DISCONNECTED] {username} removed from active list")
-        del CONNECTIONS[username]
-        broadcastConnectionsState("user_logout", username)
+        print(f"[DISCONNECTED] {websocket.remote_address} removed from active list")
+        del CONNECTIONS[websocket]
 
 
-async def handle_auth(websocket):
+async def handle_auth(websocket: ServerConnection) -> None:
     raw_json = await websocket.recv()
 
     try:
         data = json.loads(raw_json)
-        if data.get("msg_type") == "login":
-            assert_has_keys(data, LoginAttempt)
-        elif data.get("msg_type") == "register":
-            assert_has_keys(data, RegisterAttempt)
+        if data.get("msg_type") == "hello":
+            assert_has_keys(data, HelloMessage)
         else:
             raise AssertionError()
     except json.JSONDecodeError:
@@ -86,15 +92,25 @@ async def handle_auth(websocket):
         await sendError(websocket, "Wrong message format")
         return
 
-    if data.get("msg_type") == "login":
-        response = await login(LoginAttempt(**data))
-    elif data.get("msg_type") == "register":
-        response = await register(RegisterAttempt(**data))
-
-    if response["status"] == "error":
-        await sendError(websocket, response["error"])
+    parsed = HelloMessage(**data)
+    user = await get_current_user(parsed.token)
+    if user is None:
+        await sendError(websocket, "Could not validate credentials")
         return
 
-    msg = UserListMessage(msg_type="user_list", users=response["chats"])
+    headers = {"authorization": f"Bearer {parsed.token}"}
+    response = requests.get(
+        f"{str(API_URL)}/message-history",
+        headers=headers, params={"chat_id": parsed.chat_id}
+    )
+    if response.status_code == 200:
+        history = response.json()
+    else:
+        await sendError(websocket, "Error while querying message history")
+        return
+
+    msg = HistoryMessage(msg_type="history", messages=history)
+    CONNECTIONS[websocket] = parsed.chat_id
+    print(f"[LOGIN] {websocket.remote_address} - {user.username} connected")
     await websocket.send(json.dumps(msg.__dict__))
-    await message_loop(websocket, response["username"])
+    await message_loop(websocket)

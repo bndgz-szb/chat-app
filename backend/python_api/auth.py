@@ -133,17 +133,15 @@ def authenticate_user(
 
 async def get_current_user(
         token: Annotated[str, Depends(auth_scheme)]
-) -> User:
+) -> User | None:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[str(ALGORITHM)])
         username = payload.get("sub")
         if username is None:
-            raise credentials_exception()
+            return None
         token_data = TokenData(username=username)
     except InvalidTokenError:
-        raise credentials_exception()
+        return None
     with SessionLocal() as session:
         user = get_user_by_username(session, token_data.username)
-        if user is None:
-            raise credentials_exception()
         return user

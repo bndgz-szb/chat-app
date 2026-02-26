@@ -1,7 +1,8 @@
 import Message from '@/components/chat/Message';
 import { ChatContext } from '@/contexts/ChatContext';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
-import type { ChatMessage } from '@/resources/ServerMessages';
+import { selectUser } from '@/state/authSlice';
+import { useAppSelector } from '@/state/hooks';
 import { useContext, useState } from 'react';
 
 type Props = {
@@ -10,27 +11,14 @@ type Props = {
 
 function ChatScreen({ selectedChatId }: Props) {
 	const [message, setMessage] = useState<string>('');
-	const { username, messageHistory } = useContext(ChatContext);
+	const username = useAppSelector(selectUser);
 	const { sendMessage } = useContext(WebSocketContext);
+	const { messageHistory } = useContext(ChatContext);
 
 	const onType = (e: React.KeyboardEvent<HTMLInputElement>): void => {
 		if (e.key === 'Enter') {
 			sendMessage(message, selectedChatId);
 			setMessage('');
-		}
-	};
-
-	const filterMessageHistory = (messageJson: string): boolean => {
-		const message: ChatMessage = JSON.parse(messageJson);
-
-		switch (message.msg_type) {
-			case 'broadcast':
-				return selectedChatId === '';
-			case 'message':
-				return (
-					(message.sender === username && message.target === selectedChatId) ||
-					(message.sender === selectedChatId && message.target === username)
-				);
 		}
 	};
 
@@ -45,18 +33,15 @@ function ChatScreen({ selectedChatId }: Props) {
 				onKeyDown={onType}
 			/>
 			<div className="flex flex-col gap-4 overflow-y-scroll p-8 mb-13">
-				{messageHistory
-					.filter(filterMessageHistory)
-					.map((messageJsonString: string, i: number) => {
-						const message: ChatMessage = JSON.parse(messageJsonString);
-						return (
-							<Message
-								key={i} // TODO have some kind of id as key, not array index
-								message={message.message}
-								mine={username === message.sender}
-							/>
-						);
-					})}
+				{messageHistory?.map((message) => {
+					return (
+						<Message
+							key={message.id}
+							message={message.content}
+							mine={username === message.sender_username}
+						/>
+					);
+				})}
 			</div>
 		</div>
 	);

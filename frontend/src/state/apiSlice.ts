@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/state/store';
 import type { LoginRequest, RegisterRequest } from '@/state/requestTypes';
-import type { Chat, Token } from '@/state/responseTypes';
+import type { Chat, LoginResponse } from '@/state/responseTypes';
 
-const API_BASE_URL = 'http://localhost:8000'; // TODO read from env
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const apiSlice = createApi({
 	baseQuery: fetchBaseQuery({
@@ -23,7 +23,7 @@ export const apiSlice = createApi({
 				method: 'GET',
 			}),
 		}),
-		login: build.mutation<Token, LoginRequest>({
+		login: build.mutation<LoginResponse, LoginRequest>({
 			query: (body) => ({
 				url: 'login',
 				method: 'POST',

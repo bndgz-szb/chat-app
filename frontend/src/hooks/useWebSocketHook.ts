@@ -1,38 +1,31 @@
 import { ChatContext } from '@/contexts/ChatContext';
 import type { WebSocketContextInterface } from '@/contexts/WebSocketContext';
 import type {
-	AuthMessage,
-	LoginMessage,
-	RegisterMessage,
+	HelloMessage,
 	ServerToClientMessage,
 	UnicastMessage,
 } from '@/resources/ServerMessages';
+import { selectToken, selectUser, selectUserId } from '@/state/authSlice';
+import { useAppSelector } from '@/state/hooks';
 import { useContext, useRef } from 'react';
 
 function useWebSocket(): WebSocketContextInterface {
 	const ws = useRef<WebSocket | null>(null);
 	const currentSocketId = useRef<number>(0);
 
-	const {
-		username,
-		setUsername,
-		messageHistory,
-		setMessageHistory,
-		setOnlineUsers,
-	} = useContext(ChatContext);
+	const username = useAppSelector(selectUser);
+	const user_id = useAppSelector(selectUserId);
+	const { messageHistory, setMessageHistory } = useContext(ChatContext);
+	const token = useAppSelector(selectToken);
 
 	const connect = (
 		url: string,
-		authMessage: AuthMessage,
-		onSuccess: () => void,
+		helloMessage: HelloMessage,
 		onError: (error: string) => void
 	) => {
+		ws.current?.close();
 		const socketId = ++currentSocketId.current;
 		ws.current = new WebSocket(url);
-
-		ws.current.addEventListener('close', () => {
-			if (socketId === currentSocketId.current) setUsername('');
-		});
 
 		ws.current.addEventListener('error', (error: Event) =>
 			console.error(`closed socketId: ${socketId}; error: ${error}`)
@@ -41,7 +34,7 @@ function useWebSocket(): WebSocketContextInterface {
 		ws.current.addEventListener('open', () => {
 			if (socketId !== currentSocketId.current) return;
 
-			ws.current!.send(JSON.stringify(authMessage));
+			ws.current!.send(JSON.stringify(helloMessage));
 		});
 
 		ws.current.addEventListener('message', (event: MessageEvent) => {
@@ -53,23 +46,14 @@ function useWebSocket(): WebSocketContextInterface {
 
 			switch (parsed.msg_type) {
 				case 'message':
-				case 'broadcast':
-					setMessageHistory((prev) => [...prev, event.data]);
-					break;
-				case 'user_list':
-					setOnlineUsers(() => parsed.users);
-					setUsername(authMessage.username);
-					onSuccess();
-					break;
-				case 'user_login':
-					setOnlineUsers((prev) => [...prev, parsed.username]);
-					break;
-				case 'user_logout':
-					setOnlineUsers((prev) => prev.filter((u) => u !== parsed.username));
+					// setMessageHistory((prev) => [...prev, parsed.content]);
 					break;
 				case 'error':
-					console.error(`error: ${parsed.message}`);
-					onError(parsed.message);
+					console.error(`error: ${parsed.error}`);
+					onError(parsed.error);
+					break;
+				case 'history':
+					setMessageHistory(() => parsed.messages);
 					break;
 				default:
 					return assertUnreachable(parsed);
@@ -77,51 +61,30 @@ function useWebSocket(): WebSocketContextInterface {
 		});
 	};
 
-	const sendMessage = (messageContent: string, target: string) => {
+	const sendMessage = (messageContent: string, chat_id: number) => {
 		const message: UnicastMessage = {
+			token,
 			msg_type: 'message',
 			sender: username,
-			target,
-			message: messageContent,
+			chat_id,
+			content: messageContent,
 		};
 		const jsonMessage = JSON.stringify(message);
 		ws.current?.send(jsonMessage);
-		setMessageHistory((prev) => [...prev, jsonMessage]);
 	};
 
-	const sendLogin = (
-		username: string,
-		password: string,
-		onSuccess: () => void,
-		onError: (error: string) => void
-	) => {
-		ws.current?.close();
-		// TODO hash password
-		const login_msg: LoginMessage = {
-			msg_type: 'login',
-			username,
-			password,
+	const sendHello = (chat_id: number) => {
+		const message: HelloMessage = {
+			msg_type: 'hello',
+			token,
+			chat_id,
 		};
-		connect(import.meta.env.VITE_WS_URL, login_msg, onSuccess, onError);
+		connect(import.meta.env.VITE_WS_URL, message, (error) =>
+			console.log(error)
+		);
 	};
 
-	const sendRegister = (
-		username: string,
-		password: string,
-		onSuccess: () => void,
-		onError: (error: string) => void
-	) => {
-		ws.current?.close();
-		// TODO hash password
-		const register_msg: RegisterMessage = {
-			msg_type: 'register',
-			username,
-			password,
-		};
-		connect(import.meta.env.VITE_WS_URL, register_msg, onSuccess, onError);
-	};
-
-	return { messageHistory, sendMessage, sendLogin, sendRegister };
+	return { sendMessage, sendHello };
 }
 
 export default useWebSocket;

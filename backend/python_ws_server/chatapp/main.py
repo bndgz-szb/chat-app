@@ -16,7 +16,7 @@ async def main():
         print("WebSocket server started.")
         await SHUTDOWN.wait()
         print("Shutdown signal received, closing connections...")
-        for user, ws in CONNECTIONS.items():
+        for ws, _ in CONNECTIONS.items():
             await ws.close(code=1001, reason="Server shutdown")
         CONNECTIONS.clear()
 

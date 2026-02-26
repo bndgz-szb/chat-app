@@ -36,9 +36,15 @@ function Login() {
 		})
 			.unwrap()
 			.then((result) =>
-				dispatch(login({ username: inputUsername, token: result.access_token }))
+				dispatch(
+					login({
+						user_id: result.user_id,
+						token: result.access_token,
+						username: result.username,
+					})
+				)
 			)
-			.catch((error) => setServerError(error.data.detail));
+			.catch((error) => setServerError(error.data?.detail));
 	};
 
 	return (

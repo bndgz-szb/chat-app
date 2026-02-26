@@ -1,25 +1,22 @@
+import type { MessageWithUsername } from '@/state/responseTypes';
 import { ChatContext, type ChatContextInterface } from '@/contexts/ChatContext';
 import { useState, type ReactNode } from 'react';
 
 type Props = {
-  children: ReactNode;
+	children: ReactNode;
 };
 
 const ChatContextProvider = ({ children }: Props) => {
-  const [username, setUsername] = useState<string>('');
-  const [messageHistory, setMessageHistory] = useState<string[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+	const [messageHistory, setMessageHistory] = useState<MessageWithUsername[]>(
+		[]
+	);
 
-  const ctx: ChatContextInterface = {
-    username,
-    setUsername,
-    messageHistory,
-    setMessageHistory,
-    onlineUsers,
-    setOnlineUsers,
-  };
+	const ctx: ChatContextInterface = {
+		messageHistory,
+		setMessageHistory,
+	};
 
-  return <ChatContext value={ctx}>{children}</ChatContext>;
+	return <ChatContext value={ctx}>{children}</ChatContext>;
 };
 
 export default ChatContextProvider;

@@ -1,17 +1,23 @@
 from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import timedelta
-from typing import Annotated, List, Tuple
+from typing import Annotated, List
 
 from db.models import User
 from db.crud.user import create_user, get_user_by_username, get_user_by_email
-from db.crud.chat import get_chats_for_user, ChatResponse
+from db.crud.chat import (
+    get_chats_for_user, ChatResponse, get_messages_for_chat,
+    get_chat_by_id, MessageWithUsername
+)
+from db.crud.message import send_message_to_chat
 from db.session import SessionLocal
-from python_api.auth import (get_password_hash, create_access_token, Token,
-                             ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user,
-                             RegisterRequest, LoginRequest, get_current_user
-                             )
+from python_api.auth import (
+    get_password_hash, create_access_token, Token,
+    ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, RegisterRequest,
+    LoginRequest, get_current_user, credentials_exception
+)
 from python_api.auth import AuthRoute
+from python_ws_server.chatapp.messages import UnicastMessage
 
 
 app = FastAPI()
@@ -22,7 +28,7 @@ authenticated_router = APIRouter(route_class=AuthRoute)
 app.add_middleware(
     CORSMiddleware,
     # TODO use fix ip address of frontend
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://localhost:8765"],
     allow_credentials=True,
     allow_methods=["POST", "GET", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Access-Control-Allow-Origin", "authorization"]
@@ -72,12 +78,38 @@ def login(data: LoginRequest) -> Token:
         return Token(token_type="bearer", access_token=access_token)
 
 
+# TODO fix response model
 @authenticated_router.get("/chat", response_model=None)
 def chat(
-    user: Annotated[User, Depends(get_current_user)]
+    user: Annotated[User | None, Depends(get_current_user)]
 ) -> List[ChatResponse]:
+    if user is None:
+        raise credentials_exception()
     with SessionLocal() as session:
         return get_chats_for_user(session, user.id)
+
+
+@authenticated_router.get("/message-history", response_model=None)
+def message_history(chat_id: int) -> List[MessageWithUsername]:
+    with SessionLocal() as session:
+        return get_messages_for_chat(session, chat_id)
+
+
+@authenticated_router.post("/message")
+def send_message(
+    message: UnicastMessage,
+    user: Annotated[User | None, Depends(get_current_user)]
+) -> None:
+    if user is None:
+        raise credentials_exception()
+    with SessionLocal() as session:
+        chat = get_chat_by_id(session, message.chat_id)
+        if chat is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Chat doesn't exist"
+            )
+        send_message_to_chat(session, chat, user, message.content)
 
 
 app.include_router(unauthenticated_router)

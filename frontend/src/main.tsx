@@ -9,12 +9,12 @@ import { store } from './state/store';
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<UsernameContextProvider>
-			<WebSocketContextProvider>
-				<Provider store={store}>
+		<Provider store={store}>
+			<UsernameContextProvider>
+				<WebSocketContextProvider>
 					<App />
-				</Provider>
-			</WebSocketContextProvider>
-		</UsernameContextProvider>
+				</WebSocketContextProvider>
+			</UsernameContextProvider>
+		</Provider>
 	</StrictMode>
 );
