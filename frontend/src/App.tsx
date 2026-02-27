@@ -6,21 +6,23 @@ import Dashboard from '@/components/dashboard/Dashboard';
 import Topics from '@/components/dashboard/Topics';
 import TaskForm from '@/components/dashboard/TaskForm';
 import Chat from '@/components/chat/Chat';
+import Logout from '@/components/auth/Logout';
 
 function App() {
 	return (
-		<Layout>
-			<BrowserRouter>
+		<BrowserRouter>
+			<Layout>
 				<Routes>
-					<Route path="/" element={<Chat />} />
+					<Route path="/chat" element={<Chat />} />
 					<Route path="/dashboard" element={<Dashboard />} />
 					<Route path="/login" element={<Login />} />
+					<Route path="/logout" element={<Logout />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/dashboard/topics" element={<Topics />} />
 					<Route path="/dashboard/create_task" element={<TaskForm />} />
 				</Routes>
-			</BrowserRouter>
-		</Layout>
+			</Layout>
+		</BrowserRouter>
 	);
 }
 

@@ -17,7 +17,7 @@ function Register() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (username !== '') navigate('/', { replace: true });
+		if (username !== '') navigate('/dashboard', { replace: true });
 	}, [username, navigate]);
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
