@@ -53,10 +53,7 @@ async def handleHelloMessage(data, websocket: ServerConnection) -> bool:
 
 
 async def handleUnicastMessage(data, websocket: ServerConnection) -> None:
-    try:
-        assert_has_keys(data, UnicastMessage)
-    except (AssertionError):
-        await sendError(websocket, "Invalid message format")
+    assert_has_keys(data, UnicastMessage)
 
     parsed = UnicastMessage(**data)
     user = await get_current_user(parsed.token)
@@ -105,6 +102,10 @@ async def message_loop(websocket: ServerConnection) -> None:
             except (json.JSONDecodeError):
                 await sendError(websocket, "Invalid message format")
                 continue
+            except (AssertionError):
+                await sendError(websocket, "Invalid message format")
+                continue
+
     except:
         print(f"[CLOSE] {websocket.remote_address} closed connection")
     finally:
