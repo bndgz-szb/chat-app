@@ -12,10 +12,12 @@ from db.crud.chat import (
 from db.crud.message import send_message_to_chat
 from db.session import SessionLocal
 from python_api.auth import (
-    get_password_hash, create_access_token, Token,
-    ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, RegisterRequest,
-    LoginRequest, get_current_user, credentials_exception
+    get_password_hash, create_access_token,
+    ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user,
+    get_current_user, credentials_exception
 )
+from python_api.request_types import RegisterRequest, LoginRequest
+from python_api.response_types import LoginResponse
 from python_api.auth import AuthRoute
 from python_ws_server.chatapp.messages import UnicastMessage
 
@@ -61,7 +63,7 @@ def register(data: RegisterRequest) -> str:
 
 
 @unauthenticated_router.post("/login")
-def login(data: LoginRequest) -> Token:
+def login(data: LoginRequest) -> LoginResponse:
     with SessionLocal() as session:
         user = authenticate_user(
             session, data.username, data.password)
@@ -75,7 +77,9 @@ def login(data: LoginRequest) -> Token:
             data={"sub": user.username},
             expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
-        return Token(token_type="bearer", access_token=access_token)
+        return LoginResponse(
+            username=user.username, access_token=access_token, user_id=user.id
+        )
 
 
 # TODO fix response model

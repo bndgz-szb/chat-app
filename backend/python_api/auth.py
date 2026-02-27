@@ -32,24 +32,8 @@ else:
     ACCESS_TOKEN_EXPIRE_MINUTES = int(ACCESS_TOKEN_EXPIRE_MINUTES)
 
 
-class Token(BaseModel):
-    token_type: str
-    access_token: str
-
-
 class TokenData(BaseModel):
     username: str
-
-
-class RegisterRequest(BaseModel):
-    username: str
-    email: str
-    password: str
-
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
 
 
 class AuthScheme():
