@@ -10,6 +10,10 @@ interface MessageHistoryPayload {
 	messageHistory: MessageWithUsername[];
 }
 
+interface AppendMessagePayload {
+	message: MessageWithUsername;
+}
+
 const initialState: ChatState = {
 	messageHistory: [],
 };
@@ -24,12 +28,18 @@ const chatSlice = createSlice({
 		) => {
 			state.messageHistory = messageHistory;
 		},
+		appendMessage: (
+			state,
+			{ payload: { message } }: PayloadAction<AppendMessagePayload>
+		) => {
+			state.messageHistory.push(message);
+		},
 	},
 });
 
 export const chatReducer = chatSlice.reducer;
 
-export const { setMessageHistory } = chatSlice.actions;
+export const { setMessageHistory, appendMessage } = chatSlice.actions;
 
 export const selectMessageHistory = (state: RootState) =>
 	state.chat.messageHistory;

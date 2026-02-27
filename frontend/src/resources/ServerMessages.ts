@@ -20,7 +20,7 @@ export interface HelloMessage extends BaseMessage {
 
 export interface UnicastMessage extends BaseMessage {
 	msg_type: 'message';
-	sender: string;
+	sender_id: number;
 	content: string;
 }
 
@@ -34,7 +34,12 @@ export interface HistoryMessage {
 	messages: MessageWithUsername[];
 }
 
+export interface UnicastMessageWithUsername {
+	msg_type: 'message';
+	message: MessageWithUsername;
+}
+
 export type ServerToClientMessage =
-	| UnicastMessage
+	| UnicastMessageWithUsername
 	| ErrorMessage
 	| HistoryMessage;

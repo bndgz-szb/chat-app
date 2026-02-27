@@ -1,7 +1,7 @@
 import json
 import requests
 import os
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Dict
 from dataclasses import fields, is_dataclass
 from dotenv import load_dotenv
 from websockets.asyncio.server import ServerConnection
@@ -11,8 +11,8 @@ from python_ws_server.chatapp.messages import *
 from python_api.auth import get_current_user
 
 load_dotenv()
-API_URL = os.getenv("API_URL")
-if API_URL == None:
+API_URL = str(os.getenv("API_URL"))
+if API_URL == "":
     raise Exception("Don't forget to create .env file")
 T = TypeVar("T")
 
@@ -26,107 +26,117 @@ def assert_has_keys(data: dict, model: Type[T]) -> None:
     assert not missing, f"Missing keys: {missing}"
 
 
-async def handleHelloMessage(data, websocket: ServerConnection) -> bool:
+def prepareAuthHeader(token: str) -> Dict[str, str]:
+    return {"authorization": f"Bearer {token}"}
+
+
+async def handleHelloMessage(data, ws: ServerConnection) -> bool:
     assert_has_keys(data, HelloMessage)
 
     parsed = HelloMessage(**data)
     user = await get_current_user(parsed.token)
     if user is None:
-        await sendError(websocket, "Could not validate credentials")
+        await sendError(ws, "Could not validate credentials")
         return False
 
-    headers = {"authorization": f"Bearer {parsed.token}"}
+    headers = prepareAuthHeader(parsed.token)
     response = requests.get(
-        f"{str(API_URL)}/message-history",
+        f"{API_URL}/message-history",
         headers=headers, params={"chat_id": parsed.chat_id}
     )
     if response.status_code == 200:
         history = response.json()
     else:
-        await sendError(websocket, "Error while querying message history")
+        await sendError(ws, "Error while querying message history")
         return False
 
     msg = HistoryMessage(msg_type="history", messages=history)
-    CONNECTIONS[websocket] = parsed.chat_id
-    await websocket.send(json.dumps(msg.__dict__))
+    CONNECTIONS[ws] = parsed.chat_id
+    await ws.send(json.dumps(msg.__dict__))
     return True
 
 
-async def handleUnicastMessage(data, websocket: ServerConnection) -> None:
+async def handleUnicastMessage(data, ws: ServerConnection) -> None:
     assert_has_keys(data, UnicastMessage)
 
     parsed = UnicastMessage(**data)
     user = await get_current_user(parsed.token)
     if user is None:
-        await sendError(websocket, "Could not validate credentials")
+        await sendError(ws, "Could not validate credentials")
         return
 
-    if user.username != parsed.sender:
-        await websocket.close(
+    if user.id != parsed.sender_id:
+        await ws.close(
             code=4002,
             reason="Can't send messages in someone else's name"
         )
-
     else:
-        await sendMessage(websocket, parsed)
+        await sendMessage(ws, parsed)
 
 
-async def sendError(websocket: ServerConnection, message: str) -> None:
+async def sendError(ws: ServerConnection, message: str) -> None:
     msg = ErrorMessage(msg_type="error", error=message)
-    await websocket.send(json.dumps(msg.__dict__))
+    await ws.send(json.dumps(msg.__dict__))
 
 
 # save message in db, send message to active users
 async def sendMessage(
-        websocket: ServerConnection, message: UnicastMessage
+        ws: ServerConnection, message: UnicastMessage
 ) -> None:
-    # TODO consume api
-    # if success, send message to every connection that has chat_id
-    for other_websocket in CONNECTIONS.keys():
-        if CONNECTIONS[other_websocket] == message.chat_id:
-            await other_websocket.send(json.dumps(message.__dict__))
-    # if error, notify client
-    await sendError(websocket, "Error")
-    pass
+    headers = prepareAuthHeader(message.token)
+    response = requests.post(
+        f"{API_URL}/message",
+        headers=headers,
+        json={**message.__dict__}
+    )
+    response_message = response.json()
+    if response.status_code == 200:
+        for other_websocket in CONNECTIONS.keys():
+            if CONNECTIONS[other_websocket] == message.chat_id:
+                await other_websocket.send(json.dumps(
+                    {"msg_type": "message", "message": response_message}
+                ))
+                pass
+    else:
+        # TODO error handling
+        await sendError(ws, "Error while sending message")
 
 
-async def message_loop(websocket: ServerConnection) -> None:
+async def message_loop(ws: ServerConnection) -> None:
     try:
-        async for message in websocket:
+        async for message in ws:
             try:
                 data = json.loads(message)
                 if data.get("msg_type") == "hello":
-                    await handleHelloMessage(data, websocket)
+                    await handleHelloMessage(data, ws)
                 else:
-                    await handleUnicastMessage(data, websocket)
+                    await handleUnicastMessage(data, ws)
             except (json.JSONDecodeError):
-                await sendError(websocket, "Invalid message format")
+                await sendError(ws, "Invalid message format")
                 continue
             except (AssertionError):
-                await sendError(websocket, "Invalid message format")
+                await sendError(ws, "Invalid message format")
                 continue
-
     except:
-        print(f"[CLOSE] {websocket.remote_address} closed connection")
+        print(f"[CLOSE] {ws.remote_address} closed connection")
     finally:
-        print(
-            f"[DISCONNECTED] {websocket.remote_address} removed from active list")
-        del CONNECTIONS[websocket]
+        print(f"[DISCONNECTED] {ws.remote_address} removed from active list")
+        del CONNECTIONS[ws]
 
 
-async def handle_auth(websocket: ServerConnection) -> None:
-    raw_json = await websocket.recv()
+async def handle_auth(ws: ServerConnection) -> None:
+    raw_json = await ws.recv()
 
     try:
         data = json.loads(raw_json)
-        if not await handleHelloMessage(data, websocket):
+        if not await handleHelloMessage(data, ws):
             return
     except json.JSONDecodeError:
-        await sendError(websocket, "JSON decode error")
+        await sendError(ws, "JSON decode error")
         return
     except AssertionError:
-        await sendError(websocket, "Wrong message format")
+        await sendError(ws, "Wrong message format")
         return
 
-    print(f"[LOGIN] {websocket.remote_address} connected")
-    await message_loop(websocket)
+    print(f"[LOGIN] {ws.remote_address} connected")
+    await message_loop(ws)

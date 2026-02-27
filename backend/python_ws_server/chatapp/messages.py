@@ -17,7 +17,7 @@ class HelloMessage(ClientMessage):
 @dataclass
 class UnicastMessage(ClientMessage):
     msg_type: Literal["message"]
-    sender: str
+    sender_id: int
     content: str
 
 

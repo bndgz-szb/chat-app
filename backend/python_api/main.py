@@ -99,11 +99,11 @@ def message_history(chat_id: int) -> List[MessageWithUsername]:
         return get_messages_for_chat(session, chat_id)
 
 
-@authenticated_router.post("/message")
+@authenticated_router.post("/message", response_model=None)
 def send_message(
     message: UnicastMessage,
     user: Annotated[User | None, Depends(get_current_user)]
-) -> None:
+) -> MessageWithUsername:
     if user is None:
         raise credentials_exception()
     with SessionLocal() as session:
@@ -113,7 +113,15 @@ def send_message(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Chat doesn't exist"
             )
-        send_message_to_chat(session, chat, user, message.content)
+        result = send_message_to_chat(session, chat, user, message.content)
+        return MessageWithUsername(
+            id=result.id,
+            chat_id=result.chat_id,
+            sender_id=result.sender_id,
+            content=result.content,
+            sent_at=result.sent_at,
+            sender_username=user.username
+        )
 
 
 app.include_router(unauthenticated_router)

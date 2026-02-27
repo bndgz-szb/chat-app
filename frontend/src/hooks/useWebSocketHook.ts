@@ -4,8 +4,8 @@ import type {
 	ServerToClientMessage,
 	UnicastMessage,
 } from '@/resources/ServerMessages';
-import { selectToken, selectUser, selectUserId } from '@/state/authSlice';
-import { selectMessageHistory } from '@/state/chatSlice';
+import { selectToken, selectUserId } from '@/state/authSlice';
+import { appendMessage } from '@/state/chatSlice';
 import { useAppDispatch, useAppSelector } from '@/state/hooks';
 import { useRef } from 'react';
 import { setMessageHistory } from '@/state/chatSlice';
@@ -13,9 +13,7 @@ import { setMessageHistory } from '@/state/chatSlice';
 function useWebSocket(): WebSocketContextInterface {
 	const ws = useRef<WebSocket | null>(null);
 
-	const username = useAppSelector(selectUser);
 	const user_id = useAppSelector(selectUserId);
-	const messageHistory = useAppSelector(selectMessageHistory);
 	const token = useAppSelector(selectToken);
 	const dispatch = useAppDispatch();
 
@@ -44,11 +42,11 @@ function useWebSocket(): WebSocketContextInterface {
 
 			switch (parsed.msg_type) {
 				case 'message':
-					// dispatch(
-					// 	setMessageHistory({
-					// 		messageHistory: [...messageHistory, parsed.content],
-					// 	})
-					// );
+					dispatch(
+						appendMessage({
+							message: parsed.message,
+						})
+					);
 					break;
 				case 'error':
 					console.error(`error: ${parsed.error}`);
@@ -67,7 +65,7 @@ function useWebSocket(): WebSocketContextInterface {
 		const message: UnicastMessage = {
 			token,
 			msg_type: 'message',
-			sender: username,
+			sender_id: user_id,
 			chat_id,
 			content: messageContent,
 		};
