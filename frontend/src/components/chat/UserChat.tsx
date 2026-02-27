@@ -15,7 +15,7 @@ function UserChat({ chatId, name, onClick, selected }: Props) {
 					: 'hover:rounded-md hover:bg-gray-700'
 			} p-8 font-bold`}
 		>
-			{name === '' ? 'Broadcast' : name}
+			{name}
 		</div>
 	);
 }

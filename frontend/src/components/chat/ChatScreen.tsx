@@ -1,7 +1,7 @@
 import Message from '@/components/chat/Message';
-import { ChatContext } from '@/contexts/ChatContext';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
 import { selectUser } from '@/state/authSlice';
+import { selectMessageHistory } from '@/state/chatSlice';
 import { useAppSelector } from '@/state/hooks';
 import { useContext, useState } from 'react';
 
@@ -13,7 +13,7 @@ function ChatScreen({ selectedChatId }: Props) {
 	const [message, setMessage] = useState<string>('');
 	const username = useAppSelector(selectUser);
 	const { sendMessage } = useContext(WebSocketContext);
-	const { messageHistory } = useContext(ChatContext);
+	const messageHistory = useAppSelector(selectMessageHistory);
 
 	const onType = (e: React.KeyboardEvent<HTMLInputElement>): void => {
 		if (e.key === 'Enter') {

@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { RootState } from './store';
+import type { RootState } from '@/state/store';
 
 const authFromStorage = localStorage.getItem('auth');
 let parsedAuth: AuthState = { username: '', user_id: -1, token: '' };

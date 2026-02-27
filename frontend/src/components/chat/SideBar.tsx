@@ -2,12 +2,12 @@ import UserChat from '@/components/chat/UserChat';
 import type { Chat } from '@/state/responseTypes';
 
 type Props = {
-	setSelectedChatId: (receiver: number) => void;
+	onChatSelect: (receiver: number) => void;
 	selectedChatId: number;
 	listOfChats: Chat[];
 };
 
-function SideBar({ setSelectedChatId, selectedChatId, listOfChats }: Props) {
+function SideBar({ onChatSelect, selectedChatId, listOfChats }: Props) {
 	return (
 		<div className="w-1/5 bg-gray-800 outline-1 outline-solid outline-gray-900 overflow-y-scroll p-4">
 			{listOfChats.map((chat) => (
@@ -15,7 +15,7 @@ function SideBar({ setSelectedChatId, selectedChatId, listOfChats }: Props) {
 					key={chat.id}
 					chatId={chat.id}
 					name={chat.name}
-					onClick={setSelectedChatId}
+					onClick={onChatSelect}
 					selected={chat.id === selectedChatId}
 				/>
 			))}
