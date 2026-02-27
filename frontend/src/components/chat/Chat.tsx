@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import SideBar from '@/components/chat/SideBar';
-import ChatScreen from './ChatScreen';
+import ChatScreen from '@/components/chat/ChatScreen';
 import { useChatQuery } from '@/state/apiSlice';
-import { logout } from '@/state/authSlice';
-import { useAppDispatch } from '@/state/hooks';
+import { logout, selectToken } from '@/state/authSlice';
+import { useAppDispatch, useAppSelector } from '@/state/hooks';
 import { useNavigate } from 'react-router-dom';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
 
@@ -12,7 +12,8 @@ function Chat() {
 	const { isError, isSuccess, data } = useChatQuery();
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { sendHello } = useContext(WebSocketContext);
+	const { sendHello, connect } = useContext(WebSocketContext);
+	const token = useAppSelector(selectToken);
 
 	useEffect(() => {
 		if (isError) {
@@ -22,15 +23,24 @@ function Chat() {
 	}, [isError, dispatch, logout, navigate]);
 
 	useEffect(() => {
-		if (isSuccess && selectedChatId !== -1) {
-			sendHello(selectedChatId);
+		if (isSuccess) {
+			connect(import.meta.env.VITE_WS_URL, {
+				msg_type: 'hello',
+				token,
+				chat_id: -1,
+			});
 		}
-	}, [isSuccess, selectedChatId]);
+	}, [isSuccess]);
+
+	function handleChatSelect(chat_id: number): void {
+		setSelectedChatId(chat_id);
+		sendHello(chat_id);
+	}
 
 	return data ? (
 		<div className="flex grow w-full justify-between gap-1">
 			<SideBar
-				setSelectedChatId={setSelectedChatId}
+				onChatSelect={handleChatSelect}
 				selectedChatId={selectedChatId}
 				listOfChats={data}
 			/>

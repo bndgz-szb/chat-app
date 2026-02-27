@@ -1,4 +1,3 @@
-import { ChatContext } from '@/contexts/ChatContext';
 import type { WebSocketContextInterface } from '@/contexts/WebSocketContext';
 import type {
 	HelloMessage,
@@ -6,34 +5,33 @@ import type {
 	UnicastMessage,
 } from '@/resources/ServerMessages';
 import { selectToken, selectUser, selectUserId } from '@/state/authSlice';
-import { useAppSelector } from '@/state/hooks';
-import { useContext, useRef } from 'react';
+import { selectMessageHistory } from '@/state/chatSlice';
+import { useAppDispatch, useAppSelector } from '@/state/hooks';
+import { useRef } from 'react';
+import { setMessageHistory } from '@/state/chatSlice';
 
 function useWebSocket(): WebSocketContextInterface {
 	const ws = useRef<WebSocket | null>(null);
-	const currentSocketId = useRef<number>(0);
 
 	const username = useAppSelector(selectUser);
 	const user_id = useAppSelector(selectUserId);
-	const { messageHistory, setMessageHistory } = useContext(ChatContext);
+	const messageHistory = useAppSelector(selectMessageHistory);
 	const token = useAppSelector(selectToken);
+	const dispatch = useAppDispatch();
 
-	const connect = (
-		url: string,
-		helloMessage: HelloMessage,
-		onError: (error: string) => void
-	) => {
-		ws.current?.close();
-		const socketId = ++currentSocketId.current;
+	const connect = (url: string, helloMessage: HelloMessage) => {
+		if (ws.current) {
+			return;
+		}
+		console.log('new WebSocket connection');
+
 		ws.current = new WebSocket(url);
 
 		ws.current.addEventListener('error', (error: Event) =>
-			console.error(`closed socketId: ${socketId}; error: ${error}`)
+			console.error(`Closed WebSocket connection; error: ${error}`)
 		);
 
 		ws.current.addEventListener('open', () => {
-			if (socketId !== currentSocketId.current) return;
-
 			ws.current!.send(JSON.stringify(helloMessage));
 		});
 
@@ -46,14 +44,18 @@ function useWebSocket(): WebSocketContextInterface {
 
 			switch (parsed.msg_type) {
 				case 'message':
-					// setMessageHistory((prev) => [...prev, parsed.content]);
+					// dispatch(
+					// 	setMessageHistory({
+					// 		messageHistory: [...messageHistory, parsed.content],
+					// 	})
+					// );
 					break;
 				case 'error':
 					console.error(`error: ${parsed.error}`);
-					onError(parsed.error);
+					// TODO logout if credentials are invalid
 					break;
 				case 'history':
-					setMessageHistory(() => parsed.messages);
+					dispatch(setMessageHistory({ messageHistory: parsed.messages }));
 					break;
 				default:
 					return assertUnreachable(parsed);
@@ -69,8 +71,7 @@ function useWebSocket(): WebSocketContextInterface {
 			chat_id,
 			content: messageContent,
 		};
-		const jsonMessage = JSON.stringify(message);
-		ws.current?.send(jsonMessage);
+		ws.current?.send(JSON.stringify(message));
 	};
 
 	const sendHello = (chat_id: number) => {
@@ -79,12 +80,10 @@ function useWebSocket(): WebSocketContextInterface {
 			token,
 			chat_id,
 		};
-		connect(import.meta.env.VITE_WS_URL, message, (error) =>
-			console.log(error)
-		);
+		ws.current?.send(JSON.stringify(message));
 	};
 
-	return { sendMessage, sendHello };
+	return { connect, sendMessage, sendHello };
 }
 
 export default useWebSocket;
