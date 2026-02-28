@@ -45,7 +45,7 @@ class AuthScheme():
             scheme, _, param = authorization.partition(" ")
             param = param.strip()
         if not authorization or scheme.lower() != "bearer":
-            raise credentials_exception()
+            return ""
         return param
 
 
@@ -83,7 +83,7 @@ def credentials_exception() -> HTTPException:
 
 
 def create_access_token(
-        data: dict, expires_delta: timedelta | None = None
+    data: dict, expires_delta: timedelta | None = None
 ) -> str:
     to_encode = data.copy()
     if expires_delta:
@@ -116,7 +116,7 @@ def authenticate_user(
 
 
 async def get_current_user(
-        token: Annotated[str, Depends(auth_scheme)]
+    token: Annotated[str, Depends(auth_scheme)]
 ) -> User | None:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[str(ALGORITHM)])

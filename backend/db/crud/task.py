@@ -10,10 +10,13 @@ def create_task(
     session.commit()
     return task
 
-# if task already has topic attached, nothing happens
+
+def get_tasks_with_topics(session: Session):
+    return session.query(Task).all()
 
 
 def attach_topic(session: Session, task: Task, topic: Topic) -> None:
+    # if task already has topic attached, nothing happens
     exists = session.query(TaskTopic).filter_by(
         task_id=task.id, topic_id=topic.id
     ).first()

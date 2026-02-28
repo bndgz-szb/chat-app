@@ -41,6 +41,7 @@ function Login() {
 						user_id: result.user_id,
 						token: result.access_token,
 						username: result.username,
+						is_admin: result.is_admin,
 					})
 				)
 			)

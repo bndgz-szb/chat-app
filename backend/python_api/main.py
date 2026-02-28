@@ -10,6 +10,7 @@ from db.crud.chat import (
     get_chat_by_id, MessageWithUsername
 )
 from db.crud.message import send_message_to_chat
+from db.crud.task import get_tasks_with_topics
 from db.session import SessionLocal
 from python_api.auth import (
     get_password_hash, create_access_token,
@@ -17,7 +18,7 @@ from python_api.auth import (
     get_current_user, credentials_exception
 )
 from python_api.request_types import RegisterRequest, LoginRequest
-from python_api.response_types import LoginResponse
+from python_api.response_types import LoginResponse, TaskWithTopic
 from python_api.auth import AuthRoute
 from python_ws_server.chatapp.messages import UnicastMessage
 
@@ -78,8 +79,36 @@ def login(data: LoginRequest) -> LoginResponse:
             expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
         return LoginResponse(
-            username=user.username, access_token=access_token, user_id=user.id
+            username=user.username,
+            access_token=access_token,
+            user_id=user.id,
+            is_admin=user.admin
         )
+
+
+@unauthenticated_router.get("/dashboard", response_model=None)
+def dashboard(
+    user: Annotated[User | None, Depends(get_current_user)]
+) -> List[TaskWithTopic]:
+    with SessionLocal() as session:
+        result = []
+        if user is not None:
+            chat_ids = list(
+                map(lambda x: x.id, get_chats_for_user(session, user.id))
+            )
+        else:
+            chat_ids = []
+        tasks = get_tasks_with_topics(session)
+        for task in tasks:
+            result.append({
+                "id": task.id,
+                "name": task.name,
+                "created_by": task.created_by,
+                "done": task.done,
+                "topics": task.topics,
+                "chat_id": task.chat_id if task.chat_id in chat_ids else None
+            })
+        return result
 
 
 # TODO fix response model
