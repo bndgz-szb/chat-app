@@ -23,7 +23,7 @@ function ChatScreen({ selectedChatId }: Props) {
 	};
 
 	return (
-		<div className="flex flex-col-reverse w-4/5 bg-stone-800 p-8">
+		<div className="flex flex-col-reverse w-4/5 max-w-4/5 bg-stone-800 p-8 overflow-y-scroll">
 			<input
 				className="fixed bottom-5 right-12 border rounded-xl px-4 py-2 w-15/20"
 				type="text"
@@ -37,7 +37,7 @@ function ChatScreen({ selectedChatId }: Props) {
 					return (
 						<Message
 							key={message.id}
-							message={message.content}
+							message={message}
 							mine={username === message.sender_username}
 						/>
 					);

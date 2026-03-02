@@ -28,7 +28,7 @@ function Chat() {
 	}
 
 	return data ? (
-		<div className="flex grow w-full justify-between gap-1">
+		<div className="flex grow w-full h-5/6 justify-between gap-1">
 			<SideBar
 				onChatSelect={handleChatSelect}
 				selectedChatId={selectedChatId}

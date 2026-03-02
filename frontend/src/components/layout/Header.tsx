@@ -9,7 +9,7 @@ function Header() {
 	const username = useAppSelector(selectUser);
 
 	return (
-		<div className="w-full bg-gray-800 h-30 align-middle p-4 flex justify-between">
+		<div className="w-full bg-gray-800 h-1/6 max-h-30 align-middle p-4 flex justify-between">
 			<div className="p-8 font-bold">Site Name</div>
 			<div className="flex gap-2">
 				<Link to={'/chat'} className="p-8 font-bold">
