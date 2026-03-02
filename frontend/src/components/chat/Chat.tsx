@@ -2,25 +2,15 @@ import { useContext, useEffect, useState } from 'react';
 import SideBar from '@/components/chat/SideBar';
 import ChatScreen from '@/components/chat/ChatScreen';
 import { useChatQuery } from '@/state/apiSlice';
-import { logout, selectToken } from '@/state/authSlice';
-import { useAppDispatch, useAppSelector } from '@/state/hooks';
-import { useNavigate } from 'react-router-dom';
+import { selectToken } from '@/state/authSlice';
+import { useAppSelector } from '@/state/hooks';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
 
 function Chat() {
 	const [selectedChatId, setSelectedChatId] = useState<number>(-1);
-	const { isError, isSuccess, data } = useChatQuery();
-	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
+	const { isSuccess, data } = useChatQuery();
 	const { sendHello, connect } = useContext(WebSocketContext);
 	const token = useAppSelector(selectToken);
-
-	useEffect(() => {
-		if (isError) {
-			dispatch(logout());
-			navigate('/login');
-		}
-	}, [isError, dispatch, logout, navigate]);
 
 	useEffect(() => {
 		if (isSuccess) {
@@ -30,7 +20,7 @@ function Chat() {
 				chat_id: -1,
 			});
 		}
-	}, [isSuccess]);
+	}, [isSuccess, connect]);
 
 	function handleChatSelect(chat_id: number): void {
 		setSelectedChatId(chat_id);
@@ -47,7 +37,7 @@ function Chat() {
 			<ChatScreen selectedChatId={selectedChatId} />
 		</div>
 	) : (
-		<div>Loading...</div>
+		<div>Loading chats...</div>
 	);
 }
 

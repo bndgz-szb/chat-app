@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import timedelta
-from typing import Annotated, List
+from typing import Annotated, List, Literal
 
-from db.models import User
+from db.models import User, Topic
 from db.crud.user import create_user, get_user_by_username, get_user_by_email
 from db.crud.chat import (
     get_chats_for_user, ChatResponse, get_messages_for_chat,
@@ -11,6 +11,7 @@ from db.crud.chat import (
 )
 from db.crud.message import send_message_to_chat
 from db.crud.task import get_tasks_with_topics
+from db.crud.topic import get_all_topics
 from db.session import SessionLocal
 from python_api.auth import (
     get_password_hash, create_access_token,
@@ -38,11 +39,16 @@ app.add_middleware(
 )
 
 
+@authenticated_router.get("/token")
+def validate_token() -> Literal[True]:
+    return True
+
+
 @unauthenticated_router.post("/register")
 def register(data: RegisterRequest) -> str:
     with SessionLocal() as session:
-        # check email validity
-        # check password validity
+        # TODO check email validity
+        # TODO check password validity
         user = get_user_by_username(session, data.username)
         if user:
             raise HTTPException(
@@ -67,7 +73,8 @@ def register(data: RegisterRequest) -> str:
 def login(data: LoginRequest) -> LoginResponse:
     with SessionLocal() as session:
         user = authenticate_user(
-            session, data.username, data.password)
+            session, data.username, data.password
+        )
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -151,6 +158,12 @@ def send_message(
             sent_at=result.sent_at,
             sender_username=user.username
         )
+
+
+@authenticated_router.get('/topics', response_model=None)
+def topics() -> List[Topic]:
+    with SessionLocal() as session:
+        return get_all_topics(session)
 
 
 app.include_router(unauthenticated_router)

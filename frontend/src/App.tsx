@@ -7,19 +7,41 @@ import Topics from '@/components/dashboard/Topics';
 import TaskForm from '@/components/dashboard/TaskForm';
 import Chat from '@/components/chat/Chat';
 import Logout from '@/components/auth/Logout';
+import RequireLogin from '@/components/auth/RequireLogin';
 
 function App() {
 	return (
 		<BrowserRouter>
 			<Layout>
 				<Routes>
-					<Route path="/chat" element={<Chat />} />
 					<Route path="/dashboard" element={<Dashboard />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/logout" element={<Logout />} />
 					<Route path="/register" element={<Register />} />
-					<Route path="/dashboard/topics" element={<Topics />} />
-					<Route path="/dashboard/create_task" element={<TaskForm />} />
+					<Route
+						path="/chat"
+						element={
+							<RequireLogin>
+								<Chat />
+							</RequireLogin>
+						}
+					/>
+					<Route
+						path="/dashboard/topics"
+						element={
+							<RequireLogin>
+								<Topics />
+							</RequireLogin>
+						}
+					/>
+					<Route
+						path="/dashboard/create_task"
+						element={
+							<RequireLogin>
+								<TaskForm />
+							</RequireLogin>
+						}
+					/>
 				</Routes>
 			</Layout>
 		</BrowserRouter>

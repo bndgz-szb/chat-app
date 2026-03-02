@@ -1,7 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/state/store';
 import type { LoginRequest, RegisterRequest } from '@/state/requestTypes';
-import type { Chat, LoginResponse, TaskWithTopic } from '@/state/responseTypes';
+import type {
+	Chat,
+	LoginResponse,
+	TaskWithTopic,
+	Topic,
+} from '@/state/responseTypes';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -29,6 +34,18 @@ export const apiSlice = createApi({
 				method: 'GET',
 			}),
 		}),
+		topics: build.query<Topic[], void>({
+			query: () => ({
+				url: 'topics',
+				method: 'GET',
+			}),
+		}),
+		validateToken: build.query<void, void>({
+			query: () => ({
+				url: 'token',
+				method: 'GET',
+			}),
+		}),
 		login: build.mutation<LoginResponse, LoginRequest>({
 			query: (body) => ({
 				url: 'login',
@@ -49,6 +66,8 @@ export const apiSlice = createApi({
 export const {
 	useDashboardQuery,
 	useChatQuery,
+	useTopicsQuery,
+	useValidateTokenQuery,
 	useLoginMutation,
 	useRegisterMutation,
 } = apiSlice;
