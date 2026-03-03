@@ -1,6 +1,7 @@
 import { useDashboardQuery } from '@/state/apiSlice';
 import { selectIsAdmin, selectUserId } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
+import { Link } from 'react-router-dom';
 
 function Tasks() {
 	const { data } = useDashboardQuery();
@@ -42,10 +43,14 @@ function Tasks() {
 									</div>
 								</div>
 							)}
-							{task.chat_id && (
-								<div className="rounded-md bg-sky-500 text-center text-white border-2 border-black">
+							{user_id !== -1 && task.chat_id && (
+								<Link
+									to={'/chat'}
+									state={{ chat_id: task.chat_id }}
+									className="rounded-md bg-sky-500 text-center text-white border-2 border-black"
+								>
 									Chat
-								</div>
+								</Link>
 							)}
 						</div>
 					</div>
