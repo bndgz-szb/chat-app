@@ -32,8 +32,8 @@ function ChatScreen({ selectedChatId }: Props) {
 				onChange={(e) => setMessage(e.target.value)}
 				onKeyDown={onType}
 			/>
-			<div className="flex flex-col gap-4 overflow-y-scroll p-8 mb-13">
-				{messageHistory?.map((message) => {
+			<div className="flex flex-col-reverse gap-4 overflow-y-scroll p-8 mb-13">
+				{messageHistory?.toReversed().map((message) => {
 					return (
 						<Message
 							key={message.id}
