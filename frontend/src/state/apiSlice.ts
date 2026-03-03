@@ -11,6 +11,7 @@ import type {
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const apiSlice = createApi({
+	tagTypes: ['Dashboard', 'Auth', 'Chat', 'Topics'],
 	baseQuery: fetchBaseQuery({
 		baseUrl: API_BASE_URL,
 		prepareHeaders(headers, { getState }) {
@@ -27,24 +28,28 @@ export const apiSlice = createApi({
 				url: 'dashboard',
 				method: 'GET',
 			}),
+			providesTags: ['Dashboard', 'Auth'],
 		}),
 		chat: build.query<Chat[], void>({
 			query: () => ({
 				url: 'chat',
 				method: 'GET',
 			}),
+			providesTags: ['Chat', 'Auth'],
 		}),
 		topics: build.query<Topic[], void>({
 			query: () => ({
 				url: 'topics',
 				method: 'GET',
 			}),
+			providesTags: ['Topics', 'Auth'],
 		}),
 		validateToken: build.query<void, void>({
 			query: () => ({
 				url: 'token',
 				method: 'GET',
 			}),
+			providesTags: ['Auth'],
 		}),
 		login: build.mutation<LoginResponse, LoginRequest>({
 			query: (body) => ({
@@ -52,6 +57,7 @@ export const apiSlice = createApi({
 				method: 'POST',
 				body,
 			}),
+			invalidatesTags: ['Auth'],
 		}),
 		register: build.mutation<String, RegisterRequest>({
 			query: (body) => ({
