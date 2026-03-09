@@ -110,7 +110,7 @@ def dashboard(
             result.append({
                 "id": task.id,
                 "name": task.name,
-                "created_by": task.created_by,
+                "created_by": task.created_by if user is not None else None,
                 "done": task.done,
                 "topics": task.topics,
                 "chat_id": task.chat_id if task.chat_id in chat_ids else None

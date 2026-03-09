@@ -16,7 +16,7 @@ class LoginResponse():
 class TaskWithTopic():
     id: int
     name: str
-    created_by: int
+    created_by: int | None
     done: bool
     topics: List[Topic]
     chat_id: int | None

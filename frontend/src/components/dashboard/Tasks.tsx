@@ -33,7 +33,7 @@ function Tasks() {
 							</div>
 						</div>
 						<div className="flex flex-col gap-2">
-							{(is_admin || task.created_by == user_id) && (
+							{task.created_by && (is_admin || task.created_by == user_id) && (
 								<div className="flex flex-row justify-between gap-2">
 									<div className="p-1.5 text-white rounded-md bg-red-600">
 										Törlés

@@ -8,7 +8,7 @@ export type Topic = {
 export type TaskWithTopic = {
 	id: number;
 	name: string;
-	created_by: number;
+	created_by: number | null;
 	done: boolean;
 	topics: Topic[];
 	chat_id: number | null;
