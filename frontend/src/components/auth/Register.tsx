@@ -3,6 +3,7 @@ import InputField from '@/components/auth/InputField';
 import { useRegisterMutation } from '@/state/apiSlice';
 import { selectUser } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
+import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -90,14 +91,18 @@ function Register() {
 						onChange={setConfirmInputPassword}
 					/>
 
-					<button type="submit" className="w-full py-2">
+					<Button
+						variant="contained"
+						type="submit"
+						className="w-full py-2 rounded-lg border-1 border-solid border-[transparent] px-5 py-3 font-medium [font-family:inherit] bg-zinc-900 cursor-pointer [transition:border-color_0.25s] hover:border-sky-300 outline-[4px_auto_-webkit-focus-ring-color]"
+					>
 						Register
-					</button>
+					</Button>
 				</form>
 			</div>
 
 			<Link to={'/login'} className="mt-1 text-center">
-				Log in
+				Login
 			</Link>
 		</div>
 	);

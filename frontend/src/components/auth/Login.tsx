@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '@/state/apiSlice';
 import { useAppDispatch, useAppSelector } from '@/state/hooks';
 import { login, selectUser } from '@/state/authSlice';
+import { Button } from '@mui/material';
 
 function Login() {
 	const [inputUsername, setInputUsername] = useState<string>('');
@@ -73,9 +74,13 @@ function Login() {
 						onChange={setInputPassword}
 					/>
 
-					<button type="submit" className="w-full py-2">
-						Login
-					</button>
+					<Button
+						variant="contained"
+						type="submit"
+						className="w-full py-2 rounded-lg border-1 border-solid border-[transparent] px-5 py-3 font-medium [font-family:inherit] bg-zinc-900 cursor-pointer [transition:border-color_0.25s] hover:border-sky-300 outline-[4px_auto_-webkit-focus-ring-color]"
+					>
+						Log in
+					</Button>
 				</form>
 			</div>
 
