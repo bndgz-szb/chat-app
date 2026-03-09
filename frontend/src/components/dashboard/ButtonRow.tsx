@@ -1,3 +1,4 @@
+import TaskFormModal from '@/components/dashboard/TaskFormModal';
 import { Link } from 'react-router-dom';
 
 function ButtonRow() {
@@ -7,12 +8,8 @@ function ButtonRow() {
 			<Link to={'/dashboard/topics'} className="rounded-md p-4 bg-gray-900">
 				Tematikák kezelése
 			</Link>
-			<Link
-				to={'/dashboard/create_task'}
-				className="rounded-md p-4 bg-gray-900"
-			>
-				Feladat létrehozása
-			</Link>
+
+			<TaskFormModal />
 		</div>
 	);
 }

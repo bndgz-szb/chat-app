@@ -5,6 +5,11 @@ export type Topic = {
 	name: string;
 };
 
+export type Participant = {
+	id: number;
+	name: string;
+};
+
 export type TaskWithTopic = {
 	id: number;
 	name: string;

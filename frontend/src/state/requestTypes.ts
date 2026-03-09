@@ -8,3 +8,9 @@ export type LoginRequest = {
 	username: string;
 	password: string;
 };
+
+export type TaskParticipant = {
+	id: number;
+	name: string;
+	role: 'admin' | 'user' | 'guest';
+};
