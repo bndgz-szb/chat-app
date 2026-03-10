@@ -4,7 +4,7 @@ function Topics() {
 	const { data } = useTopicsQuery();
 
 	return data ? (
-		<div className="flex flex-col gap-4 p-4">
+		<div className="flex flex-col gap-4 p-4 self-start">
 			<div className="rounded-md bg-black text-white p-2 w-fit">
 				{/* TODO create topic modal */}
 				Tematika létrehozása

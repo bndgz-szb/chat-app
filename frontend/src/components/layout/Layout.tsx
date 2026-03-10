@@ -6,7 +6,7 @@ type Props = {
 
 function Layout(props: Props) {
 	return (
-		<div className="h-full w-full flex flex-col font-[system-ui,_Avenir,_Helvetica,_Arial,_sans-serif] leading-normal font-normal [color-scheme:light_dark] text-white/87 bg-neutral-800 antialiased m-0 place-items-center min-h-screen">
+		<div className="h-screen w-screen flex flex-col font-[system-ui,_Avenir,_Helvetica,_Arial,_sans-serif] leading-normal font-normal [color-scheme:light_dark] text-white/87 bg-neutral-800 antialiased m-0 place-items-center min-h-screen">
 			<Header />
 			{props.children}
 		</div>
