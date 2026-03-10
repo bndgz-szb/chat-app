@@ -1,34 +1,39 @@
 import ParticipantsModal from '@/components/dashboard/ParticipantsModal';
-import { useTopicsQuery } from '@/state/apiSlice';
+import { useAllUsersQuery, useTopicsQuery } from '@/state/apiSlice';
 import type { TaskParticipant } from '@/state/requestTypes';
-import type { Topic } from '@/state/responseTypes';
+import type { TaskWithTopic, Topic } from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, Switch, TextField } from '@mui/material';
 import { useState } from 'react';
 
-function TaskFormModal() {
-	const [open, setOpen] = useState(false);
-	const [isDone, setIsDone] = useState<boolean>(false);
-	const [taskName, setTaskName] = useState<string>('');
-	const [taskTopics, setTaskTopics] = useState<Topic[]>([]);
+type Props = {
+	buttonText: string;
+	buttonStyle: string;
+	task?: TaskWithTopic;
+};
+
+function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
+	const [open, setOpen] = useState<boolean>(false);
+	const [isDone, setIsDone] = useState<boolean>(task ? task.done : false);
+	const [taskName, setTaskName] = useState<string>(task ? task.name : '');
+	const [taskTopics, setTaskTopics] = useState<Topic[]>(
+		task ? task.topics : []
+	);
 	const [taskParticipants, setTaskParticipants] = useState<TaskParticipant[]>(
 		[]
 	);
+	// TODO useEffect for participants, turn off background refetching
 	const topics = useTopicsQuery();
-
-	const participants = [
-		{ id: 1, name: 'Résztvevő1' },
-		{ id: 2, name: 'Résztvevő2' },
-	];
+	const participants = useAllUsersQuery();
 
 	return (
 		<div>
 			<Button
 				variant="contained"
 				disableElevation
-				className="rounded-md p-4 bg-gray-900 normal-case text-base"
+				className={buttonStyle}
 				onClick={() => setOpen(true)}
 			>
-				Feladat létrehozása
+				{buttonText}
 			</Button>
 			<Modal open={open} onClose={() => setOpen(false)}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
@@ -70,7 +75,7 @@ function TaskFormModal() {
 						/>
 
 						<ParticipantsModal
-							allUsers={participants}
+							allUsers={participants.data}
 							initialGuests={taskParticipants.filter(
 								(user) => user.role === 'guest'
 							)}
@@ -113,7 +118,7 @@ function TaskFormModal() {
 								Mégsem
 							</Button>
 							<div className="w-full bg-slate-900 text-white p-2 rounded-md text-center">
-								Feladat létrehozása
+								{buttonText}
 							</div>
 						</div>
 					</div>

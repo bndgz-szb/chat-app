@@ -1,3 +1,4 @@
+import TaskFormModal from '@/components/dashboard/TaskFormModal';
 import { useDashboardQuery } from '@/state/apiSlice';
 import { selectIsAdmin, selectUserId } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
@@ -38,9 +39,11 @@ function Tasks() {
 									<div className="p-1.5 text-white rounded-md bg-red-600">
 										Törlés
 									</div>
-									<div className="p-1.5 text-white rounded-md bg-black">
-										Módosítás
-									</div>
+									<TaskFormModal
+										buttonText="Módosítás"
+										buttonStyle="p-1.5 text-white rounded-md bg-black normal-case"
+										task={task}
+									/>
 								</div>
 							)}
 							{user_id !== -1 && task.chat_id && (

@@ -4,6 +4,7 @@ import type { LoginRequest, RegisterRequest } from '@/state/requestTypes';
 import type {
 	Chat,
 	LoginResponse,
+	Participant,
 	TaskWithTopic,
 	Topic,
 } from '@/state/responseTypes';
@@ -29,6 +30,12 @@ export const apiSlice = createApi({
 				method: 'GET',
 			}),
 			providesTags: ['Dashboard', 'Auth'],
+		}),
+		allUsers: build.query<Participant[], void>({
+			query: () => ({
+				url: 'users',
+				method: 'GET',
+			}),
 		}),
 		chat: build.query<Chat[], void>({
 			query: () => ({
@@ -71,6 +78,7 @@ export const apiSlice = createApi({
 
 export const {
 	useDashboardQuery,
+	useAllUsersQuery,
 	useChatQuery,
 	useTopicsQuery,
 	useValidateTokenQuery,

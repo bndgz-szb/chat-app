@@ -4,7 +4,9 @@ from datetime import timedelta
 from typing import Annotated, List, Literal
 
 from db.models import User, Topic
-from db.crud.user import create_user, get_user_by_username, get_user_by_email
+from db.crud.user import (
+    create_user, get_user_by_username, get_user_by_email, get_all_users
+)
 from db.crud.chat import (
     get_chats_for_user, ChatResponse, get_messages_for_chat,
     get_chat_by_id, MessageWithUsername
@@ -19,7 +21,9 @@ from python_api.auth import (
     get_current_user, credentials_exception
 )
 from python_api.request_types import RegisterRequest, LoginRequest
-from python_api.response_types import LoginResponse, TaskWithTopic
+from python_api.response_types import (
+    LoginResponse, TaskWithTopic, UserResponse
+)
 from python_api.auth import AuthRoute
 from python_ws_server.chatapp.messages import UnicastMessage
 
@@ -164,6 +168,16 @@ def send_message(
 def topics() -> List[Topic]:
     with SessionLocal() as session:
         return get_all_topics(session)
+
+
+@authenticated_router.get('/users', response_model=None)
+def allUsers() -> List[UserResponse]:
+    with SessionLocal() as session:
+        users = get_all_users(session)
+        result = []
+        for user in users:
+            result.append(UserResponse(id=user.id, name=user.username))
+        return result
 
 
 app.include_router(unauthenticated_router)

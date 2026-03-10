@@ -4,7 +4,7 @@ import { Autocomplete, Button, Modal, TextField } from '@mui/material';
 import { useState } from 'react';
 
 type ParticipantsModalProps = {
-	allUsers: Participant[];
+	allUsers?: Participant[];
 	initialGuests: TaskParticipant[];
 	initialUsers: TaskParticipant[];
 	setTaskParticipants: (newTaskParticipants: TaskParticipant[]) => void;
@@ -49,7 +49,7 @@ function ParticipantsModal({
 			</Button>
 			<Modal open={open} onClose={() => setOpen(false)}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
-					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-xs bg-white text-black">
+					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-lg bg-white text-black">
 						<div>
 							<label htmlFor="task-participants" className="block mb-1">
 								Vendég felhasználók

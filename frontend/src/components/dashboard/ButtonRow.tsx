@@ -9,7 +9,10 @@ function ButtonRow() {
 				Tematikák kezelése
 			</Link>
 
-			<TaskFormModal />
+			<TaskFormModal
+				buttonText="Feladat létrehozása"
+				buttonStyle="rounded-md p-4 bg-gray-900 normal-case text-base"
+			/>
 		</div>
 	);
 }

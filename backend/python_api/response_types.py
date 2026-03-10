@@ -20,3 +20,9 @@ class TaskWithTopic():
     done: bool
     topics: List[Topic]
     chat_id: int | None
+
+
+@dataclass
+class UserResponse():
+    id: int
+    name: str
