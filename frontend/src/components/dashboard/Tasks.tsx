@@ -1,3 +1,4 @@
+import DeleteTaskModal from '@/components/dashboard/DeleteTaskModal';
 import TaskFormModal from '@/components/dashboard/TaskFormModal';
 import { useDashboardQuery } from '@/state/apiSlice';
 import { selectIsAdmin, selectUserId } from '@/state/authSlice';
@@ -36,9 +37,8 @@ function Tasks() {
 						<div className="flex flex-col gap-2">
 							{task.created_by && (is_admin || task.created_by == user_id) && (
 								<div className="flex flex-row justify-between gap-2">
-									<div className="p-1.5 text-white rounded-md bg-red-600">
-										Törlés
-									</div>
+									<DeleteTaskModal />
+
 									<TaskFormModal
 										buttonText="Módosítás"
 										buttonStyle="p-1.5 text-white rounded-md bg-black normal-case"
