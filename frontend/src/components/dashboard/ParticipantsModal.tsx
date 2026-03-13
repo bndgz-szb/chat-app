@@ -1,24 +1,23 @@
-import type { TaskParticipant } from '@/state/requestTypes';
-import type { Participant } from '@/state/responseTypes';
+import type { Participant, TaskParticipant } from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, TextField } from '@mui/material';
 import { useState } from 'react';
 
 type ParticipantsModalProps = {
 	allUsers?: Participant[];
 	initialGuests: TaskParticipant[];
-	initialUsers: TaskParticipant[];
+	initialMembers: TaskParticipant[];
 	setTaskParticipants: (newTaskParticipants: TaskParticipant[]) => void;
 };
 
 function ParticipantsModal({
 	allUsers,
 	initialGuests,
-	initialUsers,
+	initialMembers,
 	setTaskParticipants,
 }: ParticipantsModalProps) {
 	const [open, setOpen] = useState<boolean>(false);
 	const [guests, setGuests] = useState<Participant[]>(initialGuests);
-	const [users, setUsers] = useState<Participant[]>(initialUsers);
+	const [members, setMembers] = useState<Participant[]>(initialMembers);
 
 	const handleSubmit = () => {
 		const taskParticipants: TaskParticipant[] = guests
@@ -30,7 +29,7 @@ function ParticipantsModal({
 					}) as TaskParticipant
 			)
 			.concat(
-				users.map((user) => ({ ...user, role: 'user' }) as TaskParticipant)
+				members.map((user) => ({ ...user, role: 'member' }) as TaskParticipant)
 			);
 
 		setTaskParticipants(taskParticipants);
@@ -67,7 +66,7 @@ function ParticipantsModal({
 								options={
 									allUsers
 										? allUsers.filter((user) =>
-												users.every((other) => user.id !== other.id)
+												members.every((other) => user.id !== other.id)
 											)
 										: []
 								}
@@ -88,9 +87,9 @@ function ParticipantsModal({
 							</label>
 							<Autocomplete
 								multiple
-								value={users}
+								value={members}
 								onChange={(_: any, newValue: Participant[]) =>
-									setUsers(newValue)
+									setMembers(newValue)
 								}
 								id="task-participants"
 								loading={allUsers === undefined}

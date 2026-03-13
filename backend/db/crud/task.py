@@ -1,5 +1,15 @@
 from sqlalchemy.orm import Session
-from db.models import Chat, Task, Topic, TaskTopic, User
+from sqlalchemy import select
+from typing import List, Literal
+from dataclasses import dataclass
+from db.models import Chat, Task, Topic, TaskTopic, User, ChatParticipant
+
+
+@dataclass
+class TaskParticipant():
+    id: int
+    name: str
+    role: Literal['admin'] | Literal['guest'] | Literal['member']
 
 
 def create_task(
@@ -13,6 +23,25 @@ def create_task(
 
 def get_tasks_with_topics(session: Session):
     return session.query(Task).all()
+
+
+def get_task_participants(session: Session, task_id: int) -> List[TaskParticipant]:
+    stmt = (
+        select(User, ChatParticipant.role)
+        .join(ChatParticipant)
+        .join(Chat)
+        .join(Task)
+        .where(Task.id == task_id)
+    )
+    result = []
+    for row in session.execute(stmt):
+        result.append(TaskParticipant(
+            id=row[0].id,
+            name=row[0].username,
+            role=row[1]
+        ))
+
+    return result
 
 
 def attach_topic(session: Session, task: Task, topic: Topic) -> None:

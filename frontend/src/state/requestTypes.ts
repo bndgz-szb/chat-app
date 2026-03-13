@@ -9,8 +9,6 @@ export type LoginRequest = {
 	password: string;
 };
 
-export type TaskParticipant = {
-	id: number;
-	name: string;
-	role: 'admin' | 'user' | 'guest';
+export type TaskParticipantRequest = {
+	task_id: number;
 };

@@ -1,9 +1,16 @@
 import ParticipantsModal from '@/components/dashboard/ParticipantsModal';
-import { useAllUsersQuery, useTopicsQuery } from '@/state/apiSlice';
-import type { TaskParticipant } from '@/state/requestTypes';
-import type { TaskWithTopic, Topic } from '@/state/responseTypes';
+import {
+	useAllUsersQuery,
+	useLazyTaskParticipantsQuery,
+	useTopicsQuery,
+} from '@/state/apiSlice';
+import type {
+	TaskParticipant,
+	TaskWithTopic,
+	Topic,
+} from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, Switch, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
 	buttonText: string;
@@ -21,9 +28,18 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 	const [taskParticipants, setTaskParticipants] = useState<TaskParticipant[]>(
 		[]
 	);
-	// TODO useEffect for participants, turn off background refetching
+
 	const topics = useTopicsQuery();
 	const participants = useAllUsersQuery();
+	const [getTaskParticipants] = useLazyTaskParticipantsQuery();
+
+	useEffect(() => {
+		if (task) {
+			getTaskParticipants({ task_id: task.id })
+				.unwrap()
+				.then((data) => setTaskParticipants(data));
+		}
+	}, []);
 
 	return (
 		<div>
@@ -79,8 +95,8 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 							initialGuests={taskParticipants.filter(
 								(user) => user.role === 'guest'
 							)}
-							initialUsers={taskParticipants.filter(
-								(user) => user.role === 'user'
+							initialMembers={taskParticipants.filter(
+								(user) => user.role === 'member'
 							)}
 							setTaskParticipants={setTaskParticipants}
 						/>

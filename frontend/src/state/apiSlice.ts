@@ -1,10 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/state/store';
-import type { LoginRequest, RegisterRequest } from '@/state/requestTypes';
+import type {
+	LoginRequest,
+	RegisterRequest,
+	TaskParticipantRequest,
+} from '@/state/requestTypes';
 import type {
 	Chat,
 	LoginResponse,
 	Participant,
+	TaskParticipant,
 	TaskWithTopic,
 	Topic,
 } from '@/state/responseTypes';
@@ -58,6 +63,13 @@ export const apiSlice = createApi({
 			}),
 			providesTags: ['Auth'],
 		}),
+		taskParticipants: build.query<TaskParticipant[], TaskParticipantRequest>({
+			query: (body) => ({
+				url: 'task-participants',
+				method: 'GET',
+				params: body,
+			}),
+		}),
 		login: build.mutation<LoginResponse, LoginRequest>({
 			query: (body) => ({
 				url: 'login',
@@ -82,6 +94,7 @@ export const {
 	useChatQuery,
 	useTopicsQuery,
 	useValidateTokenQuery,
+	useLazyTaskParticipantsQuery,
 	useLoginMutation,
 	useRegisterMutation,
 } = apiSlice;

@@ -10,6 +10,12 @@ export type Participant = {
 	name: string;
 };
 
+export type TaskParticipant = {
+	id: number;
+	name: string;
+	role: 'admin' | 'member' | 'guest';
+};
+
 export type TaskWithTopic = {
 	id: number;
 	name: string;

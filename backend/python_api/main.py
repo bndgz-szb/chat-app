@@ -12,7 +12,9 @@ from db.crud.chat import (
     get_chat_by_id, MessageWithUsername
 )
 from db.crud.message import send_message_to_chat
-from db.crud.task import get_tasks_with_topics
+from db.crud.task import (
+    get_tasks_with_topics, get_task_participants, TaskParticipant
+)
 from db.crud.topic import get_all_topics
 from db.session import SessionLocal
 from python_api.auth import (
@@ -171,13 +173,19 @@ def topics() -> List[Topic]:
 
 
 @authenticated_router.get('/users', response_model=None)
-def allUsers() -> List[UserResponse]:
+def all_users() -> List[UserResponse]:
     with SessionLocal() as session:
         users = get_all_users(session)
         result = []
         for user in users:
             result.append(UserResponse(id=user.id, name=user.username))
         return result
+
+
+@authenticated_router.get('/task-participants', response_model=None)
+def task_participants(task_id: int) -> List[TaskParticipant]:
+    with SessionLocal() as session:
+        return get_task_participants(session, task_id)
 
 
 app.include_router(unauthenticated_router)
