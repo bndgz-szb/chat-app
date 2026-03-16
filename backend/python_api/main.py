@@ -8,13 +8,13 @@ from db.crud.user import (
     create_user, get_user_by_username, get_user_by_email, get_all_users
 )
 from db.crud.chat import (
-    get_chats_for_user, ChatResponse, get_messages_for_chat,
+    get_chats_for_user, ChatResponse, get_messages_for_chat, delete_chat,
     get_chat_by_id, MessageWithUsername, create_chat, assign_user
 )
 from db.crud.message import send_message_to_chat
 from db.crud.task import (
     get_tasks_with_topics, get_task_participants,
-    TaskParticipant, create_task, attach_topic
+    TaskParticipant, create_task, attach_topic, get_task_by_id, delete_task
 )
 from db.crud.topic import get_all_topics
 from db.session import SessionLocal
@@ -24,7 +24,7 @@ from python_api.auth import (
     get_current_user, credentials_exception
 )
 from python_api.request_types import (
-    RegisterRequest, LoginRequest, CreateTaskRequest
+    RegisterRequest, LoginRequest, CreateTaskRequest, DeleteTaskRequest
 )
 from python_api.response_types import (
     LoginResponse, TaskWithTopic, UserResponse
@@ -194,7 +194,7 @@ def task_participants(task_id: int) -> List[TaskParticipant]:
 @authenticated_router.post('/create-task')
 def create_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
-    create_task_request: CreateTaskRequest
+    request: CreateTaskRequest
 ) -> str:
     if user is None:
         raise credentials_exception()
@@ -202,7 +202,7 @@ def create_task_endpoint(
         all_topic_ids = list(
             map(lambda topic: topic.id, get_all_topics(session))
         )
-        for topic in create_task_request.topics:
+        for topic in request.topics:
             if topic.id not in all_topic_ids:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -210,7 +210,7 @@ def create_task_endpoint(
                 )
 
         user_ids = list(map(lambda user: user.id, get_all_users(session)))
-        for participant in create_task_request.participants:
+        for participant in request.participants:
             if participant.id not in user_ids:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -218,19 +218,44 @@ def create_task_endpoint(
                 )
 
         chat = create_chat(session)
-        for participant in create_task_request.participants:
+        for participant in request.participants:
             assign_user(session, chat.id, participant.id)
         task = create_task(
             session=session,
-            name=create_task_request.name,
+            name=request.name,
             chat=chat,
             creator=user,
-            done=create_task_request.done
+            done=request.done
         )
-        for topic in create_task_request.topics:
+        for topic in request.topics:
             attach_topic(session, task, topic.id)
 
     return "Task created successfully"
+
+
+@authenticated_router.delete('/delete-task')
+def delete_task_endpoint(
+    user: Annotated[User | None, Depends(get_current_user)],
+    request: DeleteTaskRequest
+) -> str:
+    if user is None:
+        raise credentials_exception()
+    with SessionLocal.begin() as session:
+        task = get_task_by_id(session, request.task_id)
+        if task is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Task with given id does not exist"
+            )
+        if not (user.admin or user.id == task.created_by):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You don't have permission to delete this task!"
+            )
+        delete_task(session, task)
+        delete_chat(session, task.chat)
+
+    return "Task and its chat has been successfully deleted"
 
 
 app.include_router(unauthenticated_router)

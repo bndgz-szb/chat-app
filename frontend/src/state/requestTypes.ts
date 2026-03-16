@@ -21,3 +21,7 @@ export type CreateTaskRequest = {
 	topics: Topic[];
 	participants: TaskParticipant[];
 };
+
+export type DeleteTaskRequest = {
+	task_id: number;
+};

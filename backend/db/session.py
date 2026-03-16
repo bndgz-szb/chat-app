@@ -9,8 +9,8 @@ load_dotenv()
 DB_URL = os.getenv("DB_URL")
 
 if DB_URL == None:
-	raise Exception("Don't forget to create .env file with DB_URL")
+    raise Exception("Don't forget to create .env file with DB_URL")
 
-engine = create_engine(DB_URL, echo=True)
+engine = create_engine(DB_URL)  # set 'echo=True' for logging
 
 SessionLocal = sessionmaker(autoflush=False, bind=engine)

@@ -37,6 +37,10 @@ def get_tasks_with_topics(session: Session):
     return session.query(Task).all()
 
 
+def get_task_by_id(session: Session, task_id: int) -> Task | None:
+    return session.query(Task).filter_by(id=task_id).first()
+
+
 def create_task(
         session: Session, name: str, chat: Chat, creator: User,
         done: bool = False
@@ -56,3 +60,7 @@ def attach_topic(session: Session, task: Task, topic_id: int) -> None:
         taskTopic = TaskTopic(task_id=task.id, topic_id=topic_id)
         session.add(taskTopic)
         session.commit()
+
+
+def delete_task(session: Session, task: Task) -> None:
+    session.delete(task)

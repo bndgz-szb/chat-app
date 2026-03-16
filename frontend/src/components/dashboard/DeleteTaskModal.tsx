@@ -1,8 +1,19 @@
+import { useDeleteTaskMutation } from '@/state/apiSlice';
 import { Button, Modal } from '@mui/material';
 import { useState } from 'react';
 
-function DeleteTaskModal() {
+type Props = {
+	task_id: number;
+};
+
+function DeleteTaskModal({ task_id }: Props) {
 	const [open, setOpen] = useState<boolean>(false);
+	const [sendDeleteTask] = useDeleteTaskMutation();
+
+	const handleDelete = () => {
+		sendDeleteTask({ task_id });
+		setOpen(false);
+	};
 
 	return (
 		<div>
@@ -25,9 +36,12 @@ function DeleteTaskModal() {
 							>
 								Mégsem
 							</Button>
-							<div className="w-full bg-red-600 text-white p-2 rounded-md text-center">
+							<Button
+								className="w-full bg-red-600 text-white p-2 rounded-md text-center"
+								onClick={handleDelete}
+							>
 								Törlés
-							</div>
+							</Button>
 						</div>
 					</div>
 				</div>

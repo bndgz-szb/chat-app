@@ -85,3 +85,7 @@ def assign_user(
         )
         session.add(chatParticipant)
         session.commit()
+
+
+def delete_chat(session: Session, chat: Chat) -> None:
+    session.delete(chat)

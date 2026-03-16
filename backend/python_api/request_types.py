@@ -25,3 +25,7 @@ class CreateTaskRequest(BaseModel):
     done: bool
     topics: List[Topic]
     participants: List[TaskParticipant]
+
+
+class DeleteTaskRequest(BaseModel):
+    task_id: int

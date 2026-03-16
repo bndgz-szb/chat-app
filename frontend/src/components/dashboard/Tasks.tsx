@@ -37,7 +37,7 @@ function Tasks() {
 						<div className="flex flex-col gap-2">
 							{task.created_by && (is_admin || task.created_by == user_id) && (
 								<div className="flex flex-row justify-between gap-2">
-									<DeleteTaskModal />
+									<DeleteTaskModal task_id={task.id} />
 
 									<TaskFormModal
 										buttonText="Módosítás"
