@@ -1,3 +1,5 @@
+import type { TaskParticipant, Topic } from '@/state/responseTypes';
+
 export type RegisterRequest = {
 	username: string;
 	email: string;
@@ -11,4 +13,11 @@ export type LoginRequest = {
 
 export type TaskParticipantRequest = {
 	task_id: number;
+};
+
+export type CreateTaskRequest = {
+	name: string;
+	done: boolean;
+	topics: Topic[];
+	participants: TaskParticipant[];
 };

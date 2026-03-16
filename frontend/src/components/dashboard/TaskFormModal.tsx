@@ -1,9 +1,13 @@
+import ErrorDiv from '@/components/utils/ErrorDiv';
 import ParticipantsModal from '@/components/dashboard/ParticipantsModal';
 import {
 	useAllUsersQuery,
+	useCreateTaskMutation,
 	useLazyTaskParticipantsQuery,
 	useTopicsQuery,
 } from '@/state/apiSlice';
+import { selectUserId } from '@/state/authSlice';
+import { useAppSelector } from '@/state/hooks';
 import type {
 	TaskParticipant,
 	TaskWithTopic,
@@ -11,6 +15,7 @@ import type {
 } from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, Switch, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
+import SuccessDiv from '@/components/utils/SuccessDiv';
 
 type Props = {
 	buttonText: string;
@@ -19,6 +24,8 @@ type Props = {
 };
 
 function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
+	const [error, setError] = useState<string>('');
+	const [successMessage, setSuccessMessage] = useState<string>('');
 	const [open, setOpen] = useState<boolean>(false);
 	const [isDone, setIsDone] = useState<boolean>(task ? task.done : false);
 	const [taskName, setTaskName] = useState<string>(task ? task.name : '');
@@ -32,6 +39,8 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 	const topics = useTopicsQuery();
 	const participants = useAllUsersQuery();
 	const [getTaskParticipants] = useLazyTaskParticipantsQuery();
+	const [createTask] = useCreateTaskMutation();
+	const userId = useAppSelector(selectUserId);
 
 	useEffect(() => {
 		if (task) {
@@ -40,6 +49,37 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 				.then((data) => setTaskParticipants(data));
 		}
 	}, []);
+
+	const resetFormState = () => {
+		setIsDone(false);
+		setTaskName('');
+		setTaskTopics([]);
+		setTaskParticipants([]);
+	};
+
+	const handleSubmit = () => {
+		if (taskName === '') {
+			setError('A feladat neve kötelező mező!');
+			return;
+		}
+		if (taskParticipants.length === 0) {
+			setError('A feladatnak kell, hogy legyen legalább 1 résztvevője!');
+			return;
+		}
+
+		createTask({
+			name: taskName,
+			done: isDone,
+			topics: taskTopics,
+			participants: taskParticipants,
+		})
+			.unwrap()
+			.then((value) => {
+				setSuccessMessage(value);
+				resetFormState();
+			})
+			.catch((reason) => setError(reason.data?.detail));
+	};
 
 	return (
 		<div>
@@ -54,6 +94,9 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 			<Modal open={open} onClose={() => setOpen(false)}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-md bg-white text-black">
+						{successMessage && <SuccessDiv message={successMessage} />}
+						{error && <ErrorDiv error={error} />}
+
 						<div>
 							<label htmlFor="task-name" className="block mb-1">
 								Feladat neve
@@ -91,7 +134,7 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 						/>
 
 						<ParticipantsModal
-							allUsers={participants.data}
+							allUsers={participants.data?.filter((user) => user.id !== userId)}
 							initialGuests={taskParticipants.filter(
 								(user) => user.role === 'guest'
 							)}
@@ -123,7 +166,6 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 							</div>
 						</div>
 
-						{/* TODO create task */}
 						<div className="flex gap-1">
 							<Button
 								variant="outlined"
@@ -133,9 +175,12 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 							>
 								Mégsem
 							</Button>
-							<div className="w-full bg-slate-900 text-white p-2 rounded-md text-center">
+							<Button
+								className="w-full bg-slate-900 text-white p-2 rounded-md text-cente normal-case"
+								onClick={handleSubmit}
+							>
 								{buttonText}
-							</div>
+							</Button>
 						</div>
 					</div>
 				</div>

@@ -1,4 +1,4 @@
-import ErrorDiv from '@/components/auth/ErrorDiv';
+import ErrorDiv from '@/components/utils/ErrorDiv';
 import InputField from '@/components/auth/InputField';
 import { useRegisterMutation } from '@/state/apiSlice';
 import { selectUser } from '@/state/authSlice';

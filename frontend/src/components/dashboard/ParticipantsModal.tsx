@@ -1,3 +1,5 @@
+import { selectUser, selectUserId } from '@/state/authSlice';
+import { useAppSelector } from '@/state/hooks';
 import type { Participant, TaskParticipant } from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, TextField } from '@mui/material';
 import { useState } from 'react';
@@ -18,6 +20,13 @@ function ParticipantsModal({
 	const [open, setOpen] = useState<boolean>(false);
 	const [guests, setGuests] = useState<Participant[]>(initialGuests);
 	const [members, setMembers] = useState<Participant[]>(initialMembers);
+	const userId = useAppSelector(selectUserId);
+	const username = useAppSelector(selectUser);
+	const fixedParticipant: TaskParticipant = {
+		id: userId,
+		name: username,
+		role: 'admin',
+	};
 
 	const handleSubmit = () => {
 		const taskParticipants: TaskParticipant[] = guests
@@ -31,6 +40,7 @@ function ParticipantsModal({
 			.concat(
 				members.map((user) => ({ ...user, role: 'member' }) as TaskParticipant)
 			);
+		taskParticipants.push(fixedParticipant);
 
 		setTaskParticipants(taskParticipants);
 		setOpen(false);
@@ -50,7 +60,7 @@ function ParticipantsModal({
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-lg bg-white text-black">
 						<div>
-							<label htmlFor="task-participants" className="block mb-1">
+							<label htmlFor="task-guests" className="block mb-1">
 								Vendég felhasználók
 							</label>
 							<Autocomplete
@@ -59,7 +69,7 @@ function ParticipantsModal({
 								onChange={(_: any, newValue: Participant[]) =>
 									setGuests(newValue)
 								}
-								id="task-participants"
+								id="task-guests"
 								loading={allUsers === undefined}
 								loadingText="Résztvevők betöltése folyamatban..."
 								noOptionsText="Nincs további felhasználó"
@@ -75,14 +85,15 @@ function ParticipantsModal({
 								renderInput={(params) => (
 									<TextField
 										{...params}
-										label="Feladat résztvevői"
-										placeholder="Feladat résztvevői"
+										label="Vendég résztvevők"
+										placeholder="Vendég résztvevők"
 									/>
 								)}
 							/>
 						</div>
+
 						<div>
-							<label htmlFor="task-participants" className="block mb-1">
+							<label htmlFor="task-members" className="block mb-1">
 								Teljes körű felhasználók
 							</label>
 							<Autocomplete
@@ -91,7 +102,7 @@ function ParticipantsModal({
 								onChange={(_: any, newValue: Participant[]) =>
 									setMembers(newValue)
 								}
-								id="task-participants"
+								id="task-members"
 								loading={allUsers === undefined}
 								loadingText="Résztvevők betöltése folyamatban..."
 								noOptionsText="Nincs további felhasználó"
@@ -113,6 +124,27 @@ function ParticipantsModal({
 								)}
 							/>
 						</div>
+
+						<div>
+							<label htmlFor="task-admin" className="block mb-1">
+								Admin felhasználó
+							</label>
+							<Autocomplete
+								multiple
+								id="task-admin"
+								options={[fixedParticipant.name]}
+								defaultValue={[fixedParticipant.name]}
+								readOnly
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										label="Admin résztvevő"
+										placeholder="Admin"
+									/>
+								)}
+							/>
+						</div>
+
 						<div className="flex gap-1">
 							<Button
 								variant="outlined"

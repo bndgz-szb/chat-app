@@ -1,4 +1,4 @@
-import ErrorDiv from '@/components/auth/ErrorDiv';
+import ErrorDiv from '@/components/utils/ErrorDiv';
 import InputField from '@/components/auth/InputField';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

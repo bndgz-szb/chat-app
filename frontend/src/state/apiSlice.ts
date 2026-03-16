@@ -1,9 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/state/store';
-import type {
-	LoginRequest,
-	RegisterRequest,
-	TaskParticipantRequest,
+import {
+	type CreateTaskRequest,
+	type LoginRequest,
+	type RegisterRequest,
+	type TaskParticipantRequest,
 } from '@/state/requestTypes';
 import type {
 	Chat,
@@ -85,6 +86,14 @@ export const apiSlice = createApi({
 				body,
 			}),
 		}),
+		createTask: build.mutation<string, CreateTaskRequest>({
+			query: (body) => ({
+				url: 'create-task',
+				method: 'POST',
+				body,
+			}),
+			invalidatesTags: ['Dashboard'],
+		}),
 	}),
 });
 
@@ -97,4 +106,5 @@ export const {
 	useLazyTaskParticipantsQuery,
 	useLoginMutation,
 	useRegisterMutation,
+	useCreateTaskMutation,
 } = apiSlice;
