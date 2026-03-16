@@ -9,11 +9,12 @@ from db.crud.user import (
 )
 from db.crud.chat import (
     get_chats_for_user, ChatResponse, get_messages_for_chat,
-    get_chat_by_id, MessageWithUsername
+    get_chat_by_id, MessageWithUsername, create_chat, assign_user
 )
 from db.crud.message import send_message_to_chat
 from db.crud.task import (
-    get_tasks_with_topics, get_task_participants, TaskParticipant
+    get_tasks_with_topics, get_task_participants,
+    TaskParticipant, create_task, attach_topic
 )
 from db.crud.topic import get_all_topics
 from db.session import SessionLocal
@@ -22,7 +23,9 @@ from python_api.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user,
     get_current_user, credentials_exception
 )
-from python_api.request_types import RegisterRequest, LoginRequest
+from python_api.request_types import (
+    RegisterRequest, LoginRequest, CreateTaskRequest
+)
 from python_api.response_types import (
     LoginResponse, TaskWithTopic, UserResponse
 )
@@ -186,6 +189,48 @@ def all_users() -> List[UserResponse]:
 def task_participants(task_id: int) -> List[TaskParticipant]:
     with SessionLocal() as session:
         return get_task_participants(session, task_id)
+
+
+@authenticated_router.post('/create-task')
+def create_task_endpoint(
+    user: Annotated[User | None, Depends(get_current_user)],
+    create_task_request: CreateTaskRequest
+) -> str:
+    if user is None:
+        raise credentials_exception()
+    with SessionLocal() as session:
+        all_topic_ids = list(
+            map(lambda topic: topic.id, get_all_topics(session))
+        )
+        for topic in create_task_request.topics:
+            if topic.id not in all_topic_ids:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Given topic(s) are invalid!"
+                )
+
+        user_ids = list(map(lambda user: user.id, get_all_users(session)))
+        for participant in create_task_request.participants:
+            if participant.id not in user_ids:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Given user(s) are invalid!"
+                )
+
+        chat = create_chat(session)
+        for participant in create_task_request.participants:
+            assign_user(session, chat.id, participant.id)
+        task = create_task(
+            session=session,
+            name=create_task_request.name,
+            chat=chat,
+            creator=user,
+            done=create_task_request.done
+        )
+        for topic in create_task_request.topics:
+            attach_topic(session, task, topic.id)
+
+    return "Task created successfully"
 
 
 app.include_router(unauthenticated_router)

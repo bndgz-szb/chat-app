@@ -12,20 +12,9 @@ class TaskParticipant():
     role: Literal['admin'] | Literal['guest'] | Literal['member']
 
 
-def create_task(
-        session: Session, name: str, chat: Chat, creator: User
-) -> Task:
-    task = Task(chat_id=chat.id, name=name, created_by=creator.id, done=False)
-    session.add(task)
-    session.commit()
-    return task
-
-
-def get_tasks_with_topics(session: Session):
-    return session.query(Task).all()
-
-
-def get_task_participants(session: Session, task_id: int) -> List[TaskParticipant]:
+def get_task_participants(
+        session: Session, task_id: int
+) -> List[TaskParticipant]:
     stmt = (
         select(User, ChatParticipant.role)
         .join(ChatParticipant)
@@ -44,14 +33,26 @@ def get_task_participants(session: Session, task_id: int) -> List[TaskParticipan
     return result
 
 
-def attach_topic(session: Session, task: Task, topic: Topic) -> None:
+def get_tasks_with_topics(session: Session):
+    return session.query(Task).all()
+
+
+def create_task(
+        session: Session, name: str, chat: Chat, creator: User,
+        done: bool = False
+) -> Task:
+    task = Task(chat_id=chat.id, name=name, created_by=creator.id, done=done)
+    session.add(task)
+    session.commit()
+    return task
+
+
+def attach_topic(session: Session, task: Task, topic_id: int) -> None:
     # if task already has topic attached, nothing happens
     exists = session.query(TaskTopic).filter_by(
-        task_id=task.id, topic_id=topic.id
+        task_id=task.id, topic_id=topic_id
     ).first()
     if exists == None:
-        taskTopic = TaskTopic(task_id=task.id, topic_id=topic.id)
+        taskTopic = TaskTopic(task_id=task.id, topic_id=topic_id)
         session.add(taskTopic)
         session.commit()
-        session.refresh(task)
-        session.refresh(topic)

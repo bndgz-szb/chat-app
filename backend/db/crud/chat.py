@@ -74,16 +74,14 @@ def create_chat(session: Session) -> Chat:
 
 # if user is already assigned to chat, nothing happens
 def assign_user(
-    session: Session, chat: Chat, user: User, role: str = "member"
+    session: Session, chat_id: int, user_id: int, role: str = "member"
 ) -> None:
     exists = session.query(ChatParticipant).filter_by(
-        chat_id=chat.id, user_id=user.id
+        chat_id=chat_id, user_id=user_id
     ).first()
     if exists == None:
         chatParticipant = ChatParticipant(
-            chat_id=chat.id, user_id=user.id, role=role
+            chat_id=chat_id, user_id=user_id, role=role
         )
         session.add(chatParticipant)
         session.commit()
-        session.refresh(chat)
-        session.refresh(user)

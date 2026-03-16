@@ -78,7 +78,7 @@ def generate_task_topic_relations(
             population=topics, k=random.randint(1, 4)
         )
         for topic in selected_topics:
-            attach_topic(session, task, topic)
+            attach_topic(session, task, topic.id)
 
 
 def generate_chat_user_relations(
@@ -91,7 +91,7 @@ def generate_chat_user_relations(
             population=users, k=random.randint(2, 4)
         )
         for user in selected_users:
-            assign_user(session, chat, user)
+            assign_user(session, chat.id, user.id)
             res[chat].append(user)
     return res
 
