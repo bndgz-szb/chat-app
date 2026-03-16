@@ -43,12 +43,12 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 	const userId = useAppSelector(selectUserId);
 
 	useEffect(() => {
-		if (task) {
+		if (open && taskParticipants.length === 0 && task) {
 			getTaskParticipants({ task_id: task.id })
 				.unwrap()
 				.then((data) => setTaskParticipants(data));
 		}
-	}, []);
+	}, [open]);
 
 	const resetFormState = () => {
 		setIsDone(false);
