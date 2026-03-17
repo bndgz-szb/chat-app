@@ -3,7 +3,7 @@ from faker import Faker
 from sqlalchemy.orm import Session
 from typing import List, Tuple, Dict
 from db.session import SessionLocal
-from db.models import User, Chat, Task, Topic, TaskTopic
+from db.models import *
 from python_api.auth import get_password_hash
 from db.crud import (
     create_user, create_chat, create_task, create_topic, attach_topic,
@@ -33,8 +33,6 @@ def generate_users(
         'admin'), email='admin@example.com', admin=True
     )
     session.add(admin)
-    session.commit()
-    session.refresh(admin)
     users = []
     for _ in range(number_of_users):
         user = create_user(
@@ -44,6 +42,7 @@ def generate_users(
             session=session
         )
         users.append(user)
+    session.commit()
     return users
 
 
@@ -54,9 +53,11 @@ def generate_tasks_and_chats(
     for _ in range(number_of_tasks):
         task_creator = random.choice(users)
         chat = create_chat(session)
+        session.commit()
         task = create_task(session, fake.city(), chat, task_creator)
         chats.append(chat)
         tasks.append(task)
+    session.commit()
     return tasks, chats
 
 
@@ -67,6 +68,7 @@ def generate_topics(
     for _ in range(number_of_topics):
         topic = create_topic(session, fake.safe_color_name())
         topics.append(topic)
+    session.commit()
     return topics
 
 
@@ -74,7 +76,7 @@ def generate_task_topic_relations(
         session: Session, tasks: List[Task], topics: List[Topic]
 ) -> None:
     for task in tasks:
-        selected_topics = random.choices(
+        selected_topics = random.sample(
             population=topics, k=random.randint(1, 4)
         )
         for topic in selected_topics:
@@ -88,13 +90,13 @@ def generate_chat_user_relations(
     res = dict()
     for chat in chats:
         res[chat] = []
-        selected_users = random.choices(
+        selected_users = random.sample(
             population=users, k=random.randint(2, 4)
         )
         for user in selected_users:
             assign_user(session, chat.id, user.id)
             res[chat].append(user)
-        session.commit()
+    session.commit()
     return res
 
 
@@ -110,9 +112,12 @@ def generate_messages(
                     session, chat, user,
                     fake.text(max_nb_chars=200)
                 )
+    session.commit()
 
 
 def delete_records(session: Session):
+    session.query(Message).delete()
+    session.query(ChatParticipant).delete()
     session.query(TaskTopic).delete()
     session.query(Topic).delete()
     session.query(Task).delete()
