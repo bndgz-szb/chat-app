@@ -215,7 +215,7 @@ function Analytics() {
 	};
 
 	return (
-		<Card className="bg-white w-5xl p-4 my-8">
+		<Card className="bg-white w-5xl p-4 my-8 overflow-y-scroll">
 			<CardContent>
 				<div className="flex flex-col gap-8">
 					{input.tasks.map((task) => {
