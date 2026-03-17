@@ -68,7 +68,6 @@ def get_messages_for_chat(
 def create_chat(session: Session) -> Chat:
     chat = Chat()
     session.add(chat)
-    session.commit()
     return chat
 
 
@@ -101,4 +100,18 @@ def remove_user(
 
 
 def delete_chat(session: Session, chat: Chat) -> None:
+    messages = session.scalars(
+        select(Message)
+        .where(Message.chat_id == chat.id)
+    )
+    for message in messages:
+        session.delete(message)
+
+    participants = session.scalars(
+        select(ChatParticipant)
+        .where(ChatParticipant.chat_id == chat.id)
+    )
+    for participant in participants:
+        session.delete(participant)
+
     session.delete(chat)
