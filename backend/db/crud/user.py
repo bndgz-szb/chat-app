@@ -19,5 +19,4 @@ def get_all_users(session: Session) -> List[User]:
 def create_user(session: Session, username: str, email: str, hashed_password: str) -> User:
     user = User(username=username, email=email, password=hashed_password)
     session.add(user)
-    session.commit()
     return user

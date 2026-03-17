@@ -57,7 +57,7 @@ def validate_token() -> Literal[True]:
 
 @unauthenticated_router.post("/register")
 def register(data: RegisterRequest) -> str:
-    with SessionLocal() as session:
+    with SessionLocal.begin() as session:
         # TODO check email validity
         # TODO check password validity
         user = get_user_by_username(session, data.username)
@@ -161,6 +161,7 @@ def send_message(
                 detail="Chat doesn't exist"
             )
         result = send_message_to_chat(session, chat, user, message.content)
+        session.commit()
         return MessageWithUsername(
             id=result.id,
             chat_id=result.chat_id,
@@ -205,6 +206,7 @@ def create_task_endpoint(
         validate_task_participants(session, request)
 
         chat = create_chat(session)
+        session.commit()
         for participant in request.participants:
             assign_user(session, chat.id, participant.id, participant.role)
         task = create_task(
@@ -214,6 +216,7 @@ def create_task_endpoint(
             creator=user,
             done=request.done
         )
+        session.commit()
         for topic in request.topics:
             attach_topic(session, task, topic.id)
         session.commit()

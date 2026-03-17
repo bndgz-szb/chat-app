@@ -48,7 +48,6 @@ def create_task(
 ) -> Task:
     task = Task(chat_id=chat.id, name=name, created_by=creator.id, done=done)
     session.add(task)
-    session.commit()
     return task
 
 

@@ -8,5 +8,4 @@ def send_message_to_chat(
 ) -> Message:
     message = Message(chat_id=chat.id, sender_id=user.id, content=content)
     session.add(message)
-    session.commit()
     return message
