@@ -29,3 +29,8 @@ class CreateTaskRequest(BaseModel):
 
 class DeleteTaskRequest(BaseModel):
     task_id: int
+
+
+class UpdateTaskRequest(BaseModel):
+    task_id: int
+    updated_task: CreateTaskRequest

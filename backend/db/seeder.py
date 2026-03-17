@@ -79,6 +79,7 @@ def generate_task_topic_relations(
         )
         for topic in selected_topics:
             attach_topic(session, task, topic.id)
+    session.commit()
 
 
 def generate_chat_user_relations(
@@ -93,6 +94,7 @@ def generate_chat_user_relations(
         for user in selected_users:
             assign_user(session, chat.id, user.id)
             res[chat].append(user)
+        session.commit()
     return res
 
 

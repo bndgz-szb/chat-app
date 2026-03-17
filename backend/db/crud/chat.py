@@ -80,11 +80,24 @@ def assign_user(
         chat_id=chat_id, user_id=user_id
     ).first()
     if exists == None:
-        chatParticipant = ChatParticipant(
+        chat_participant = ChatParticipant(
             chat_id=chat_id, user_id=user_id, role=role
         )
-        session.add(chatParticipant)
-        session.commit()
+        session.add(chat_participant)
+
+
+def remove_user(
+    session: Session, chat_id: int, user_id: int
+) -> None:
+    chat_participant = session.scalar(
+        select(ChatParticipant)
+        .where(
+            ChatParticipant.chat_id == chat_id,
+            ChatParticipant.user_id == user_id
+        )
+    )
+    if chat_participant:
+        session.delete(chat_participant)
 
 
 def delete_chat(session: Session, chat: Chat) -> None:

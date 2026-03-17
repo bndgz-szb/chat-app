@@ -22,6 +22,11 @@ export type CreateTaskRequest = {
 	participants: TaskParticipant[];
 };
 
+export type UpdateTaskRequest = {
+	task_id: number;
+	updated_task: CreateTaskRequest;
+};
+
 export type DeleteTaskRequest = {
 	task_id: number;
 };

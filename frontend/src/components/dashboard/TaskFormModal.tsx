@@ -2,7 +2,6 @@ import ErrorDiv from '@/components/utils/ErrorDiv';
 import ParticipantsModal from '@/components/dashboard/ParticipantsModal';
 import {
 	useAllUsersQuery,
-	useCreateTaskMutation,
 	useLazyTaskParticipantsQuery,
 	useTopicsQuery,
 } from '@/state/apiSlice';
@@ -16,14 +15,21 @@ import type {
 import { Autocomplete, Button, Modal, Switch, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import SuccessDiv from '@/components/utils/SuccessDiv';
+import type { CreateTaskRequest } from '@/state/requestTypes';
 
 type Props = {
 	buttonText: string;
 	buttonStyle: string;
 	task?: TaskWithTopic;
+	handleSubmit: (
+		updated_task: CreateTaskRequest,
+		onSuccess: (value: string) => void,
+		onError: (reason: any) => void,
+		taskId: number
+	) => void;
 };
 
-function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
+function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 	const [error, setError] = useState<string>('');
 	const [successMessage, setSuccessMessage] = useState<string>('');
 	const [open, setOpen] = useState<boolean>(false);
@@ -39,7 +45,6 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 	const topics = useTopicsQuery();
 	const participants = useAllUsersQuery();
 	const [getTaskParticipants] = useLazyTaskParticipantsQuery();
-	const [createTask] = useCreateTaskMutation();
 	const userId = useAppSelector(selectUserId);
 
 	useEffect(() => {
@@ -57,7 +62,7 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 		setTaskParticipants([]);
 	};
 
-	const handleSubmit = () => {
+	const onClick = () => {
 		if (taskName === '') {
 			setError('A feladat neve kötelező mező!');
 			return;
@@ -67,18 +72,20 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 			return;
 		}
 
-		createTask({
-			name: taskName,
-			done: isDone,
-			topics: taskTopics,
-			participants: taskParticipants,
-		})
-			.unwrap()
-			.then((value) => {
+		handleSubmit(
+			{
+				name: taskName,
+				done: isDone,
+				topics: taskTopics,
+				participants: taskParticipants,
+			},
+			(value) => {
 				setSuccessMessage(value);
 				resetFormState();
-			})
-			.catch((reason) => setError(reason.data?.detail));
+			},
+			(reason) => setError(reason.data?.detail),
+			task?.id ?? -1
+		);
 	};
 
 	return (
@@ -115,6 +122,7 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 						<Autocomplete
 							multiple
 							value={taskTopics}
+							isOptionEqualToValue={(option, value) => option.id === value.id}
 							onChange={(_: any, newValue: Topic[]) => setTaskTopics(newValue)}
 							id="topics"
 							loading={topics.isLoading}
@@ -177,7 +185,7 @@ function TaskFormModal({ buttonText, buttonStyle, task }: Props) {
 							</Button>
 							<Button
 								className="w-full bg-slate-900 text-white p-2 rounded-md text-cente normal-case"
-								onClick={handleSubmit}
+								onClick={onClick}
 							>
 								{buttonText}
 							</Button>

@@ -2,7 +2,7 @@ import { selectUser, selectUserId } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
 import type { Participant, TaskParticipant } from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type ParticipantsModalProps = {
 	allUsers?: Participant[];
@@ -27,6 +27,15 @@ function ParticipantsModal({
 		name: username,
 		role: 'admin',
 	};
+
+	useEffect(() => {
+		if (members.length === 0) {
+			setMembers(initialMembers);
+		}
+		if (guests.length === 0) {
+			setGuests(initialGuests);
+		}
+	}, [initialGuests, initialMembers]);
 
 	const handleSubmit = () => {
 		const taskParticipants: TaskParticipant[] = guests
@@ -66,6 +75,7 @@ function ParticipantsModal({
 							<Autocomplete
 								multiple
 								value={guests}
+								isOptionEqualToValue={(option, value) => option.id === value.id}
 								onChange={(_: any, newValue: Participant[]) =>
 									setGuests(newValue)
 								}
@@ -99,6 +109,7 @@ function ParticipantsModal({
 							<Autocomplete
 								multiple
 								value={members}
+								isOptionEqualToValue={(option, value) => option.id === value.id}
 								onChange={(_: any, newValue: Participant[]) =>
 									setMembers(newValue)
 								}
@@ -158,7 +169,7 @@ function ParticipantsModal({
 								onClick={handleSubmit}
 								className="w-full bg-slate-900 text-white p-2 rounded-md text-center"
 							>
-								Hozzáadás
+								Módosítás
 							</Button>
 						</div>
 					</div>

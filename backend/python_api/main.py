@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import timedelta
 from typing import Annotated, List, Literal
+from sqlalchemy.orm import Session
 
 from db.models import User, Topic
 from db.crud.user import (
@@ -13,7 +14,7 @@ from db.crud.chat import (
 )
 from db.crud.message import send_message_to_chat
 from db.crud.task import (
-    get_tasks_with_topics, get_task_participants,
+    get_tasks_with_topics, get_task_participants, update_task,
     TaskParticipant, create_task, attach_topic, get_task_by_id, delete_task
 )
 from db.crud.topic import get_all_topics
@@ -24,7 +25,8 @@ from python_api.auth import (
     get_current_user, credentials_exception
 )
 from python_api.request_types import (
-    RegisterRequest, LoginRequest, CreateTaskRequest, DeleteTaskRequest
+    RegisterRequest, LoginRequest, CreateTaskRequest,
+    DeleteTaskRequest, UpdateTaskRequest
 )
 from python_api.response_types import (
     LoginResponse, TaskWithTopic, UserResponse
@@ -199,27 +201,12 @@ def create_task_endpoint(
     if user is None:
         raise credentials_exception()
     with SessionLocal() as session:
-        all_topic_ids = list(
-            map(lambda topic: topic.id, get_all_topics(session))
-        )
-        for topic in request.topics:
-            if topic.id not in all_topic_ids:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Given topic(s) are invalid!"
-                )
-
-        user_ids = list(map(lambda user: user.id, get_all_users(session)))
-        for participant in request.participants:
-            if participant.id not in user_ids:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Given user(s) are invalid!"
-                )
+        validate_task_topics(session, request)
+        validate_task_participants(session, request)
 
         chat = create_chat(session)
         for participant in request.participants:
-            assign_user(session, chat.id, participant.id)
+            assign_user(session, chat.id, participant.id, participant.role)
         task = create_task(
             session=session,
             name=request.name,
@@ -229,6 +216,7 @@ def create_task_endpoint(
         )
         for topic in request.topics:
             attach_topic(session, task, topic.id)
+        session.commit()
 
     return "Task created successfully"
 
@@ -258,5 +246,67 @@ def delete_task_endpoint(
     return "Task and its chat has been successfully deleted"
 
 
+@authenticated_router.put('/update-task')
+def update_task_endpoint(
+    user: Annotated[User | None, Depends(get_current_user)],
+    request: UpdateTaskRequest
+) -> str:
+    if user is None:
+        raise credentials_exception()
+    with SessionLocal.begin() as session:
+        task = get_task_by_id(session, request.task_id)
+        if task is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Task with given id does not exist"
+            )
+        if not (user.admin or user.id == task.created_by):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You don't have permission to modify this task!"
+            )
+
+        validate_task_topics(session, request.updated_task)
+        validate_task_participants(session, request.updated_task)
+        update_task(
+            session=session,
+            task=task,
+            updated_name=request.updated_task.name,
+            updated_status=request.updated_task.done,
+            updated_topic_ids=list(
+                map(lambda topic: topic.id, request.updated_task.topics)
+            ),
+            updated_participants=request.updated_task.participants
+        )
+
+    return "Task has been modified successfully"
+
+
 app.include_router(unauthenticated_router)
 app.include_router(authenticated_router)
+
+
+def validate_task_topics(
+    session: Session, task: CreateTaskRequest
+) -> None:
+    all_topic_ids = list(
+        map(lambda topic: topic.id, get_all_topics(session))
+    )
+    for topic in task.topics:
+        if topic.id not in all_topic_ids:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Given topic(s) are invalid!"
+            )
+
+
+def validate_task_participants(
+    session: Session, task: CreateTaskRequest
+) -> None:
+    user_ids = list(map(lambda user: user.id, get_all_users(session)))
+    for participant in task.participants:
+        if participant.id not in user_ids:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Given participant(s) are invalid!"
+            )

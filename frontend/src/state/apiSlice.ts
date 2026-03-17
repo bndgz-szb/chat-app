@@ -6,6 +6,7 @@ import {
 	type LoginRequest,
 	type RegisterRequest,
 	type TaskParticipantRequest,
+	type UpdateTaskRequest,
 } from '@/state/requestTypes';
 import type {
 	Chat,
@@ -95,6 +96,14 @@ export const apiSlice = createApi({
 			}),
 			invalidatesTags: ['Dashboard'],
 		}),
+		updateTask: build.mutation<string, UpdateTaskRequest>({
+			query: (body) => ({
+				url: 'update-task',
+				method: 'PUT',
+				body,
+			}),
+			invalidatesTags: ['Dashboard'],
+		}),
 		deleteTask: build.mutation<string, DeleteTaskRequest>({
 			query: (body) => ({
 				url: 'delete-task',
@@ -116,5 +125,6 @@ export const {
 	useLoginMutation,
 	useRegisterMutation,
 	useCreateTaskMutation,
+	useUpdateTaskMutation,
 	useDeleteTaskMutation,
 } = apiSlice;
