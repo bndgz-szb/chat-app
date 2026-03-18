@@ -27,6 +27,10 @@ class CreateTaskRequest(BaseModel):
     participants: List[TaskParticipant]
 
 
+class CreateTopicRequest(BaseModel):
+    name: str
+
+
 class DeleteTaskRequest(BaseModel):
     task_id: int
 

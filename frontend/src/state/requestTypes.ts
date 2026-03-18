@@ -22,6 +22,10 @@ export type CreateTaskRequest = {
 	participants: TaskParticipant[];
 };
 
+export type CreateTopicRequest = {
+	name: string;
+};
+
 export type UpdateTaskRequest = {
 	task_id: number;
 	updated_task: CreateTaskRequest;

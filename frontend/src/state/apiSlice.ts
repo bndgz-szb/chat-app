@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/state/store';
 import {
+	type CreateTopicRequest,
 	type CreateTaskRequest,
 	type DeleteTaskRequest,
 	type LoginRequest,
@@ -96,6 +97,14 @@ export const apiSlice = createApi({
 			}),
 			invalidatesTags: ['Dashboard'],
 		}),
+		createTopic: build.mutation<string, CreateTopicRequest>({
+			query: (body) => ({
+				url: 'create-topic',
+				method: 'POST',
+				body,
+			}),
+			invalidatesTags: ['Topics'],
+		}),
 		updateTask: build.mutation<string, UpdateTaskRequest>({
 			query: (body) => ({
 				url: 'update-task',
@@ -125,6 +134,7 @@ export const {
 	useLoginMutation,
 	useRegisterMutation,
 	useCreateTaskMutation,
+	useCreateTopicMutation,
 	useUpdateTaskMutation,
 	useDeleteTaskMutation,
 } = apiSlice;

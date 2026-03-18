@@ -17,7 +17,7 @@ from db.crud.task import (
     get_tasks_with_topics, get_task_participants, update_task,
     TaskParticipant, create_task, attach_topic, get_task_by_id, delete_task
 )
-from db.crud.topic import get_all_topics
+from db.crud.topic import get_all_topics, create_topic
 from db.session import SessionLocal
 from python_api.auth import (
     get_password_hash, create_access_token,
@@ -26,7 +26,7 @@ from python_api.auth import (
 )
 from python_api.request_types import (
     RegisterRequest, LoginRequest, CreateTaskRequest,
-    DeleteTaskRequest, UpdateTaskRequest
+    DeleteTaskRequest, UpdateTaskRequest, CreateTopicRequest
 )
 from python_api.response_types import (
     LoginResponse, TaskWithTopic, UserResponse
@@ -222,6 +222,13 @@ def create_task_endpoint(
         session.commit()
 
     return "Task created successfully"
+
+
+@authenticated_router.post('/create-topic')
+def create_topic_endpoint(request: CreateTopicRequest):
+    with SessionLocal.begin() as session:
+        create_topic(session, request.name)
+    return "Topic created successfully"
 
 
 @authenticated_router.delete('/delete-task')
