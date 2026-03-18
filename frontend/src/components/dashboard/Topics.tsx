@@ -1,11 +1,16 @@
 import CreateTopicModal from '@/components/dashboard/CreateTopicModal';
 import DeleteModal from '@/components/dashboard/DeleteModal';
-import { useCreateTopicMutation, useTopicsQuery } from '@/state/apiSlice';
+import {
+	useCreateTopicMutation,
+	useDeleteTopicMutation,
+	useTopicsQuery,
+} from '@/state/apiSlice';
 import type { CreateTopicRequest } from '@/state/requestTypes';
 
 function Topics() {
 	const { data } = useTopicsQuery();
 	const [sendCreate] = useCreateTopicMutation();
+	const [sendDeleteTopic] = useDeleteTopicMutation();
 
 	const handleCreateTopic = (
 		topic: CreateTopicRequest,
@@ -30,14 +35,13 @@ function Topics() {
 						className="flex gap-1 rounded-md text-white bg-black p-2 items-center"
 						key={topic.id}
 					>
-						{/* TODO delete topic modal */}
 						<div className="h-full self-center">{topic.name} </div>
 						<DeleteModal
 							title={topic.name}
 							buttonText="&#10005;"
 							buttonStyle="p-0 h-full min-w-1 w-5 text-white rounded-md normal-case"
 							confirmText={`Biztosan törli a tematikát?`}
-							handleDelete={() => {}}
+							handleDelete={() => sendDeleteTopic({ topic_id: topic.id })}
 						/>
 					</div>
 				))}

@@ -34,3 +34,7 @@ export type UpdateTaskRequest = {
 export type DeleteTaskRequest = {
 	task_id: number;
 };
+
+export type DeleteTopicRequest = {
+	topic_id: number;
+};

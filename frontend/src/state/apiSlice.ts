@@ -8,6 +8,7 @@ import {
 	type RegisterRequest,
 	type TaskParticipantRequest,
 	type UpdateTaskRequest,
+	type DeleteTopicRequest,
 } from '@/state/requestTypes';
 import type {
 	Chat,
@@ -121,6 +122,14 @@ export const apiSlice = createApi({
 			}),
 			invalidatesTags: ['Dashboard', 'Chat'],
 		}),
+		deleteTopic: build.mutation<string, DeleteTopicRequest>({
+			query: (body) => ({
+				url: 'delete-topic',
+				method: 'DELETE',
+				body,
+			}),
+			invalidatesTags: ['Topics'],
+		}),
 	}),
 });
 
@@ -137,4 +146,5 @@ export const {
 	useCreateTopicMutation,
 	useUpdateTaskMutation,
 	useDeleteTaskMutation,
+	useDeleteTopicMutation,
 } = apiSlice;
