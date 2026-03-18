@@ -1,17 +1,16 @@
-import { useDeleteTaskMutation } from '@/state/apiSlice';
 import { Button, Modal } from '@mui/material';
 import { useState } from 'react';
 
 type Props = {
-	task_id: number;
+	confirmText: string;
+	handleDelete: () => void;
 };
 
-function DeleteTaskModal({ task_id }: Props) {
+function DeleteModal({ confirmText, handleDelete }: Props) {
 	const [open, setOpen] = useState<boolean>(false);
-	const [sendDeleteTask] = useDeleteTaskMutation();
 
-	const handleDelete = () => {
-		sendDeleteTask({ task_id });
+	const onClick = () => {
+		handleDelete();
 		setOpen(false);
 	};
 
@@ -26,7 +25,7 @@ function DeleteTaskModal({ task_id }: Props) {
 			<Modal open={open} onClose={() => setOpen(false)}>
 				<div className="absolute inset-0.5 flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-md bg-white text-black">
-						Biztosan törli a feladatot?
+						{confirmText}
 						<div className="flex gap-1">
 							<Button
 								variant="outlined"
@@ -38,7 +37,7 @@ function DeleteTaskModal({ task_id }: Props) {
 							</Button>
 							<Button
 								className="w-full bg-red-600 text-white p-2 rounded-md text-center"
-								onClick={handleDelete}
+								onClick={onClick}
 							>
 								Törlés
 							</Button>
@@ -50,4 +49,4 @@ function DeleteTaskModal({ task_id }: Props) {
 	);
 }
 
-export default DeleteTaskModal;
+export default DeleteModal;

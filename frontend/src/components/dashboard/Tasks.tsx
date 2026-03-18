@@ -1,6 +1,10 @@
-import DeleteTaskModal from '@/components/dashboard/DeleteTaskModal';
+import DeleteModal from '@/components/dashboard/DeleteModal';
 import TaskFormModal from '@/components/dashboard/TaskFormModal';
-import { useDashboardQuery, useUpdateTaskMutation } from '@/state/apiSlice';
+import {
+	useDashboardQuery,
+	useDeleteTaskMutation,
+	useUpdateTaskMutation,
+} from '@/state/apiSlice';
 import { selectIsAdmin, selectUserId } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
 import type { CreateTaskRequest } from '@/state/requestTypes';
@@ -11,6 +15,7 @@ function Tasks() {
 	const user_id = useAppSelector(selectUserId);
 	const is_admin = useAppSelector(selectIsAdmin);
 	const [sendUpdate] = useUpdateTaskMutation();
+	const [sendDeleteTask] = useDeleteTaskMutation();
 
 	const handleModifyTask = (
 		updated_task: CreateTaskRequest,
@@ -58,7 +63,10 @@ function Tasks() {
 						<div className="flex flex-col gap-2">
 							{task.created_by && (is_admin || task.created_by == user_id) && (
 								<div className="flex flex-row justify-between gap-2">
-									<DeleteTaskModal task_id={task.id} />
+									<DeleteModal
+										confirmText="Biztosan törli a feladatot?"
+										handleDelete={() => sendDeleteTask({ task_id: task.id })}
+									/>
 
 									<TaskFormModal
 										buttonText="Módosítás"
