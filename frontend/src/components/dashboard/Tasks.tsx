@@ -64,7 +64,10 @@ function Tasks() {
 							{task.created_by && (is_admin || task.created_by == user_id) && (
 								<div className="flex flex-row justify-between gap-2">
 									<DeleteModal
-										confirmText="Biztosan törli a feladatot?"
+										title={task.name}
+										buttonText="Törlés"
+										buttonStyle="p-1.5 text-white rounded-md bg-red-600 normal-case"
+										confirmText={`Biztosan törli a feladatot?`}
 										handleDelete={() => sendDeleteTask({ task_id: task.id })}
 									/>
 

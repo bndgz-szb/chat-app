@@ -2,11 +2,20 @@ import { Button, Modal } from '@mui/material';
 import { useState } from 'react';
 
 type Props = {
+	title: string;
+	buttonText: string;
+	buttonStyle: string;
 	confirmText: string;
 	handleDelete: () => void;
 };
 
-function DeleteModal({ confirmText, handleDelete }: Props) {
+function DeleteModal({
+	title,
+	buttonText,
+	buttonStyle,
+	confirmText,
+	handleDelete,
+}: Props) {
 	const [open, setOpen] = useState<boolean>(false);
 
 	const onClick = () => {
@@ -16,15 +25,13 @@ function DeleteModal({ confirmText, handleDelete }: Props) {
 
 	return (
 		<div>
-			<Button
-				className="p-1.5 text-white rounded-md bg-red-600 normal-case"
-				onClick={() => setOpen(true)}
-			>
-				Törlés
+			<Button className={buttonStyle} onClick={() => setOpen(true)}>
+				{buttonText}
 			</Button>
 			<Modal open={open} onClose={() => setOpen(false)}>
 				<div className="absolute inset-0.5 flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-md bg-white text-black">
+						<h1 className="font-bold">{title}</h1>
 						{confirmText}
 						<div className="flex gap-1">
 							<Button

@@ -1,3 +1,4 @@
+import DeleteModal from '@/components/dashboard/DeleteModal';
 import { useTopicsQuery } from '@/state/apiSlice';
 
 function Topics() {
@@ -12,9 +13,19 @@ function Topics() {
 			<div className="text-white text-lg font-bold">Tematikák</div>
 			<div className="flex flex-row gap-2 flex-wrap">
 				{data.map((topic) => (
-					<div className="rounded-md text-white bg-black p-2" key={topic.id}>
+					<div
+						className="flex gap-1 rounded-md text-white bg-black p-2 items-center"
+						key={topic.id}
+					>
 						{/* TODO delete topic modal */}
-						{topic.name} &#10005;
+						<div className="h-full self-center">{topic.name} </div>
+						<DeleteModal
+							title={topic.name}
+							buttonText="&#10005;"
+							buttonStyle="p-0 h-full min-w-1 w-5 text-white rounded-md normal-case"
+							confirmText={`Biztosan törli a tematikát?`}
+							handleDelete={() => {}}
+						/>
 					</div>
 				))}
 			</div>
