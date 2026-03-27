@@ -18,11 +18,12 @@ from db.crud.task import (
     TaskParticipant, create_task, attach_topic, get_task_by_id, delete_task
 )
 from db.crud.topic import get_all_topics, create_topic, delete_topic
+from db.crud.analytics import get_task_analytics, TaskWithAnalytics
 from db.session import SessionLocal
 from python_api.auth import (
     get_password_hash, create_access_token,
     ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user,
-    get_current_user, credentials_exception
+    get_current_user, credentials_exception, AuthRoute
 )
 from python_api.request_types import (
     RegisterRequest, LoginRequest, CreateTaskRequest, DeleteTopicRequest,
@@ -31,7 +32,6 @@ from python_api.request_types import (
 from python_api.response_types import (
     LoginResponse, TaskWithTopic, UserResponse
 )
-from python_api.auth import AuthRoute
 from python_ws_server.chatapp.messages import UnicastMessage
 
 
@@ -301,6 +301,16 @@ def update_task_endpoint(
         )
 
     return "Task has been modified successfully"
+
+
+@authenticated_router.get('/analytics')
+def get_analytics(
+    user: Annotated[User | None, Depends(get_current_user)]
+) -> List[TaskWithAnalytics]:
+    if user is None or not user.admin:
+        raise credentials_exception()
+    with SessionLocal() as session:
+        return get_task_analytics(session)
 
 
 app.include_router(unauthenticated_router)

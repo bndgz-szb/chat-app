@@ -15,6 +15,7 @@ import type {
 	LoginResponse,
 	Participant,
 	TaskParticipant,
+	TaskWithAnalytics,
 	TaskWithTopic,
 	Topic,
 } from '@/state/responseTypes';
@@ -34,6 +35,12 @@ export const apiSlice = createApi({
 		},
 	}),
 	endpoints: (build) => ({
+		analytics: build.query<TaskWithAnalytics[], void>({
+			query: () => ({
+				url: 'analytics',
+				method: 'GET',
+			}),
+		}),
 		dashboard: build.query<TaskWithTopic[], void>({
 			query: () => ({
 				url: 'dashboard',
@@ -134,6 +141,7 @@ export const apiSlice = createApi({
 });
 
 export const {
+	useAnalyticsQuery,
 	useDashboardQuery,
 	useAllUsersQuery,
 	useChatQuery,

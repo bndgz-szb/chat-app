@@ -37,6 +37,22 @@ export type LoginResponse = {
 	is_admin: boolean;
 };
 
+export type TaskWithAnalytics = {
+	name: string;
+	messagesByDays: MessagesByDay[];
+	messagesPerUsers: MessagesPerUser[];
+};
+
+type MessagesByDay = {
+	day: string;
+	messages: number;
+};
+
+type MessagesPerUser = {
+	username: string;
+	total_messages: number;
+};
+
 export interface MessageWithUsername extends Message {
 	sender_username: string;
 }
