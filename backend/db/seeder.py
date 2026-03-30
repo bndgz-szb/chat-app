@@ -1,6 +1,7 @@
 import random
 from faker import Faker
 from sqlalchemy.orm import Session
+from sqlalchemy import delete
 from typing import List, Tuple, Dict
 from db.session import SessionLocal
 from db.models import *
@@ -116,13 +117,13 @@ def generate_messages(
 
 
 def delete_records(session: Session):
-    session.query(Message).delete()
-    session.query(ChatParticipant).delete()
-    session.query(TaskTopic).delete()
-    session.query(Topic).delete()
-    session.query(Task).delete()
-    session.query(Chat).delete()
-    session.query(User).delete()
+    session.execute(delete(Message))
+    session.execute(delete(ChatParticipant))
+    session.execute(delete(TaskTopic))
+    session.execute(delete(Topic))
+    session.execute(delete(Task))
+    session.execute(delete(Chat))
+    session.execute(delete(User))
     session.commit()
 
 

@@ -1,19 +1,26 @@
 from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy import select
+from typing import Sequence
 
 from db.models import User
 
 
 def get_user_by_username(session: Session, username: str) -> User | None:
-    return session.query(User).filter_by(username=username).first()
+    return session.scalar(
+        select(User)
+        .where(User.username == username)
+    )
 
 
 def get_user_by_email(session: Session, email: str) -> User | None:
-    return session.query(User).filter_by(email=email).first()
+    return session.scalar(
+        select(User)
+        .where(User.email == email)
+    )
 
 
-def get_all_users(session: Session) -> List[User]:
-    return session.query(User).all()
+def get_all_users(session: Session) -> Sequence[User]:
+    return session.scalars(select(User)).all()
 
 
 def create_user(session: Session, username: str, email: str, hashed_password: str) -> User:

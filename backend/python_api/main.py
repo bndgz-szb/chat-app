@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import timedelta
-from typing import Annotated, List, Literal
+from typing import Annotated, List, Literal, Sequence
 from sqlalchemy.orm import Session
 
 from db.models import User, Topic
@@ -173,7 +173,7 @@ def send_message(
 
 
 @authenticated_router.get('/topics', response_model=None)
-def topics() -> List[Topic]:
+def topics() -> Sequence[Topic]:
     with SessionLocal() as session:
         return get_all_topics(session)
 

@@ -1,12 +1,12 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from typing import List
+from typing import Sequence
 
 from db.models import Topic
 
 
-def get_all_topics(session: Session) -> List[Topic]:
-    return session.query(Topic).all()
+def get_all_topics(session: Session) -> Sequence[Topic]:
+    return session.scalars(select(Topic)).all()
 
 
 def create_topic(session: Session, name: str) -> Topic:

@@ -24,7 +24,10 @@ class MessageWithUsername:
 
 
 def get_chat_by_id(session: Session, chat_id: int) -> Chat | None:
-    return session.query(Chat).filter(Chat.id == chat_id).first()
+    return session.scalar(
+        select(Chat)
+        .where(Chat.id == chat_id)
+    )
 
 
 def get_chats_for_user(
@@ -75,9 +78,13 @@ def create_chat(session: Session) -> Chat:
 def assign_user(
     session: Session, chat_id: int, user_id: int, role: str = "member"
 ) -> None:
-    exists = session.query(ChatParticipant).filter_by(
-        chat_id=chat_id, user_id=user_id
-    ).first()
+    exists = session.scalar(
+        select(ChatParticipant)
+        .where(
+            ChatParticipant.chat_id == chat_id,
+            ChatParticipant.user_id == user_id
+        )
+    )
     if exists == None:
         chat_participant = ChatParticipant(
             chat_id=chat_id, user_id=user_id, role=role

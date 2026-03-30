@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from typing import List, Literal
+from typing import List, Literal, Sequence
 from dataclasses import dataclass
 from db.models import Chat, Task, TaskTopic, User, ChatParticipant
 from db.crud.chat import remove_user, assign_user
@@ -34,12 +34,15 @@ def get_task_participants(
     return result
 
 
-def get_tasks_with_topics(session: Session):
-    return session.query(Task).all()
+def get_tasks_with_topics(session: Session) -> Sequence[Task]:
+    return session.scalars(select(Task)).all()
 
 
 def get_task_by_id(session: Session, task_id: int) -> Task | None:
-    return session.query(Task).filter_by(id=task_id).first()
+    return session.scalar(
+        select(Task)
+        .where(Task.id == task_id)
+    )
 
 
 def create_task(
@@ -53,9 +56,10 @@ def create_task(
 
 def attach_topic(session: Session, task: Task, topic_id: int) -> None:
     # if task already has topic attached, nothing happens
-    exists = session.query(TaskTopic).filter_by(
-        task_id=task.id, topic_id=topic_id
-    ).first()
+    exists = session.scalar(
+        select(TaskTopic)
+        .where(TaskTopic.task_id == task.id, TaskTopic.topic_id == topic_id)
+    )
     if exists == None:
         task_topic = TaskTopic(task_id=task.id, topic_id=topic_id)
         session.add(task_topic)
@@ -63,9 +67,10 @@ def attach_topic(session: Session, task: Task, topic_id: int) -> None:
 
 def remove_topic(session: Session, task: Task, topic_id: int) -> None:
     # if task doesn't have topic attached, nothing happens
-    task_topic = session.query(TaskTopic).filter_by(
-        task_id=task.id, topic_id=topic_id
-    ).first()
+    task_topic = session.scalar(
+        select(TaskTopic)
+        .where(TaskTopic.task_id == task.id, TaskTopic.topic_id == topic_id)
+    )
     if task_topic != None:
         session.delete(task_topic)
 
