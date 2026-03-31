@@ -60,6 +60,8 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 		setTaskName('');
 		setTaskTopics([]);
 		setTaskParticipants([]);
+		setError('');
+		setSuccessMessage('');
 	};
 
 	const onClick = () => {
@@ -81,11 +83,15 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 			},
 			(value) => {
 				setSuccessMessage(value);
-				resetFormState();
 			},
 			(reason) => setError(reason.data?.detail),
 			task?.id ?? -1
 		);
+	};
+
+	const onClose = () => {
+		setOpen(false);
+		resetFormState();
 	};
 
 	return (
@@ -98,7 +104,7 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 			>
 				{buttonText}
 			</Button>
-			<Modal open={open} onClose={() => setOpen(false)}>
+			<Modal open={open} onClose={onClose}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-md bg-white text-black">
 						{successMessage && <SuccessDiv message={successMessage} />}
@@ -179,7 +185,7 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 								variant="outlined"
 								disableElevation
 								className="w-full p-2 rounded-md text-center"
-								onClick={() => setOpen(false)}
+								onClick={onClose}
 							>
 								Mégsem
 							</Button>
