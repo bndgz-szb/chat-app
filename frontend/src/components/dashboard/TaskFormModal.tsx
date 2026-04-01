@@ -56,9 +56,15 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 	}, [open]);
 
 	const resetFormState = () => {
-		setIsDone(false);
-		setTaskName('');
-		setTaskTopics([]);
+		if (task) {
+			setIsDone(task.done);
+			setTaskName(task.name);
+			setTaskTopics(task.topics);
+		} else {
+			setIsDone(false);
+			setTaskName('');
+			setTaskTopics([]);
+		}
 		setTaskParticipants([]);
 		setError('');
 		setSuccessMessage('');
@@ -83,8 +89,12 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 			},
 			(value) => {
 				setSuccessMessage(value);
+				setError('');
 			},
-			(reason) => setError(reason.data?.detail),
+			(reason) => {
+				setError(reason.data?.detail);
+				setSuccessMessage('');
+			},
 			task?.id ?? -1
 		);
 	};
