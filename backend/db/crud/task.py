@@ -45,6 +45,13 @@ def get_task_by_id(session: Session, task_id: int) -> Task | None:
     )
 
 
+def get_task_by_name(session: Session, task_name: str) -> Task | None:
+    return session.scalar(
+        select(Task)
+        .where(Task.name == task_name)
+    )
+
+
 def create_task(
         session: Session, name: str, chat: Chat, creator: User,
         done: bool = False

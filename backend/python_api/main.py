@@ -15,7 +15,8 @@ from db.crud.chat import (
 from db.crud.message import send_message_to_chat
 from db.crud.task import (
     get_tasks_with_topics, get_task_participants, update_task,
-    TaskParticipant, create_task, attach_topic, get_task_by_id, delete_task
+    TaskParticipant, create_task, attach_topic,
+    get_task_by_id, delete_task, get_task_by_name
 )
 from db.crud.topic import get_all_topics, create_topic, delete_topic
 from db.crud.analytics import get_task_analytics, TaskWithAnalytics
@@ -287,6 +288,7 @@ def update_task_endpoint(
                 detail="You don't have permission to modify this task!"
             )
 
+        validate_task_name(session, request.updated_task)
         validate_task_topics(session, request.updated_task)
         validate_task_participants(session, request.updated_task)
         update_task(
@@ -317,9 +319,16 @@ app.include_router(unauthenticated_router)
 app.include_router(authenticated_router)
 
 
-def validate_task_topics(
-    session: Session, task: CreateTaskRequest
-) -> None:
+def validate_task_name(session: Session, task: CreateTaskRequest) -> None:
+    exists = get_task_by_name(session, task.name)
+    if exists:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Given task name is already taken!"
+        )
+
+
+def validate_task_topics(session: Session, task: CreateTaskRequest) -> None:
     all_topic_ids = list(
         map(lambda topic: topic.id, get_all_topics(session))
     )
