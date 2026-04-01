@@ -264,8 +264,11 @@ def delete_topic_endpoint(request: DeleteTopicRequest) -> str:
     if isDeleteSuccess:
         return "Topic has been successfully deleted"
     else:
-        return ("Could not delete topic."
-                " Make sure it is not attached to any tasks")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=("Could not delete topic."
+                    " Make sure it is not attached to any tasks.")
+        )
 
 
 @authenticated_router.put('/update-task')

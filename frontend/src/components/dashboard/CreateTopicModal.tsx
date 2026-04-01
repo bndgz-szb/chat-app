@@ -43,6 +43,12 @@ function CreateTopicModal({ buttonText, buttonStyle, handleSubmit }: Props) {
 		);
 	};
 
+	const onClose = () => {
+		setOpen(false);
+		setError('');
+		setSuccessMessage('');
+	};
+
 	return (
 		<div>
 			<Button
@@ -53,7 +59,7 @@ function CreateTopicModal({ buttonText, buttonStyle, handleSubmit }: Props) {
 			>
 				{buttonText}
 			</Button>
-			<Modal open={open} onClose={() => setOpen(false)}>
+			<Modal open={open} onClose={onClose}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-md bg-white text-black">
 						{successMessage && <SuccessDiv message={successMessage} />}
@@ -79,7 +85,7 @@ function CreateTopicModal({ buttonText, buttonStyle, handleSubmit }: Props) {
 								variant="outlined"
 								disableElevation
 								className="w-full p-2 rounded-md text-center"
-								onClick={() => setOpen(false)}
+								onClick={onClose}
 							>
 								Mégsem
 							</Button>

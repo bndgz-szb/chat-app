@@ -36,6 +36,17 @@ function Tasks() {
 			.catch(onError);
 	};
 
+	const handleDelete =
+		(task_id: number) =>
+		(onSuccess: (value: string) => void, onError: (reason: any) => void) => {
+			sendDeleteTask({
+				task_id,
+			})
+				.unwrap()
+				.then(onSuccess)
+				.catch(onError);
+		};
+
 	return (
 		<div className="flex flex-row p-8 gap-4 flex-wrap">
 			{data ? (
@@ -67,8 +78,8 @@ function Tasks() {
 										title={task.name}
 										buttonText="Törlés"
 										buttonStyle="p-1.5 text-white rounded-md bg-red-600 normal-case"
-										confirmText={`Biztosan törli a feladatot?`}
-										handleDelete={() => sendDeleteTask({ task_id: task.id })}
+										confirmText={`Biztosan törli a feladatot és a hozzá tartozó chat-et?`}
+										handleDelete={handleDelete(task.id)}
 									/>
 
 									<TaskFormModal

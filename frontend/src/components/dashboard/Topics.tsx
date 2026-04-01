@@ -20,6 +20,17 @@ function Topics() {
 		sendCreate(topic).unwrap().then(onSuccess).catch(onError);
 	};
 
+	const handleDelete =
+		(topic_id: number) =>
+		(onSuccess: (value: string) => void, onError: (reason: any) => void) => {
+			sendDeleteTopic({
+				topic_id,
+			})
+				.unwrap()
+				.then(onSuccess)
+				.catch(onError);
+		};
+
 	return data ? (
 		<div className="flex flex-col gap-4 p-4 self-start">
 			<CreateTopicModal
@@ -41,7 +52,7 @@ function Topics() {
 							buttonText="&#10005;"
 							buttonStyle="p-0 h-full min-w-1 w-5 text-white rounded-md normal-case"
 							confirmText={`Biztosan törli a tematikát?`}
-							handleDelete={() => sendDeleteTopic({ topic_id: topic.id })}
+							handleDelete={handleDelete(topic.id)}
 						/>
 					</div>
 				))}
