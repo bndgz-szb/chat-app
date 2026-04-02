@@ -1,4 +1,7 @@
-__all__ = ["User", "Chat", "Message", "ChatParticipant", "Task", "Topic", "TaskTopic"]
+__all__ = [
+    "User", "Chat", "Message",
+    "ChatParticipant", "Task", "Topic", "TaskTopic"
+]
 
 from .user import User
 from .chat import Chat
