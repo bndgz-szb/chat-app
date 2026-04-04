@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
-from typing import Sequence
+from fastapi import APIRouter, HTTPException, status, Depends
+from typing import Sequence, Annotated
+from sqlalchemy.orm import Session
 
 from db.models import Topic
-from db.session import SessionLocal
+from db.session import get_session
 from db.crud.topic import get_all_topics, create_topic, delete_topic
 from python_api.auth import AuthRoute
 from python_api.request_types import CreateTopicRequest, DeleteTopicRequest
@@ -13,22 +14,27 @@ authenticated_router = APIRouter(route_class=AuthRoute)
 
 
 @authenticated_router.get('/topics', response_model=None)
-def topics() -> Sequence[Topic]:
-    with SessionLocal() as session:
-        return get_all_topics(session)
+def topics(session: Annotated[Session, Depends(get_session)]) -> Sequence[Topic]:
+    return get_all_topics(session)
 
 
 @authenticated_router.post('/create-topic')
-def create_topic_endpoint(request: CreateTopicRequest) -> str:
-    with SessionLocal.begin() as session:
-        create_topic(session, request.name)
+def create_topic_endpoint(
+    request: CreateTopicRequest,
+    session: Annotated[Session, Depends(get_session)]
+) -> str:
+    create_topic(session, request.name)
+    session.commit()
     return "Topic created successfully"
 
 
 @authenticated_router.delete('/delete-topic')
-def delete_topic_endpoint(request: DeleteTopicRequest) -> str:
-    with SessionLocal.begin() as session:
-        isDeleteSuccess = delete_topic(session, request.topic_id)
+def delete_topic_endpoint(
+    request: DeleteTopicRequest,
+    session: Annotated[Session, Depends(get_session)]
+) -> str:
+    isDeleteSuccess = delete_topic(session, request.topic_id)
+    session.commit()
     if isDeleteSuccess:
         return "Topic has been successfully deleted"
     else:

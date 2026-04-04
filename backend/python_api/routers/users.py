@@ -1,8 +1,9 @@
-from typing import Literal, List
-from fastapi import HTTPException, status, APIRouter
+from typing import Literal, List, Annotated
+from fastapi import HTTPException, status, APIRouter, Depends
 from datetime import timedelta
+from sqlalchemy.orm import Session
 
-from db.session import SessionLocal
+from db.session import get_session
 from python_api.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token,
     authenticate_user, get_password_hash, AuthRoute
@@ -25,68 +26,77 @@ def validate_token() -> Literal[True]:
 
 
 @authenticated_router.get('/users', response_model=None)
-def all_users() -> List[UserResponse]:
-    with SessionLocal() as session:
-        users = get_all_users(session)
-        result = []
-        for user in users:
-            result.append(UserResponse(id=user.id, name=user.username))
-        return result
+def all_users(
+    session: Annotated[Session, Depends(get_session)]
+) -> List[UserResponse]:
+    users = get_all_users(session)
+    result = []
+    for user in users:
+        result.append(UserResponse(id=user.id, name=user.username))
+    return result
 
 
 @authenticated_router.get('/task-participants', response_model=None)
-def task_participants(task_id: int) -> List[TaskParticipant]:
-    with SessionLocal() as session:
-        return get_task_participants(session, task_id)
+def task_participants(
+    task_id: int,
+    session: Annotated[Session, Depends(get_session)]
+) -> List[TaskParticipant]:
+    return get_task_participants(session, task_id)
 
 
 @unauthenticated_router.post("/register")
-def register(data: RegisterRequest) -> str:
-    with SessionLocal.begin() as session:
-        # TODO check email validity
-        # TODO check password validity
-        user = get_user_by_username(session, data.username)
-        if user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already taken"
-            )
-        user = get_user_by_email(session, data.email)
-        if user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already taken"
-            )
-
-        create_user(
-            session=session, username=data.username, email=data.email,
-            hashed_password=get_password_hash(data.password)
+def register(
+    data: RegisterRequest,
+    session: Annotated[Session, Depends(get_session)]
+) -> str:
+    # TODO check email validity
+    # TODO check password validity
+    user = get_user_by_username(session, data.username)
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already taken"
         )
-        return "Account successfully registered."
+    user = get_user_by_email(session, data.email)
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already taken"
+        )
+
+    create_user(
+        session=session, username=data.username, email=data.email,
+        hashed_password=get_password_hash(data.password)
+    )
+    session.commit()
+    return "Account successfully registered."
 
 
 @unauthenticated_router.post("/login")
-def login(data: LoginRequest) -> LoginResponse:
-    with SessionLocal() as session:
-        user = authenticate_user(
-            session, data.username, data.password
+def login(
+    data: LoginRequest,
+    session: Annotated[Session, Depends(get_session)]
+) -> LoginResponse:
+    user = authenticate_user(
+        session, data.username, data.password
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
         )
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        access_token = create_access_token(
-            data={"sub": user.username},
-            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        )
-        return LoginResponse(
-            username=user.username,
-            access_token=access_token,
-            user_id=user.id,
-            is_admin=user.admin
-        )
+    access_token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    session.commit()
+    return LoginResponse(
+        username=user.username,
+        access_token=access_token,
+        user_id=user.id,
+        is_admin=user.admin
+    )
 
 
 users_router = APIRouter()

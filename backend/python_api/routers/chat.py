@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Annotated, List
+from sqlalchemy.orm import Session
 
 from db.models import User
-from db.session import SessionLocal
+from db.session import get_session
 from db.crud.chat import (
     ChatResponse, MessageWithUsername, get_chats_for_user,
     get_messages_for_chat, get_chat_by_id
@@ -21,44 +22,45 @@ authenticated_router = APIRouter(route_class=AuthRoute)
 # TODO fix response model
 @authenticated_router.get("/chat", response_model=None)
 def chat(
-    user: Annotated[User | None, Depends(get_current_user)]
+    user: Annotated[User | None, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)]
 ) -> List[ChatResponse]:
     if user is None:
         raise credentials_exception()
-    with SessionLocal() as session:
-        return get_chats_for_user(session, user.id)
+    return get_chats_for_user(session, user.id)
 
 
 @authenticated_router.get("/message-history", response_model=None)
-def message_history(chat_id: int) -> List[MessageWithUsername]:
-    with SessionLocal() as session:
-        return get_messages_for_chat(session, chat_id)
+def message_history(
+    chat_id: int, session: Annotated[Session, Depends(get_session)]
+) -> List[MessageWithUsername]:
+    return get_messages_for_chat(session, chat_id)
 
 
 @authenticated_router.post("/message", response_model=None)
 def send_message(
     message: UnicastMessage,
-    user: Annotated[User | None, Depends(get_current_user)]
+    user: Annotated[User | None, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)]
 ) -> MessageWithUsername:
     if user is None:
         raise credentials_exception()
-    with SessionLocal() as session:
-        chat = get_chat_by_id(session, message.chat_id)
-        if chat is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Chat doesn't exist"
-            )
-        result = send_message_to_chat(session, chat, user, message.content)
-        session.commit()
-        return MessageWithUsername(
-            id=result.id,
-            chat_id=result.chat_id,
-            sender_id=result.sender_id,
-            content=result.content,
-            sent_at=result.sent_at,
-            sender_username=user.username
+    chat = get_chat_by_id(session, message.chat_id)
+    if chat is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Chat doesn't exist"
         )
+    result = send_message_to_chat(session, chat, user, message.content)
+    session.commit()
+    return MessageWithUsername(
+        id=result.id,
+        chat_id=result.chat_id,
+        sender_id=result.sender_id,
+        content=result.content,
+        sent_at=result.sent_at,
+        sender_username=user.username
+    )
 
 
 chat_router = APIRouter()

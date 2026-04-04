@@ -2,7 +2,8 @@ import os
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
+from typing import Generator
 
 load_dotenv()
 
@@ -14,3 +15,11 @@ if DB_URL == None:
 engine = create_engine(DB_URL)  # set 'echo=True' for logging
 
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
+
+
+def get_session() -> Generator[Session, None, None]:
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
