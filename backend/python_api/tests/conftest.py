@@ -81,11 +81,15 @@ def test_client(db_session) -> Generator[TestClient, None, None]:
 
 
 @pytest.fixture
-def prepare_auth_header(db_session, user) -> Dict[str, str]:
+def token(db_session, user) -> str:
     db_session.add(user)
     db_session.commit()
-    token = create_access_token(
+    return create_access_token(
         data={"sub": user.username},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
+
+
+@pytest.fixture
+def prepare_auth_header(token) -> Dict[str, str]:
     return {"authorization": f"Bearer {token}"}
