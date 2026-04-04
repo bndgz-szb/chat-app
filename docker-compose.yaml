@@ -51,10 +51,18 @@ services:
       POSTGRES_USER: chatuser
       POSTGRES_PASSWORD: chatpass
       POSTGRES_DB: chatapp
-    ports:
-      - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  db-test:
+    container_name: db-test
+    image: postgres:17
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase_test
+    restart: always
 
 volumes:
   db-data:

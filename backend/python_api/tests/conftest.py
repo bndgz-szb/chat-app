@@ -1,4 +1,5 @@
 import pytest
+import os
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine, StaticPool
@@ -12,6 +13,9 @@ from python_api.main import app
 from python_api.auth import (
     get_password_hash, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 )
+
+
+DB_TEST_URL = os.getenv("DB_TEST_URL")
 
 
 @pytest.fixture
@@ -29,9 +33,12 @@ def db_session() -> Generator[Session, None, None]:
     """
     Create a new database session with a rollback at the end of the test.
     """
+
     # Create a SQLAlchemy engine
+    if DB_TEST_URL == None:
+        raise Exception("Don't forget to create .env file with DB_TEST_URL")
     engine = create_engine(
-        "sqlite:///./test_db.db",
+        DB_TEST_URL,
         poolclass=StaticPool,
     )
 
