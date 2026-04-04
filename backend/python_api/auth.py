@@ -15,7 +15,7 @@ from collections.abc import Coroutine
 
 from db.models import User
 from db.crud.user import get_user_by_username
-from db.session import SessionLocal
+from db.session import get_session
 
 load_dotenv()
 password_hash = PasswordHash.recommended()
@@ -116,7 +116,8 @@ def authenticate_user(
 
 
 async def get_current_user(
-    token: Annotated[str, Depends(auth_scheme)]
+    token: Annotated[str, Depends(auth_scheme)],
+    session: Annotated[Session, Depends(get_session)]
 ) -> User | None:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[str(ALGORITHM)])
@@ -126,6 +127,5 @@ async def get_current_user(
         token_data = TokenData(username=username)
     except InvalidTokenError:
         return None
-    with SessionLocal() as session:
-        user = get_user_by_username(session, token_data.username)
-        return user
+    user = get_user_by_username(session, token_data.username)
+    return user
