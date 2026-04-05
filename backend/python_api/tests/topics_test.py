@@ -12,12 +12,12 @@ def test_topics_unauth(test_client):
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
-def test_topics(test_client, prepare_auth_header, db_session):
+def test_topics(test_client, admin_header, db_session):
     # create topic
     topic = create_topic(db_session, "test")
     db_session.commit()
 
-    response = test_client.get("/topics", headers=prepare_auth_header)
+    response = test_client.get("/topics", headers=admin_header)
     assert response.status_code == 200
     assert len(response.json()) == 1
     for topic in response.json():
@@ -32,10 +32,10 @@ def test_create_topic_unauth(test_client):
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
-def test_create_topic(test_client, prepare_auth_header):
+def test_create_topic(test_client, admin_header):
     response = test_client.post(
         "/create-topic",
-        headers=prepare_auth_header,
+        headers=admin_header,
         json={"name": "test"}
     )
     assert response.status_code == 200
@@ -49,7 +49,7 @@ def test_delete_topic_unauth(test_client):
 
 
 def test_delete_attached_topic(
-    test_client, db_session, prepare_auth_header, user
+    test_client, db_session, admin_header, admin_user
 ):
     # create topic
     topic = create_topic(db_session, "test")
@@ -62,7 +62,7 @@ def test_delete_attached_topic(
         session=db_session,
         name="test",
         chat=chat,
-        creator=user,
+        creator=admin_user,
         done=False
     )
     db_session.commit()
@@ -73,7 +73,7 @@ def test_delete_attached_topic(
     response = test_client.request(
         method="DELETE",
         url="/delete-topic",
-        headers=prepare_auth_header,
+        headers=admin_header,
         json={"topic_id": topic.id}
     )
     assert response.status_code == 400
@@ -81,7 +81,7 @@ def test_delete_attached_topic(
                                " Make sure it is not attached to any tasks."}
 
 
-def test_delete_topic(db_session, test_client, prepare_auth_header):
+def test_delete_topic(db_session, test_client, admin_header):
     # create topic
     topic = create_topic(db_session, "test")
     db_session.commit()
@@ -89,7 +89,7 @@ def test_delete_topic(db_session, test_client, prepare_auth_header):
     response = test_client.request(
         method="DELETE",
         url="/delete-topic",
-        headers=prepare_auth_header,
+        headers=admin_header,
         json={"topic_id": topic.id}
     )
     assert response.status_code == 200

@@ -13,23 +13,23 @@ def test_chat_unauth(test_client):
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
-def test_chat(test_client, prepare_auth_header, user, db_session):
+def test_chat(test_client, admin_header, admin_user, db_session):
     # assign user to a chat
     chat = create_chat(db_session)
     db_session.commit()
-    assign_user(db_session, chat.id, user.id, "admin")
+    assign_user(db_session, chat.id, admin_user.id, "admin")
     db_session.commit()
     # task needed as well for the endpoint
     create_task(
         session=db_session,
         name="test",
         chat=chat,
-        creator=user,
+        creator=admin_user,
         done=False
     )
     db_session.commit()
 
-    response = test_client.get("/chat", headers=prepare_auth_header)
+    response = test_client.get("/chat", headers=admin_header)
     assert response.status_code == 200
     assert len(response.json()) == 1
     for chat in response.json():
@@ -44,15 +44,15 @@ def test_message_history_unauth(test_client):
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
-def test_message_history(test_client, prepare_auth_header, db_session, user):
+def test_message_history(test_client, admin_header, db_session, admin_user):
     chat = create_chat(db_session)
     db_session.commit()
-    send_message_to_chat(db_session, chat, user, "test")
+    send_message_to_chat(db_session, chat, admin_user, "test")
     db_session.commit()
 
     response = test_client.get(
         "/message-history",
-        headers=prepare_auth_header,
+        headers=admin_header,
         params={"chat_id": chat.id}
     )
     assert response.status_code == 200
@@ -70,16 +70,16 @@ def test_send_message_unauth(test_client):
 
 
 def test_send_message_fake_chat(
-        test_client, prepare_auth_header, user, token
+        test_client, admin_header, admin_user, admin_token
 ):
     response = test_client.post(
         "/message",
-        headers=prepare_auth_header,
+        headers=admin_header,
         json={
-            "token": token,
+            "token": admin_token,
             "chat_id": -1,  # non-existent id
             "msg_type": "message",
-            "sender_id": user.id,
+            "sender_id": admin_user.id,
             "content": "test"
         })
     assert response.status_code == 400
@@ -87,7 +87,7 @@ def test_send_message_fake_chat(
 
 
 def test_send_message(
-    db_session, test_client, prepare_auth_header, user, token
+    db_session, test_client, admin_header, admin_user, admin_token
 ):
     chat = create_chat(db_session)
     db_session.commit()
@@ -95,12 +95,12 @@ def test_send_message(
     message_content = "test"
     response = test_client.post(
         "/message",
-        headers=prepare_auth_header,
+        headers=admin_header,
         json={
-            "token": token,
+            "token": admin_token,
             "chat_id": chat.id,
             "msg_type": "message",
-            "sender_id": user.id,
+            "sender_id": admin_user.id,
             "content": message_content
         })
     assert response.status_code == 200
@@ -109,6 +109,6 @@ def test_send_message(
     missing = required - message.keys()
     assert not missing, f"Missing keys: {missing}"
     assert message["chat_id"] == chat.id
-    assert message["sender_id"] == user.id
+    assert message["sender_id"] == admin_user.id
     assert message["content"] == message_content
-    assert message["sender_username"] == user.username
+    assert message["sender_username"] == admin_user.username

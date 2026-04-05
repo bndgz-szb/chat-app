@@ -19,13 +19,29 @@ DB_TEST_URL = os.getenv("DB_TEST_URL")
 
 
 @pytest.fixture
-def user() -> User:
-    return User(
-        username='test',
+def admin_user(db_session) -> User:
+    user = User(
+        username='test_admin',
         password=get_password_hash('test'),
-        email='test@example.com',
+        email='test_admin@example.com',
         admin=True
     )
+    db_session.add(user)
+    db_session.commit()
+    return user
+
+
+@pytest.fixture
+def non_admin_user(db_session) -> User:
+    user = User(
+        username='test_non_admin',
+        password=get_password_hash('test'),
+        email='test_non_admin@example.com',
+        admin=False
+    )
+    db_session.add(user)
+    db_session.commit()
+    return user
 
 
 @pytest.fixture
@@ -81,15 +97,26 @@ def test_client(db_session) -> Generator[TestClient, None, None]:
 
 
 @pytest.fixture
-def token(db_session, user) -> str:
-    db_session.add(user)
-    db_session.commit()
+def admin_token(admin_user) -> str:
     return create_access_token(
-        data={"sub": user.username},
+        data={"sub": admin_user.username},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
 
 
 @pytest.fixture
-def prepare_auth_header(token) -> Dict[str, str]:
-    return {"authorization": f"Bearer {token}"}
+def non_admin_token(non_admin_user) -> str:
+    return create_access_token(
+        data={"sub": non_admin_user.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+
+
+@pytest.fixture
+def admin_header(admin_token) -> Dict[str, str]:
+    return {"authorization": f"Bearer {admin_token}"}
+
+
+@pytest.fixture
+def non_admin_header(non_admin_token) -> Dict[str, str]:
+    return {"authorization": f"Bearer {non_admin_token}"}
