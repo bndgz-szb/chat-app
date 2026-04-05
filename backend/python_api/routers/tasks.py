@@ -58,6 +58,7 @@ def create_task_endpoint(
 ) -> str:
     if user is None:
         raise credentials_exception()
+    validate_task_name(session, request)
     validate_task_topics(session, request)
     validate_task_participants(session, request)
 
