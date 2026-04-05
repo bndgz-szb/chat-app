@@ -1,11 +1,13 @@
 import json
 import requests
 import os
+from sqlalchemy.orm import Session
 from typing import Type, TypeVar, Dict
 from dataclasses import fields, is_dataclass
 from dotenv import load_dotenv
 from websockets.asyncio.server import ServerConnection
 
+from db.session import SessionLocal
 from python_ws_server.chatapp.global_variables import CONNECTIONS
 from python_ws_server.chatapp.messages import *
 from python_api.auth import get_current_user
@@ -34,7 +36,8 @@ async def handleHelloMessage(data, ws: ServerConnection) -> bool:
     assert_has_keys(data, HelloMessage)
 
     parsed = HelloMessage(**data)
-    user = await get_current_user(parsed.token)
+    with SessionLocal() as session:
+        user = await get_current_user(parsed.token, session)
     if user is None:
         await sendError(ws, "Could not validate credentials")
         return False
@@ -60,7 +63,8 @@ async def handleUnicastMessage(data, ws: ServerConnection) -> None:
     assert_has_keys(data, UnicastMessage)
 
     parsed = UnicastMessage(**data)
-    user = await get_current_user(parsed.token)
+    with SessionLocal() as session:
+        user = await get_current_user(parsed.token, session)
     if user is None:
         await sendError(ws, "Could not validate credentials")
         return
