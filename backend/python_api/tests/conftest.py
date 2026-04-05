@@ -16,13 +16,14 @@ from python_api.auth import (
 
 
 DB_TEST_URL = os.getenv("DB_TEST_URL")
+UNHASHED_TEST_USER_PASSWORD = "test"
 
 
 @pytest.fixture
 def admin_user(db_session) -> User:
     user = User(
         username='test_admin',
-        password=get_password_hash('test'),
+        password=get_password_hash(UNHASHED_TEST_USER_PASSWORD),
         email='test_admin@example.com',
         admin=True
     )
@@ -35,7 +36,7 @@ def admin_user(db_session) -> User:
 def non_admin_user(db_session) -> User:
     user = User(
         username='test_non_admin',
-        password=get_password_hash('test'),
+        password=get_password_hash(UNHASHED_TEST_USER_PASSWORD),
         email='test_non_admin@example.com',
         admin=False
     )
