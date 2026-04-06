@@ -61,7 +61,7 @@ function Login() {
 						type={'text'}
 						name={'username'}
 						label={'Username'}
-						placeholder={'boti123'}
+						placeholder={'username'}
 						value={inputUsername}
 						onChange={setInputUsername}
 					/>

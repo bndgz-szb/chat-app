@@ -62,7 +62,7 @@ function Register() {
 						type={'text'}
 						name={'username'}
 						label={'Username'}
-						placeholder={'boti123'}
+						placeholder={'username'}
 						value={inputUsername}
 						onChange={setInputUsername}
 					/>
@@ -70,7 +70,7 @@ function Register() {
 						type={'text'}
 						name={'email'}
 						label={'Email'}
-						placeholder={'boti123@boti.boti'}
+						placeholder={'test@example.com'}
 						value={inputEmail}
 						onChange={setInputEmail}
 					/>

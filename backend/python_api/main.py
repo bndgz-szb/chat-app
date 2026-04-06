@@ -8,7 +8,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    # TODO use fix ip address of frontend
+    # use fix ip address of frontend and ws server in prod
     allow_origins=["http://localhost:3000", "http://localhost:8765"],
     allow_credentials=True,
     allow_methods=["POST", "GET", "PUT", "DELETE", "OPTIONS"],

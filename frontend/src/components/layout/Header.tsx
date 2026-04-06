@@ -7,7 +7,7 @@ function Header() {
 	const isAdmin = useAppSelector(selectIsAdmin);
 
 	return (
-		<div className="w-full bg-gray-800 h-30 align-middle p-4 flex justify-between">
+		<div className="w-full bg-gray-800 h-1/6 items-center p-4 flex justify-between">
 			<div className="p-8 font-bold">Site Name</div>
 			<div className="flex gap-2">
 				{username !== '' && (
