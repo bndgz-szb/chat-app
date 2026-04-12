@@ -41,9 +41,11 @@ def get_messages_for_chat(
 
 
 def send_message_to_chat(
-        session: Session, chat: Chat, user: User, content: str,
-        when: str = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        session: Session, chat: Chat, user: User,
+        content: str, when: str | None = None
 ) -> Message:
+    if when is None:
+        when = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     message = Message(
         chat_id=chat.id, sender_id=user.id, content=content, sent_at=when
     )
