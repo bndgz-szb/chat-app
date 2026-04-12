@@ -25,24 +25,21 @@ def seed():
             session, users, chats
         )
         generate_messages(session, fake, chat_to_list_of_users)
+        generate_admin(session, tasks)
 
 
 def generate_users(
         session: Session, fake: Faker, number_of_users: int
 ) -> List[User]:
-    admin = User(username='admin', password=get_password_hash(
-        'admin'), email='admin@example.com', admin=True
-    )
-    session.add(admin)
-    users = []
-    for _ in range(number_of_users):
-        user = create_user(
-            username=fake.user_name(),
+    users = [
+        create_user(
+            username=fake.unique.user_name(),
             hashed_password=get_password_hash('password'),
-            email=fake.email(),
+            email=fake.unique.email(),
             session=session
         )
-        users.append(user)
+        for _ in range(number_of_users)
+    ]
     session.commit()
     return users
 
@@ -50,25 +47,31 @@ def generate_users(
 def generate_tasks_and_chats(
         session: Session, fake: Faker, users: List[User], number_of_tasks: int
 ) -> Tuple[List[Task], List[Chat]]:
-    chats, tasks = [], []
-    for _ in range(number_of_tasks):
-        task_creator = random.choice(users)
-        chat = create_chat(session)
-        session.commit()
-        task = create_task(session, fake.city(), chat, task_creator)
-        chats.append(chat)
-        tasks.append(task)
+    chats = [create_chat(session) for _ in range(number_of_tasks)]
+    session.commit()
+    tasks = [
+        create_task(
+            session=session,
+            name=fake.unique.city(),
+            chat=chat,
+            creator=random.choice(users)
+        )
+        for chat in chats
+    ]
+    session.commit()
+    for task in tasks:
+        assign_user(session, task.chat.id, task.creator.id, "admin")
     session.commit()
     return tasks, chats
 
 
 def generate_topics(
-        session: Session, fake: Faker, number_of_topics
+        session: Session, fake: Faker, number_of_topics: int
 ) -> List[Topic]:
-    topics = []
-    for _ in range(number_of_topics):
-        topic = create_topic(session, fake.safe_color_name())
-        topics.append(topic)
+    topics = [
+        create_topic(session, fake.unique.safe_color_name())
+        for _ in range(number_of_topics)
+    ]
     session.commit()
     return topics
 
@@ -108,11 +111,22 @@ def generate_messages(
     for chat in chat_to_list_of_users.keys():
         for user in chat_to_list_of_users[chat]:
             for _ in range(random.randint(0, 10)):
-                # TODO randomize 'sent_at' parameter as well
                 send_message_to_chat(
-                    session, chat, user,
-                    fake.text(max_nb_chars=200)
+                    session, chat, user, fake.text(max_nb_chars=200),
+                    fake.date_time_between(start_date='-1w')
+                    .strftime('%Y-%m-%d %H:%M:%S')
                 )
+    session.commit()
+
+
+def generate_admin(session: Session, tasks: List[Task]):
+    admin = User(username='admin', password=get_password_hash(
+        'admin'), email='admin@example.com', admin=True
+    )
+    session.add(admin)
+    session.commit()
+    for task in tasks:
+        assign_user(session, task.chat.id, admin.id, "admin")
     session.commit()
 
 
