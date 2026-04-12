@@ -9,6 +9,10 @@ def get_all_topics(session: Session) -> Sequence[Topic]:
     return session.scalars(select(Topic)).all()
 
 
+def get_topic_by_name(session: Session, topic_name: str) -> Topic | None:
+    return session.scalar(select(Topic).where(Topic.name == topic_name))
+
+
 def create_topic(session: Session, name: str) -> Topic:
     topic = Topic(name=name)
     session.add(topic)

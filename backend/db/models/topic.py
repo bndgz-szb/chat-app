@@ -9,7 +9,7 @@ class Topic(Base):
     __tablename__ = topic_tablename
 
     id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String(20), nullable=False)
+    name = mapped_column(String(20), nullable=False, unique=True)
 
     tasks: Mapped[List["Task"]] = relationship(
         secondary=task_topic_tablename, back_populates="topics"
