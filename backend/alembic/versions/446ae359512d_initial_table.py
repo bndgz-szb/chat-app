@@ -1,8 +1,8 @@
-"""Initial bash
+"""Initial table
 
-Revision ID: 0baeaace9cc2
+Revision ID: 446ae359512d
 Revises: 
-Create Date: 2026-02-24 11:09:07.859107
+Create Date: 2026-04-12 13:23:38.409926
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0baeaace9cc2'
+revision: str = '446ae359512d'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,7 +28,8 @@ def upgrade() -> None:
     op.create_table('topic',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=20), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -43,7 +44,7 @@ def upgrade() -> None:
     op.create_table('chat_participant',
     sa.Column('chat_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('role', sa.String(length=20), nullable=False),
+    sa.Column('role', sa.Enum('OWNER', 'MEMBER', 'GUEST', name='chatrole'), nullable=False),
     sa.Column('joined_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['chat_id'], ['chat.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),

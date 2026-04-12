@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from typing import List, Literal, Sequence
+from typing import List, Sequence
 from dataclasses import dataclass
-from db.models import Chat, Task, TaskTopic, User, ChatParticipant
-from db.crud.chat import remove_user, assign_user, ChatRole
+from db.models import Chat, Task, TaskTopic, User, ChatParticipant, ChatRole
+from db.crud.chat import remove_user, assign_user
 
 
 @dataclass

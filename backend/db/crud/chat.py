@@ -1,22 +1,15 @@
-from enum import Enum
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from typing import List, Literal
 from dataclasses import dataclass
 
-from db.models import Chat, ChatParticipant, User, Task, Message
+from db.models import Chat, ChatParticipant, User, Task, Message, ChatRole
 
 
 @dataclass
 class ChatResponse:
     id: int
     name: str
-
-
-class ChatRole(Enum):
-    OWNER = "owner"
-    MEMBER = "member"
-    GUEST = "guest"
 
 
 def get_chat_by_id(session: Session, chat_id: int) -> Chat | None:
@@ -54,7 +47,7 @@ def get_user_role_for_chat(
     )
     if role is None:
         return False
-    return ChatRole(role)
+    return role
 
 
 def create_chat(session: Session) -> Chat:
@@ -77,7 +70,7 @@ def assign_user(
     )
     if exists == None:
         chat_participant = ChatParticipant(
-            chat_id=chat_id, user_id=user_id, role=role.value
+            chat_id=chat_id, user_id=user_id, role=role
         )
         session.add(chat_participant)
 

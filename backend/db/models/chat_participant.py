@@ -1,7 +1,15 @@
-from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, ForeignKey, Integer, DateTime, func
+import datetime
+import enum
+from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import Enum as SAEnum, ForeignKey, Integer, DateTime, func
 
 from db.db import Base, participant_tablename, chat_tablename, user_tablename
+
+
+class ChatRole(enum.Enum):
+    OWNER = "owner"
+    MEMBER = "member"
+    GUEST = "guest"
 
 
 class ChatParticipant(Base):
@@ -11,7 +19,9 @@ class ChatParticipant(Base):
         f"{chat_tablename}.id"), primary_key=True)
     user_id = mapped_column(Integer, ForeignKey(
         f"{user_tablename}.id"), primary_key=True)
-    role = mapped_column(String(20), default="member", nullable=False)
+    role: Mapped[ChatRole] = mapped_column(
+        SAEnum(ChatRole), default="member", nullable=False
+    )
     joined_at = mapped_column(DateTime, default=func.now(), nullable=False)
 
     def __repr__(self) -> str:
