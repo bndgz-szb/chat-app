@@ -10,10 +10,18 @@ export type Participant = {
 	name: string;
 };
 
+export const ChatRole = {
+	owner: 'owner',
+	member: 'member',
+	guest: 'guest',
+} as const;
+
+export type ChatRole = keyof typeof ChatRole;
+
 export type TaskParticipant = {
 	id: number;
 	name: string;
-	role: 'admin' | 'member' | 'guest';
+	role: ChatRole;
 };
 
 export type TaskWithTopic = {

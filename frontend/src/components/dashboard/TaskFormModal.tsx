@@ -7,10 +7,11 @@ import {
 } from '@/state/apiSlice';
 import { selectUserId } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
-import type {
-	TaskParticipant,
-	TaskWithTopic,
-	Topic,
+import {
+	ChatRole,
+	type TaskParticipant,
+	type TaskWithTopic,
+	type Topic,
 } from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, Switch, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -160,10 +161,10 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 						<ParticipantsModal
 							allUsers={participants.data?.filter((user) => user.id !== userId)}
 							initialGuests={taskParticipants.filter(
-								(user) => user.role === 'guest'
+								(user) => user.role === ChatRole.guest
 							)}
 							initialMembers={taskParticipants.filter(
-								(user) => user.role === 'member'
+								(user) => user.role === ChatRole.member
 							)}
 							setTaskParticipants={setTaskParticipants}
 						/>

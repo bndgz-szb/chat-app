@@ -1,6 +1,10 @@
 import { selectUser, selectUserId } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
-import type { Participant, TaskParticipant } from '@/state/responseTypes';
+import {
+	ChatRole,
+	type Participant,
+	type TaskParticipant,
+} from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -25,7 +29,7 @@ function ParticipantsModal({
 	const fixedParticipant: TaskParticipant = {
 		id: userId,
 		name: username,
-		role: 'admin',
+		role: ChatRole.owner,
 	};
 
 	useEffect(() => {
@@ -43,11 +47,13 @@ function ParticipantsModal({
 				(guest) =>
 					({
 						...guest,
-						role: 'guest',
+						role: ChatRole.guest,
 					}) as TaskParticipant
 			)
 			.concat(
-				members.map((user) => ({ ...user, role: 'member' }) as TaskParticipant)
+				members.map(
+					(user) => ({ ...user, role: ChatRole.member }) as TaskParticipant
+				)
 			);
 		taskParticipants.push(fixedParticipant);
 

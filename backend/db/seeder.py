@@ -8,7 +8,7 @@ from db.models import *
 from python_api.auth import get_password_hash
 from db.crud import (
     create_user, create_chat, create_task, create_topic, attach_topic,
-    assign_user, send_message_to_chat
+    assign_user, send_message_to_chat, ChatRole
 )
 
 
@@ -60,7 +60,7 @@ def generate_tasks_and_chats(
     ]
     session.commit()
     for task in tasks:
-        assign_user(session, task.chat.id, task.creator.id, "admin")
+        assign_user(session, task.chat.id, task.creator.id, ChatRole.OWNER)
     session.commit()
     return tasks, chats
 
@@ -126,7 +126,7 @@ def generate_admin(session: Session, tasks: List[Task]):
     session.add(admin)
     session.commit()
     for task in tasks:
-        assign_user(session, task.chat.id, admin.id, "admin")
+        assign_user(session, task.chat.id, admin.id, ChatRole.OWNER)
     session.commit()
 
 

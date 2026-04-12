@@ -5,6 +5,7 @@ from python_api.request_types import CreateTaskRequest
 from db.crud.task import get_task_by_name
 from db.crud.user import get_all_users
 from db.crud.topic import get_all_topics
+from db.crud.chat import ChatRole
 
 
 def validate_task_name(session: Session, task: CreateTaskRequest) -> None:
@@ -33,6 +34,14 @@ def validate_task_participants(
 ) -> None:
     user_ids = list(map(lambda user: user.id, get_all_users(session)))
     for participant in task.participants:
+        try:
+            ChatRole(participant.role)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=("Invalid role provided for participant " +
+                        participant.name)
+            )
         if participant.id not in user_ids:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

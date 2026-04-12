@@ -3,14 +3,14 @@ from sqlalchemy import select
 from typing import List, Literal, Sequence
 from dataclasses import dataclass
 from db.models import Chat, Task, TaskTopic, User, ChatParticipant
-from db.crud.chat import remove_user, assign_user
+from db.crud.chat import remove_user, assign_user, ChatRole
 
 
 @dataclass
 class TaskParticipant():
     id: int
     name: str
-    role: Literal['admin'] | Literal['guest'] | Literal['member']
+    role: ChatRole
 
 
 def get_task_participants(
