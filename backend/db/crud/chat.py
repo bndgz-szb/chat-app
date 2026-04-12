@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from typing import List, Literal
 from dataclasses import dataclass
+from datetime import datetime
 
 from db.models import Chat, ChatParticipant, User, Task, Message, ChatRole
 
@@ -48,6 +49,21 @@ def get_user_role_for_chat(
     if role is None:
         return False
     return role
+
+
+def get_user_joined_at(
+        session: Session, chat_id: int, user_id: int
+) -> datetime | Literal[False]:
+    joined_at = session.scalar(
+        select(ChatParticipant.joined_at)
+        .where(
+            ChatParticipant.chat_id == chat_id,
+            ChatParticipant.user_id == user_id
+        )
+    )
+    if joined_at is None:
+        return False
+    return joined_at
 
 
 def create_chat(session: Session) -> Chat:

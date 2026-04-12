@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
 from dataclasses import dataclass
-from sqlalchemy import DateTime, select
+from sqlalchemy import select
 from typing import List
 
 from db.models import Chat, User, Message
@@ -13,7 +13,7 @@ class MessageWithUsername:
     chat_id: int
     sender_id: int
     content: str
-    sent_at: DateTime
+    sent_at: datetime
     sender_username: str
 
 

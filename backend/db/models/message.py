@@ -1,3 +1,4 @@
+import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Text, ForeignKey, Integer, DateTime, func
 
@@ -13,7 +14,9 @@ class Message(Base):
     sender_id = mapped_column(Integer, ForeignKey(
         f"{user_tablename}.id"), nullable=False)
     content = mapped_column(Text, nullable=False)
-    sent_at = mapped_column(DateTime, default=func.now(), nullable=False)
+    sent_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=func.now(), nullable=False
+    )
 
     sender: Mapped["User"] = relationship(back_populates="messages")
     chat: Mapped["Chat"] = relationship(back_populates="messages")

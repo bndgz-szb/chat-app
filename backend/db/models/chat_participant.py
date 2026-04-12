@@ -22,7 +22,9 @@ class ChatParticipant(Base):
     role: Mapped[ChatRole] = mapped_column(
         SAEnum(ChatRole), default="member", nullable=False
     )
-    joined_at = mapped_column(DateTime, default=func.now(), nullable=False)
+    joined_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=func.now(), nullable=False
+    )
 
     def __repr__(self) -> str:
         return f"ChatParticipant(chat_id={self.chat_id!r}, user_id={self.user_id!r}, role={self.role!r}, joined_at={self.joined_at!r})"

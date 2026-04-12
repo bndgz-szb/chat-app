@@ -2,13 +2,15 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Annotated, List
 from sqlalchemy.orm import Session
 
-from db.models import User
+from db.models import User, ChatRole
 from db.session import get_session
 from db.crud.chat import (
-    ChatResponse, MessageWithUsername, get_chats_for_user,
-    get_messages_for_chat, get_chat_by_id
+    ChatResponse, get_chats_for_user,
+    get_chat_by_id, get_user_role_for_chat, get_user_joined_at
 )
-from db.crud.message import send_message_to_chat
+from db.crud.message import (
+    send_message_to_chat, MessageWithUsername, get_messages_for_chat
+)
 from python_api.auth import (
     AuthRoute, get_current_user, credentials_exception
 )
@@ -32,9 +34,31 @@ def chat(
 
 @authenticated_router.get("/message-history", response_model=None)
 def message_history(
-    chat_id: int, session: Annotated[Session, Depends(get_session)]
+    chat_id: int,
+    user: Annotated[User | None, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)]
 ) -> List[MessageWithUsername]:
-    return get_messages_for_chat(session, chat_id)
+    if user is None:
+        raise credentials_exception()
+    messages = get_messages_for_chat(session, chat_id)
+    user_role = get_user_role_for_chat(session, chat_id, user.id)
+    if user_role is False:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User isn't part of chat"
+        )
+
+    if user_role is ChatRole.GUEST:
+        start = get_user_joined_at(session, chat_id, user.id)
+        if start is False:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User isn't part of chat"
+            )
+        messages = list(
+            filter(lambda message: message.sent_at > start, messages)
+        )
+    return messages
 
 
 @authenticated_router.post("/message", response_model=None)
