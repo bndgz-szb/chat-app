@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal, List
-from db.crud.chat import MessageWithUsername
+from db.crud.message import MessageWithUsername
 
 
 @dataclass
