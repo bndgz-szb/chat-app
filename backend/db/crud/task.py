@@ -4,6 +4,7 @@ from typing import List, Sequence, Tuple
 from dataclasses import dataclass
 from db.models import Chat, Task, TaskTopic, User, ChatParticipant, ChatRole
 from db.crud.chat import remove_user, assign_user
+from db.crud.user import get_admin_user
 
 
 @dataclass
@@ -81,6 +82,28 @@ def update_task(
     task.name = updated_name
     task.done = updated_status
 
+    update_task_topics(session, task, updated_topic_ids)
+
+    admin = get_admin_user(session)
+    admin_id = admin.id if admin else -1
+    old_participants = session.scalars(
+        select(ChatParticipant)
+        .where(
+            ChatParticipant.chat_id == task.chat_id,
+            ChatParticipant.user_id != admin_id
+        )
+    ).all()
+    remove_old_participants(
+        session, task, updated_participants, old_participants
+    )
+    assign_new_participants(
+        session, task, updated_participants, old_participants
+    )
+
+
+def update_task_topics(
+    session: Session, task: Task, updated_topic_ids: List[int]
+):
     # remove old topics
     old_topic_ids = session.scalars(
         select(TaskTopic.topic_id).where(TaskTopic.task_id == task.id)
@@ -94,17 +117,12 @@ def update_task(
         if new_topic_id not in old_topic_ids:
             attach_topic(session, task, new_topic_id)
 
-    # remove old participants
-    old_participants = session.scalars(
-        select(ChatParticipant)
-        .where(ChatParticipant.chat_id == task.chat_id)
-    ).all()
-    old_participant_ids = list(
-        map(
-            lambda chat_participant: chat_participant.user_id,
-            old_participants
-        )
-    )
+
+def remove_old_participants(
+    session: Session, task: Task,
+    updated_participants: List[TaskParticipant],
+    old_participants: Sequence[ChatParticipant]
+):
     new_participant_ids = list(
         map(lambda user: user.id, updated_participants)
     )
@@ -120,7 +138,18 @@ def update_task(
             if old_role != new_role:
                 old_participant.role = new_role
 
-    # assign new participants
+
+def assign_new_participants(
+        session: Session, task: Task,
+        updated_participants: List[TaskParticipant],
+        old_participants: Sequence[ChatParticipant]
+):
+    old_participant_ids = list(
+        map(
+            lambda chat_participant: chat_participant.user_id,
+            old_participants
+        )
+    )
     for new_participant in updated_participants:
         if new_participant.id not in old_participant_ids:
             assign_user(
