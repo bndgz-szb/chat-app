@@ -56,6 +56,8 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 		}
 	}, [open]);
 
+	const owner = taskParticipants.find((user) => user.role === ChatRole.owner);
+
 	const resetFormState = () => {
 		if (task) {
 			setIsDone(task.done);
@@ -159,18 +161,16 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 						/>
 
 						<ParticipantsModal
-							allUsers={participants.data?.filter((user) => user.id !== userId)}
+							allUsers={participants.data?.filter(
+								(user) => user.id !== userId && user.id !== owner?.id
+							)}
 							initialGuests={taskParticipants.filter(
 								(user) => user.role === ChatRole.guest
 							)}
 							initialMembers={taskParticipants.filter(
 								(user) => user.role === ChatRole.member
 							)}
-							owner={
-								taskParticipants.filter(
-									(user) => user.role === ChatRole.owner
-								)[0]
-							}
+							owner={owner}
 							setTaskParticipants={setTaskParticipants}
 						/>
 
