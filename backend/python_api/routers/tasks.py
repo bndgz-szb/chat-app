@@ -68,9 +68,10 @@ def create_task_endpoint(
     for participant in request.participants:
         assign_user(session, chat.id, participant.id, participant.role)
 
-    admin = get_admin_user(session)
-    if admin is not None:
-        assign_user(session, chat.id, admin.id, ChatRole.OWNER)
+    if not user.admin:
+        admin = get_admin_user(session)
+        if admin is not None:
+            assign_user(session, chat.id, admin.id, ChatRole.OWNER)
 
     task = create_task(
         session=session,
