@@ -166,6 +166,11 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 							initialMembers={taskParticipants.filter(
 								(user) => user.role === ChatRole.member
 							)}
+							owner={
+								taskParticipants.filter(
+									(user) => user.role === ChatRole.owner
+								)[0]
+							}
 							setTaskParticipants={setTaskParticipants}
 						/>
 

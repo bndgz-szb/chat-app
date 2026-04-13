@@ -12,6 +12,7 @@ type ParticipantsModalProps = {
 	allUsers?: Participant[];
 	initialGuests: TaskParticipant[];
 	initialMembers: TaskParticipant[];
+	owner?: TaskParticipant;
 	setTaskParticipants: (newTaskParticipants: TaskParticipant[]) => void;
 };
 
@@ -19,18 +20,21 @@ function ParticipantsModal({
 	allUsers,
 	initialGuests,
 	initialMembers,
+	owner,
 	setTaskParticipants,
 }: ParticipantsModalProps) {
+	const userId = useAppSelector(selectUserId);
+	const username = useAppSelector(selectUser);
 	const [open, setOpen] = useState<boolean>(false);
 	const [guests, setGuests] = useState<Participant[]>(initialGuests);
 	const [members, setMembers] = useState<Participant[]>(initialMembers);
-	const userId = useAppSelector(selectUserId);
-	const username = useAppSelector(selectUser);
-	const fixedParticipant: TaskParticipant = {
-		id: userId,
-		name: username,
-		role: ChatRole.owner,
-	};
+	const [fixedParticipant, setFixedParticipant] = useState<TaskParticipant>(
+		owner ?? {
+			id: userId,
+			name: username,
+			role: ChatRole.owner,
+		}
+	);
 
 	useEffect(() => {
 		if (members.length === 0) {
@@ -39,7 +43,10 @@ function ParticipantsModal({
 		if (guests.length === 0) {
 			setGuests(initialGuests);
 		}
-	}, [initialGuests, initialMembers]);
+		if (owner) {
+			setFixedParticipant(owner);
+		}
+	}, [initialGuests, initialMembers, owner]);
 
 	const handleSubmit = () => {
 		const taskParticipants: TaskParticipant[] = guests
