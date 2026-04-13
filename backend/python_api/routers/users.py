@@ -32,7 +32,8 @@ def all_users(
     users = get_all_users(session)
     result = []
     for user in users:
-        result.append(UserResponse(id=user.id, name=user.username))
+        if not user.admin:
+            result.append(UserResponse(id=user.id, name=user.username))
     return result
 
 
@@ -41,7 +42,16 @@ def task_participants(
     task_id: int,
     session: Annotated[Session, Depends(get_session)]
 ) -> List[TaskParticipant]:
-    return get_task_participants(session, task_id)
+    result = []
+    for row in get_task_participants(session, task_id):
+        if row[0].admin is False:
+            result.append(TaskParticipant(
+                id=row[0].id,
+                name=row[0].username,
+                role=row[1]
+            ))
+
+    return result
 
 
 @unauthenticated_router.post("/register")

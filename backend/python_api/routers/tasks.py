@@ -7,6 +7,7 @@ from db.session import get_session
 from db.crud.chat import (
     get_chats_for_user, create_chat, assign_user, delete_chat
 )
+from db.crud.user import get_admin_user
 from db.crud.task import (
     get_tasks_with_topics, create_task,
     attach_topic, get_task_by_id, delete_task, update_task
@@ -66,6 +67,11 @@ def create_task_endpoint(
     session.commit()
     for participant in request.participants:
         assign_user(session, chat.id, participant.id, participant.role)
+
+    admin = get_admin_user(session)
+    if admin is not None:
+        assign_user(session, chat.id, admin.id, ChatRole.OWNER)
+
     task = create_task(
         session=session,
         name=request.name,

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select
-from typing import List, Sequence
+from sqlalchemy import select, Result
+from typing import List, Sequence, Tuple
 from dataclasses import dataclass
 from db.models import Chat, Task, TaskTopic, User, ChatParticipant, ChatRole
 from db.crud.chat import remove_user, assign_user
@@ -15,7 +15,7 @@ class TaskParticipant():
 
 def get_task_participants(
         session: Session, task_id: int
-) -> List[TaskParticipant]:
+) -> Result[Tuple[User, ChatRole]]:
     stmt = (
         select(User, ChatParticipant.role)
         .join(ChatParticipant)
@@ -23,15 +23,7 @@ def get_task_participants(
         .join(Task)
         .where(Task.id == task_id)
     )
-    result = []
-    for row in session.execute(stmt):
-        result.append(TaskParticipant(
-            id=row[0].id,
-            name=row[0].username,
-            role=row[1]
-        ))
-
-    return result
+    return session.execute(stmt)
 
 
 def get_tasks_with_topics(session: Session) -> Sequence[Task]:
