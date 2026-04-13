@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, Result
+from sqlalchemy import select, Result, delete
 from typing import List, Sequence, Tuple
 from dataclasses import dataclass
 from db.models import Chat, Task, TaskTopic, User, ChatParticipant, ChatRole
@@ -67,12 +67,10 @@ def attach_topic(session: Session, task: Task, topic_id: int) -> None:
 
 def remove_topic(session: Session, task: Task, topic_id: int) -> None:
     # if task doesn't have topic attached, nothing happens
-    task_topic = session.scalar(
-        select(TaskTopic)
+    session.scalar(
+        delete(TaskTopic)
         .where(TaskTopic.task_id == task.id, TaskTopic.topic_id == topic_id)
     )
-    if task_topic != None:
-        session.delete(task_topic)
 
 
 def update_task(

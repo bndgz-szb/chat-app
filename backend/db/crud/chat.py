@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 from typing import List, Literal
 from dataclasses import dataclass
@@ -94,30 +94,24 @@ def assign_user(
 def remove_user(
     session: Session, chat_id: int, user_id: int
 ) -> None:
-    chat_participant = session.scalar(
-        select(ChatParticipant)
+    session.execute(
+        delete(ChatParticipant)
         .where(
             ChatParticipant.chat_id == chat_id,
             ChatParticipant.user_id == user_id
         )
     )
-    if chat_participant:
-        session.delete(chat_participant)
 
 
 def delete_chat(session: Session, chat: Chat) -> None:
-    messages = session.scalars(
-        select(Message)
+    session.execute(
+        delete(Message)
         .where(Message.chat_id == chat.id)
     )
-    for message in messages:
-        session.delete(message)
 
-    participants = session.scalars(
-        select(ChatParticipant)
+    session.execute(
+        delete(ChatParticipant)
         .where(ChatParticipant.chat_id == chat.id)
     )
-    for participant in participants:
-        session.delete(participant)
 
     session.delete(chat)
