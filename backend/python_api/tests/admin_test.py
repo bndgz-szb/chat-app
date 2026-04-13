@@ -1,5 +1,6 @@
 from dataclasses import fields
 
+from db.models import ChatRole
 from db.crud.chat import create_chat, assign_user
 from db.crud.task import create_task, TaskParticipant
 from db.crud.message import send_message_to_chat
@@ -27,7 +28,7 @@ def test_analytics(db_session, admin_user, test_client, admin_header):
     for participant in [TaskParticipant(
         id=admin_user.id,
         name=admin_user.username,
-        role="admin"
+        role=ChatRole.OWNER
     )]:
         assign_user(db_session, chat.id, participant.id, participant.role)
 

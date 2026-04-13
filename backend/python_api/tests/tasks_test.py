@@ -1,6 +1,6 @@
 from dataclasses import fields
 
-from db.models import Task
+from db.models import Task, ChatRole
 from db.crud.task import create_task
 from db.crud.chat import create_chat
 from python_api.response_types import TaskWithTopic
@@ -46,7 +46,7 @@ def test_create_task_duplicate_name(
             "participants": [{
                 "id": admin_user.id,
                 "name": admin_user.username,
-                "role": "admin"
+                "role": ChatRole.OWNER.value
             }]
         }
     )
@@ -65,7 +65,7 @@ def test_create_task_invalid_topic(test_client, admin_header, admin_user):
             "participants": [{
                 "id": admin_user.id,
                 "name": admin_user.username,
-                "role": "admin"
+                "role": ChatRole.OWNER.value
             }]
         }
     )
@@ -87,7 +87,7 @@ def test_create_task_invalid_participant(
             "participants": [{
                 "id": -1,
                 "name": "i_don't_exist",
-                "role": "admin"
+                "role": ChatRole.OWNER.value
             }]
         }
     )
@@ -107,7 +107,7 @@ def test_create_task(test_client, admin_header, admin_user):
             "participants": [{
                 "id": admin_user.id,
                 "name": admin_user.username,
-                "role": "admin"
+                "role": ChatRole.OWNER.value
             }]
         }
     )
@@ -185,7 +185,7 @@ def test_update_task_fake_task(test_client, admin_header, admin_user):
                 "participants": [{
                     "id": admin_user.id,
                     "name": admin_user.username,
-                    "role": "admin"
+                    "role": ChatRole.OWNER.value
                 }]
             }
         }
@@ -210,7 +210,7 @@ def test_update_task_non_updatable(
                 "participants": [{
                     "id": admin_user.id,
                     "name": admin_user.username,
-                    "role": "admin"
+                    "role": ChatRole.OWNER.value
                 }]
             }
         }
@@ -238,7 +238,7 @@ def test_update_task_duplicate_name(
                 "participants": [{
                     "id": admin_user.id,
                     "name": admin_user.username,
-                    "role": "admin"
+                    "role": ChatRole.OWNER.value
                 }]
             }
         }
@@ -263,7 +263,7 @@ def test_update_task_invalid_topic(
                 "participants": [{
                     "id": admin_user.id,
                     "name": admin_user.username,
-                    "role": "admin"
+                    "role": ChatRole.OWNER.value
                 }]
             }
         }
@@ -289,7 +289,7 @@ def test_update_task_invalid_participant(
                 "participants": [{
                     "id": -1,
                     "name": "i_don't_exist",
-                    "role": "admin"
+                    "role": ChatRole.OWNER.value
                 }]
             }
         }
@@ -313,7 +313,7 @@ def test_update_task(test_client, admin_header, admin_user, db_session):
                 "participants": [{
                     "id": admin_user.id,
                     "name": admin_user.username,
-                    "role": "admin"
+                    "role": ChatRole.OWNER.value
                 }]
             }
         }

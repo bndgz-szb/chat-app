@@ -1,10 +1,9 @@
 from dataclasses import fields
 
-from db.crud.chat import (
-    assign_user, create_chat, ChatResponse, MessageWithUsername
-)
+from db.models import ChatRole
+from db.crud.chat import (assign_user, create_chat, ChatResponse)
 from db.crud.task import create_task
-from db.crud.message import send_message_to_chat
+from db.crud.message import send_message_to_chat, MessageWithUsername
 
 
 def test_chat_unauth(test_client):
@@ -17,7 +16,7 @@ def test_chat(test_client, admin_header, admin_user, db_session):
     # assign user to a chat
     chat = create_chat(db_session)
     db_session.commit()
-    assign_user(db_session, chat.id, admin_user.id, "admin")
+    assign_user(db_session, chat.id, admin_user.id, ChatRole.OWNER)
     db_session.commit()
     # task needed as well for the endpoint
     create_task(
@@ -47,6 +46,7 @@ def test_message_history_unauth(test_client):
 def test_message_history(test_client, admin_header, db_session, admin_user):
     chat = create_chat(db_session)
     db_session.commit()
+    assign_user(db_session, chat.id, admin_user.id, ChatRole.OWNER)
     send_message_to_chat(db_session, chat, admin_user, "test")
     db_session.commit()
 
