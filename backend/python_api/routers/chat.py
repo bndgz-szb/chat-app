@@ -40,6 +40,8 @@ def message_history(
 ) -> List[MessageWithUsername]:
     if user is None:
         raise credentials_exception()
+    if chat_id == -1:
+        return []
     messages = get_messages_for_chat(session, chat_id)
     user_role = get_user_role_for_chat(session, chat_id, user.id)
     if user_role is False:

@@ -50,7 +50,11 @@ async def handleHelloMessage(data, ws: ServerConnection) -> bool:
     if response.status_code == 200:
         history = response.json()
     else:
-        await sendError(ws, "Error while querying message history")
+        error = response.json()
+        if "detail" in error:
+            await sendError(ws, error["detail"])
+        else:
+            await sendError(ws, "Error while querying message history")
         return False
 
     msg = HistoryMessage(msg_type="history", messages=history)
@@ -102,8 +106,11 @@ async def sendMessage(
                 ))
                 pass
     else:
-        # TODO error handling
-        await sendError(ws, "Error while sending message")
+        error = response.json()
+        if "detail" in error:
+            await sendError(ws, error["detail"])
+        else:
+            await sendError(ws, "Error while sending message")
 
 
 async def message_loop(ws: ServerConnection) -> None:
@@ -116,7 +123,7 @@ async def message_loop(ws: ServerConnection) -> None:
                 else:
                     await handleUnicastMessage(data, ws)
             except (json.JSONDecodeError):
-                await sendError(ws, "Invalid message format")
+                await sendError(ws, "JSON decode error")
                 continue
             except (AssertionError):
                 await sendError(ws, "Invalid message format")
