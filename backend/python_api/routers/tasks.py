@@ -88,32 +88,6 @@ def create_task_endpoint(
     return "Task created successfully"
 
 
-@authenticated_router.delete('/delete-task')
-def delete_task_endpoint(
-    user: Annotated[User | None, Depends(get_current_user)],
-    session: Annotated[Session, Depends(get_session)],
-    request: DeleteTaskRequest
-) -> str:
-    if user is None:
-        raise credentials_exception()
-    task = get_task_by_id(session, request.task_id)
-    if task is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Task with given id does not exist"
-        )
-    if not (user.admin or user.id == task.created_by):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You don't have permission to delete this task!"
-        )
-    delete_task(session, task)
-    delete_chat(session, task.chat)
-    session.commit()
-
-    return "Task and its chat has been successfully deleted"
-
-
 @authenticated_router.put('/update-task')
 def update_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
@@ -151,6 +125,32 @@ def update_task_endpoint(
     session.commit()
 
     return "Task has been modified successfully"
+
+
+@authenticated_router.delete('/delete-task')
+def delete_task_endpoint(
+    user: Annotated[User | None, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    request: DeleteTaskRequest
+) -> str:
+    if user is None:
+        raise credentials_exception()
+    task = get_task_by_id(session, request.task_id)
+    if task is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Task with given id does not exist"
+        )
+    if not (user.admin or user.id == task.created_by):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You don't have permission to delete this task!"
+        )
+    delete_task(session, task)
+    delete_chat(session, task.chat)
+    session.commit()
+
+    return "Task and its chat has been successfully deleted"
 
 
 tasks_router = APIRouter()
