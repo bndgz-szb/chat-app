@@ -13,6 +13,7 @@ import {
 	type TooltipContentProps,
 } from 'recharts';
 
+// ChatGPT generated parts within this component
 function Analytics() {
 	const { data } = useAnalyticsQuery();
 
@@ -80,7 +81,7 @@ function Analytics() {
 												nameKey="username"
 												cx="50%"
 												cy="50%"
-												outerRadius={120}
+												outerRadius={105}
 												shape={MyCustomPie}
 												label={({ name, percent }) =>
 													`${name} ${((percent ?? 1) * 100).toFixed(0)}%`

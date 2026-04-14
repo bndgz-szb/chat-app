@@ -34,6 +34,7 @@ def get_task_analytics(session: Session) -> List[TaskWithAnalytics]:
         ).join(Message.chat)
         .join(Chat.task)
         .group_by(Task.name, "day")
+        .order_by("day")
     )
     messages_per_users_raw = (
         select(
