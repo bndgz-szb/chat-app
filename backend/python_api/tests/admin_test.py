@@ -1,10 +1,9 @@
-from dataclasses import fields
+from datetime import datetime
 
 from db.models import ChatRole
 from db.crud.chat import create_chat, assign_user
 from db.crud.task import create_task, TaskParticipant
 from db.crud.message import send_message_to_chat
-from db.crud.analytics import TaskWithAnalytics
 
 
 def test_analytics_unauth(test_client):
@@ -32,7 +31,7 @@ def test_analytics(db_session, admin_user, test_client, admin_header):
     )]:
         assign_user(db_session, chat.id, participant.id, participant.role)
 
-    create_task(
+    task = create_task(
         session=db_session,
         name="test",
         chat=chat,
@@ -46,9 +45,23 @@ def test_analytics(db_session, admin_user, test_client, admin_header):
     db_session.commit()
 
     response = test_client.get("/analytics", headers=admin_header)
+    tasks_with_analytics = response.json()
     assert response.status_code == 200
-    assert len(response.json()) == 1
-    for task_with_analytics in response.json():
-        required = {f.name for f in fields(TaskWithAnalytics)}
-        missing = required - task_with_analytics.keys()
-        assert not missing, f"Missing keys: {missing}"
+    assert len(tasks_with_analytics) == 1
+    assert tasks_with_analytics[0]["name"] == task.name
+    assert (
+        tasks_with_analytics[0]["messagesByDays"][0]["day"]
+        ==
+        datetime.today().strftime('%Y/%m/%d')
+    )
+    assert tasks_with_analytics[0]["messagesByDays"][0]["messages"] == 1
+    assert (
+        tasks_with_analytics[0]["messagesPerUsers"][0]["username"]
+        ==
+        admin_user.username
+    )
+    assert (
+        tasks_with_analytics[0]["messagesPerUsers"][0]["total_messages"]
+        ==
+        1
+    )
