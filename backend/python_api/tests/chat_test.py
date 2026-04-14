@@ -1,9 +1,9 @@
-from dataclasses import fields
+from datetime import datetime, timedelta
 
 from db.models import ChatRole
-from db.crud.chat import (assign_user, create_chat, ChatResponse)
+from db.crud.chat import assign_user, create_chat
 from db.crud.task import create_task
-from db.crud.message import send_message_to_chat, MessageWithUsername
+from db.crud.message import send_message_to_chat
 
 
 def test_chat_unauth(test_client):
@@ -19,7 +19,7 @@ def test_chat(test_client, admin_header, admin_user, db_session):
     assign_user(db_session, chat.id, admin_user.id, ChatRole.OWNER)
     db_session.commit()
     # task needed as well for the endpoint
-    create_task(
+    task = create_task(
         session=db_session,
         name="test",
         chat=chat,
@@ -29,12 +29,11 @@ def test_chat(test_client, admin_header, admin_user, db_session):
     db_session.commit()
 
     response = test_client.get("/chat", headers=admin_header)
+    chat_list = response.json()
     assert response.status_code == 200
-    assert len(response.json()) == 1
-    for chat in response.json():
-        required = {f.name for f in fields(ChatResponse)}
-        missing = required - chat.keys()
-        assert not missing, f"Missing keys: {missing}"
+    assert len(chat_list) == 1
+    assert chat_list[0]["id"] == chat.id
+    assert chat_list[0]["name"] == task.name
 
 
 def test_message_history_unauth(test_client):
@@ -43,11 +42,25 @@ def test_message_history_unauth(test_client):
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
-def test_message_history(test_client, admin_header, db_session, admin_user):
+def test_message_history_outsider(db_session, test_client, admin_header):
+    chat = create_chat(db_session)
+    db_session.commit()
+    response = test_client.get(
+        "/message-history",
+        headers=admin_header,
+        params={"chat_id": chat.id}
+    )
+    assert response.status_code == 401
+    assert response.json() == {"detail": "User isn't part of chat"}
+
+
+def test_message_history_owner(test_client, admin_header, db_session, admin_user):
     chat = create_chat(db_session)
     db_session.commit()
     assign_user(db_session, chat.id, admin_user.id, ChatRole.OWNER)
-    send_message_to_chat(db_session, chat, admin_user, "test")
+    now = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    message_content = "test"
+    send_message_to_chat(db_session, chat, admin_user, message_content, now)
     db_session.commit()
 
     response = test_client.get(
@@ -55,12 +68,47 @@ def test_message_history(test_client, admin_header, db_session, admin_user):
         headers=admin_header,
         params={"chat_id": chat.id}
     )
+    messages = response.json()
     assert response.status_code == 200
-    assert len(response.json()) == 1
-    for message in response.json():
-        required = {f.name for f in fields(MessageWithUsername)}
-        missing = required - message.keys()
-        assert not missing, f"Missing keys: {missing}"
+    assert len(messages) == 1
+    assert messages[0]["id"]
+    assert messages[0]["chat_id"] == chat.id
+    assert messages[0]["sender_id"] == admin_user.id
+    assert messages[0]["content"] == message_content
+    assert (messages[0]["sent_at"] == now.replace(" ", "T"))
+    assert messages[0]["sender_username"] == admin_user.username
+
+
+def test_message_history_guest(
+    test_client, non_admin_header, db_session, admin_user, non_admin_user
+):
+    # send message before and after joining a guest
+    seen_message, unseen_message = "test1", "test2"
+    chat = create_chat(db_session)
+    now = (datetime.today() - timedelta(1)).strftime('%Y-%m-%d %H:%M:%S.%f')
+    db_session.commit()
+    assign_user(db_session, chat.id, admin_user.id, ChatRole.OWNER)
+    send_message_to_chat(db_session, chat, admin_user, unseen_message, now)
+    assign_user(db_session, chat.id, non_admin_user.id, ChatRole.GUEST)
+    db_session.commit()
+    now = datetime.today().strftime('%Y-%m-%d %H:%M:%S.%f')
+    send_message_to_chat(db_session, chat, admin_user, seen_message, now)
+    db_session.commit()
+
+    response = test_client.get(
+        "/message-history",
+        headers=non_admin_header,
+        params={"chat_id": chat.id}
+    )
+    messages = response.json()
+    assert response.status_code == 200
+    assert len(messages) == 1
+    assert messages[0]["id"]
+    assert messages[0]["chat_id"] == chat.id
+    assert messages[0]["sender_id"] == admin_user.id
+    assert messages[0]["content"] == seen_message
+    assert messages[0]["sent_at"] == now.replace(" ", "T")
+    assert messages[0]["sender_username"] == admin_user.username
 
 
 def test_send_message_unauth(test_client):
@@ -105,9 +153,6 @@ def test_send_message(
         })
     assert response.status_code == 200
     message = response.json()
-    required = {f.name for f in fields(MessageWithUsername)}
-    missing = required - message.keys()
-    assert not missing, f"Missing keys: {missing}"
     assert message["chat_id"] == chat.id
     assert message["sender_id"] == admin_user.id
     assert message["content"] == message_content
