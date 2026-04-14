@@ -1,3 +1,4 @@
+import re
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -5,7 +6,22 @@ from python_api.request_types import CreateTaskRequest
 from db.crud.task import get_task_by_name
 from db.crud.user import get_all_users
 from db.crud.topic import get_all_topics
-from db.crud.chat import ChatRole
+
+
+def validate_email(email: str) -> None:
+    if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Given email address is not a valid email address!"
+        )
+
+
+def validate_password(password: str) -> None:
+    if not len(password) >= 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password has to be at least 8 characters long!"
+        )
 
 
 def validate_task_name(session: Session, task: CreateTaskRequest) -> None:

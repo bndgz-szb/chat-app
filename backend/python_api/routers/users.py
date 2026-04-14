@@ -8,6 +8,7 @@ from python_api.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token,
     authenticate_user, get_password_hash, AuthRoute
 )
+from python_api.utils import validate_email, validate_password
 from python_api.request_types import RegisterRequest, LoginRequest
 from python_api.response_types import LoginResponse, UserResponse
 from db.crud.task import TaskParticipant, get_task_participants
@@ -59,8 +60,8 @@ def register(
     data: RegisterRequest,
     session: Annotated[Session, Depends(get_session)]
 ) -> str:
-    # TODO check email validity
-    # TODO check password validity
+    validate_email(data.email)
+    validate_password(data.password)
     user = get_user_by_username(session, data.username)
     if user:
         raise HTTPException(

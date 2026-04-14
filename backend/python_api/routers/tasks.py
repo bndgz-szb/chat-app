@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Annotated
 from sqlalchemy.orm import Session
 
-from db.models import User
+from db.models import User, ChatRole
 from db.session import get_session
 from db.crud.chat import (
     get_chats_for_user, create_chat, assign_user, delete_chat
@@ -19,7 +19,9 @@ from python_api.request_types import (
 from python_api.auth import (
     AuthRoute, get_current_user, credentials_exception
 )
-from python_api.utils import *
+from python_api.utils import (
+    validate_task_participants, validate_task_name, validate_task_topics
+)
 
 
 unauthenticated_router = APIRouter()
