@@ -114,7 +114,7 @@ def generate_messages(
                 send_message_to_chat(
                     session, chat, user, fake.text(max_nb_chars=200),
                     fake.date_time_between(start_date='-1w')
-                    .strftime('%Y-%m-%d %H:%M:%S')
+                    .strftime('%Y-%m-%d %H:%M:%S.%f')
                 )
     session.commit()
 

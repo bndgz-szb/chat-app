@@ -45,7 +45,7 @@ def send_message_to_chat(
         content: str, when: str | None = None
 ) -> Message:
     if when is None:
-        when = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        when = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
     message = Message(
         chat_id=chat.id, sender_id=user.id, content=content, sent_at=when
     )
