@@ -1,6 +1,3 @@
-from sqlalchemy import inspect
-
-from db.models import Topic
 from db.crud.topic import create_topic
 from db.crud.chat import create_chat
 from db.crud.task import attach_topic, create_task
@@ -18,18 +15,31 @@ def test_topics(test_client, admin_header, db_session):
     db_session.commit()
 
     response = test_client.get("/topics", headers=admin_header)
+    all_topics = response.json()
     assert response.status_code == 200
-    assert len(response.json()) == 1
-    for topic in response.json():
-        required = inspect(Topic).c.keys()
-        missing = required - topic.keys()
-        assert not missing, f"Missing keys: {missing}"
+    assert len(all_topics) == 1
+    assert all_topics[0]["id"] == topic.id
+    assert all_topics[0]["name"] == topic.name
 
 
 def test_create_topic_unauth(test_client):
     response = test_client.post("/create-topic")
     assert response.status_code == 401
     assert response.json() == {"detail": "Could not validate credentials"}
+
+
+def test_create_topic_duplicate_name(db_session, test_client, admin_header):
+    create_topic(db_session, "test")
+    db_session.commit()
+    response = test_client.post(
+        "/create-topic",
+        headers=admin_header,
+        json={"name": "test"}
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Topic with given name already exists!"
+    }
 
 
 def test_create_topic(test_client, admin_header):
