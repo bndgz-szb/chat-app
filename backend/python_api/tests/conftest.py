@@ -16,7 +16,7 @@ from python_api.auth import (
 
 
 DB_TEST_URL = os.getenv("DB_TEST_URL")
-UNHASHED_TEST_USER_PASSWORD = "test"
+UNHASHED_TEST_USER_PASSWORD = "password"
 
 
 @pytest.fixture

@@ -37,6 +37,13 @@ def test_users_unauth(test_client):
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
+def test_users_no_admin_return(test_client, admin_header):
+    response = test_client.get("/users", headers=admin_header)
+    assert response.status_code == 200
+    users = response.json()
+    assert len(users) == 0
+
+
 def test_users_one(test_client, non_admin_header, non_admin_user):
     response = test_client.get("/users", headers=non_admin_header)
     assert response.status_code == 200
@@ -101,13 +108,43 @@ def test_task_participants(
     assert particpants[0]["role"] == user_role.value
 
 
+def test_register_invalid_email(test_client, admin_user):
+    response = test_client.post(
+        "/register",
+        json={
+            "username": admin_user.username,
+            "email": "invalid_email",
+            "password": UNHASHED_TEST_USER_PASSWORD
+        }
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Given email address is not a valid email address!"
+    }
+
+
+def test_register_invalid_password(test_client, admin_user):
+    response = test_client.post(
+        "/register",
+        json={
+            "username": admin_user.username,
+            "email": f"new_{admin_user.email}",
+            "password": "short"
+        }
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Password has to be at least 8 characters long!"
+    }
+
+
 def test_register_taken_name(test_client, admin_user):
     response = test_client.post(
         "/register",
         json={
             "username": admin_user.username,
             "email": f"new_{admin_user.email}",
-            "password": "test"
+            "password": UNHASHED_TEST_USER_PASSWORD
         }
     )
     assert response.status_code == 400
@@ -120,7 +157,7 @@ def test_register_taken_email(test_client, admin_user):
         json={
             "username": f"new_{admin_user.username}",
             "email": admin_user.email,
-            "password": "test"
+            "password": UNHASHED_TEST_USER_PASSWORD
         }
     )
     assert response.status_code == 400
@@ -133,7 +170,7 @@ def test_register(test_client):
         json={
             "username": "test",
             "email": "test@example.com",
-            "password": "test"
+            "password": UNHASHED_TEST_USER_PASSWORD
         }
     )
     assert response.status_code == 200
