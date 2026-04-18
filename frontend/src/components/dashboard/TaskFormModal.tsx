@@ -17,6 +17,7 @@ import { Autocomplete, Button, Modal, Switch, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import SuccessDiv from '@/components/utils/SuccessDiv';
 import type { CreateTaskRequest } from '@/state/requestTypes';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
 	buttonText: string;
@@ -42,6 +43,7 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 	const [taskParticipants, setTaskParticipants] = useState<TaskParticipant[]>(
 		[]
 	);
+	const { t } = useTranslation();
 
 	const topics = useTopicsQuery();
 	const participants = useAllUsersQuery();
@@ -75,11 +77,11 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 
 	const onClick = () => {
 		if (taskName === '') {
-			setError('A feladat neve kötelező mező!');
+			setError(t('task_name_required'));
 			return;
 		}
 		if (taskParticipants.length === 0) {
-			setError('A feladatnak kell, hogy legyen legalább 1 résztvevője!');
+			setError(t('task_participant_required'));
 			return;
 		}
 
@@ -120,12 +122,12 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 			<Modal open={open} onClose={onClose}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-md bg-white text-black">
-						{successMessage && <SuccessDiv message={successMessage} />}
-						{error && <ErrorDiv error={error} />}
+						{successMessage && <SuccessDiv message={t(successMessage)} />}
+						{error && <ErrorDiv error={t(error)} />}
 
 						<div>
 							<label htmlFor="task-name" className="block mb-1">
-								Feladat neve
+								{t('task_name')}
 							</label>
 							<input
 								type="text"
@@ -133,7 +135,7 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 								id="task-name"
 								value={taskName}
 								onChange={(e) => setTaskName(e.target.value)}
-								placeholder="Feladat1"
+								placeholder={t('task')}
 								className="w-full px-4 py-2 rounded-md outline-none border border-1 placeholder-gray-500"
 							/>
 						</div>
@@ -145,8 +147,8 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 							onChange={(_: any, newValue: Topic[]) => setTaskTopics(newValue)}
 							id="topics"
 							loading={topics.isLoading}
-							loadingText="Tematikák betöltése folyamatban..."
-							noOptionsText="Nincs további tematika"
+							loadingText={t('loading')}
+							noOptionsText={t('no_options')}
 							options={topics.data ?? []}
 							getOptionLabel={(option) => option.name}
 							getOptionKey={(option) => option.id}
@@ -154,8 +156,8 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 							renderInput={(params) => (
 								<TextField
 									{...params}
-									label="Tematikák"
-									placeholder="Feladat tematikái"
+									label={t('topics')}
+									placeholder={t('task_topics')}
 								/>
 							)}
 						/>
@@ -177,14 +179,14 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 						<div className="flex flex-row flex-wrap gap-2">
 							{taskParticipants.map((participant) => (
 								<div className="rounded-md border p-1" key={participant.id}>
-									{participant.name}:{participant.role}
+									{participant.name}:{t(participant.role)}
 								</div>
 							))}
 						</div>
 
 						<div>
 							<div className="flex flex-row w-full justify-between">
-								Státusz
+								{t('status')}
 								<Switch
 									color="info"
 									checked={isDone}
@@ -192,7 +194,7 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 								/>
 							</div>
 							<div className="text-gray-500">
-								{isDone ? 'Befejezve' : 'Folyamatban'}
+								{isDone ? t('done') : t('ongoing')}
 							</div>
 						</div>
 
@@ -203,7 +205,7 @@ function TaskFormModal({ buttonText, buttonStyle, task, handleSubmit }: Props) {
 								className="w-full p-2 rounded-md text-center"
 								onClick={onClose}
 							>
-								Mégsem
+								{t('cancel')}
 							</Button>
 							<Button
 								className="w-full bg-slate-900 text-white p-2 rounded-md text-cente normal-case"

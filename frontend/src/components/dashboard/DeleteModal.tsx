@@ -1,6 +1,7 @@
 import ErrorDiv from '@/components/utils/ErrorDiv';
 import { Button, Modal } from '@mui/material';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
 	title: string;
@@ -19,6 +20,7 @@ function DeleteModal({
 }: Props) {
 	const [open, setOpen] = useState<boolean>(false);
 	const [error, setError] = useState<string>('');
+	const { t } = useTranslation();
 
 	const onClick = () => {
 		handleDelete(onClose, (reason) => setError(reason.data?.detail));
@@ -37,7 +39,7 @@ function DeleteModal({
 			<Modal open={open} onClose={onClose}>
 				<div className="absolute inset-0.5 flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-lg bg-white text-black">
-						{error && <ErrorDiv error={error} />}
+						{error && <ErrorDiv error={t(error)} />}
 
 						<h1 className="font-bold">{title}</h1>
 						{confirmText}
@@ -48,13 +50,13 @@ function DeleteModal({
 								className="w-full p-2 rounded-md text-center"
 								onClick={onClose}
 							>
-								Mégsem
+								{t('cancel')}
 							</Button>
 							<Button
 								className="w-full bg-red-600 text-white p-2 rounded-md text-center"
 								onClick={onClick}
 							>
-								Törlés
+								{t('delete')}
 							</Button>
 						</div>
 					</div>

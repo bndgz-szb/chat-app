@@ -1,16 +1,19 @@
 import CreateTopicModal from '@/components/dashboard/CreateTopicModal';
 import DeleteModal from '@/components/dashboard/DeleteModal';
+import LoadingDiv from '@/components/utils/LoadingDiv';
 import {
 	useCreateTopicMutation,
 	useDeleteTopicMutation,
 	useTopicsQuery,
 } from '@/state/apiSlice';
 import type { CreateTopicRequest } from '@/state/requestTypes';
+import { useTranslation } from 'react-i18next';
 
 function Topics() {
 	const { data } = useTopicsQuery();
 	const [sendCreate] = useCreateTopicMutation();
 	const [sendDeleteTopic] = useDeleteTopicMutation();
+	const { t } = useTranslation();
 
 	const handleCreateTopic = (
 		topic: CreateTopicRequest,
@@ -34,12 +37,12 @@ function Topics() {
 	return data ? (
 		<div className="flex flex-col gap-4 p-4 self-start">
 			<CreateTopicModal
-				buttonText={'Tematika létrehozása'}
+				buttonText={t('create_topic')}
 				buttonStyle={'rounded-md bg-black text-white p-2 w-fit normal-case'}
 				handleSubmit={handleCreateTopic}
 			/>
 
-			<div className="text-white text-lg font-bold">Tematikák</div>
+			<div className="text-white text-lg font-bold">{t('topics')}</div>
 			<div className="flex flex-row gap-2 flex-wrap">
 				{data.map((topic) => (
 					<div
@@ -51,7 +54,7 @@ function Topics() {
 							title={topic.name}
 							buttonText="&#10005;"
 							buttonStyle="p-0 h-full min-w-1 w-5 text-white rounded-md normal-case"
-							confirmText={`Biztosan törli a tematikát?`}
+							confirmText={t('confirm_topic_delete')}
 							handleDelete={handleDelete(topic.id)}
 						/>
 					</div>
@@ -59,7 +62,7 @@ function Topics() {
 			</div>
 		</div>
 	) : (
-		<div>Loading topics...</div>
+		<LoadingDiv />
 	);
 }
 

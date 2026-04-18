@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { store } from './state/store';
 import { StyledEngineProvider } from '@mui/material/styles';
 import GlobalStyles from '@mui/material/GlobalStyles';
+import '@/i18n.tsx';
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>

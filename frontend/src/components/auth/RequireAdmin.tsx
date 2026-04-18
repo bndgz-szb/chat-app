@@ -3,6 +3,7 @@ import { logout, selectIsAdmin } from '@/state/authSlice';
 import { useAppDispatch, useAppSelector } from '@/state/hooks';
 import { useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
 	children: ReactNode;
@@ -13,6 +14,7 @@ function RequireAdmin({ children }: Props) {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const isAdmin = useAppSelector(selectIsAdmin);
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (isError) {
@@ -23,7 +25,7 @@ function RequireAdmin({ children }: Props) {
 		}
 	}, [isError, dispatch, logout, navigate, isAdmin]);
 
-	return data ? children : <div>Validating token...</div>;
+	return data ? children : <div>{t('validating')}</div>;
 }
 
 export default RequireAdmin;

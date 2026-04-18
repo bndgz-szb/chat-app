@@ -1,5 +1,6 @@
 import DeleteModal from '@/components/dashboard/DeleteModal';
 import TaskFormModal from '@/components/dashboard/TaskFormModal';
+import LoadingDiv from '@/components/utils/LoadingDiv';
 import {
 	useDashboardQuery,
 	useDeleteTaskMutation,
@@ -8,6 +9,7 @@ import {
 import { selectIsAdmin, selectUserId } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
 import type { CreateTaskRequest } from '@/state/requestTypes';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 function Tasks() {
@@ -16,6 +18,7 @@ function Tasks() {
 	const is_admin = useAppSelector(selectIsAdmin);
 	const [sendUpdate] = useUpdateTaskMutation();
 	const [sendDeleteTask] = useDeleteTaskMutation();
+	const { t } = useTranslation();
 
 	const handleModifyTask = (
 		updated_task: CreateTaskRequest,
@@ -58,7 +61,11 @@ function Tasks() {
 						<div className="flex flex-col gap-2">
 							<div className="text-center font-bold text-lg">{task.name}</div>
 							<div className="rounded-md bg-black text-white p-1.5 w-min">
-								{task.done ? <>&#10003;Befejezve</> : <>&#9900;Folyamatban</>}
+								{task.done ? (
+									<>&#10003;{t('done')}</>
+								) : (
+									<>&#9900;{t('ongoing')}</>
+								)}
 							</div>
 							<div className="flex flex-row gap-2 flex-wrap">
 								{task.topics.map((topic) => (
@@ -76,14 +83,14 @@ function Tasks() {
 								<div className="flex flex-row justify-between gap-2">
 									<DeleteModal
 										title={task.name}
-										buttonText="Törlés"
+										buttonText={t('delete')}
 										buttonStyle="p-1.5 text-white rounded-md bg-red-600 normal-case"
-										confirmText={`Biztosan törli a feladatot és a hozzá tartozó chat-et?`}
+										confirmText={t('confirm_task_delete')}
 										handleDelete={handleDelete(task.id)}
 									/>
 
 									<TaskFormModal
-										buttonText="Módosítás"
+										buttonText={t('modify')}
 										buttonStyle="p-1.5 text-white rounded-md bg-black normal-case"
 										task={task}
 										handleSubmit={handleModifyTask}
@@ -103,7 +110,7 @@ function Tasks() {
 					</div>
 				))
 			) : (
-				<div>Loading...</div>
+				<LoadingDiv />
 			)}
 		</div>
 	);

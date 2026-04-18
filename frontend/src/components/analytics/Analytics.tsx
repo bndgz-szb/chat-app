@@ -12,10 +12,13 @@ import {
 	type PieSectorShapeProps,
 	type TooltipContentProps,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
+import LoadingDiv from '@/components/utils/LoadingDiv';
 
 // ChatGPT generated parts within this component
 function Analytics() {
 	const { data } = useAnalyticsQuery();
+	const { t } = useTranslation();
 
 	const customTooltip = (o: TooltipContentProps) => {
 		const { active, payload } = o;
@@ -32,7 +35,9 @@ function Analytics() {
 					<div>
 						<strong>{d.username}</strong>
 					</div>
-					<div>Total messages: {d.total_messages}</div>
+					<div>
+						{t('total_messages')}: {d.total_messages}
+					</div>
 				</div>
 			);
 		}
@@ -94,7 +99,7 @@ function Analytics() {
 							);
 						})
 					) : (
-						<div>Loading...</div>
+						<LoadingDiv />
 					)}
 				</div>
 			</CardContent>

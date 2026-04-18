@@ -6,16 +6,18 @@ import { useAppSelector } from '@/state/hooks';
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function Register() {
 	const [inputUsername, setInputUsername] = useState<string>('');
 	const [inputEmail, setInputEmail] = useState<string>('');
 	const [inputPassword, setInputPassword] = useState<string>('');
-	const [serverError, setServerError] = useState<string>('');
+	const [error, setError] = useState<string>('');
 	const [confirmInputPassword, setConfirmInputPassword] = useState<string>('');
 	const username = useAppSelector(selectUser);
 	const [sendRegister] = useRegisterMutation();
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (username !== '') navigate('/dashboard', { replace: true });
@@ -24,19 +26,19 @@ function Register() {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (inputPassword !== confirmInputPassword) {
-			setServerError('Passwords have to match!');
+			setError(t('password_match'));
 			return;
 		}
 		if (inputUsername === '') {
-			setServerError('Username field is required!');
+			setError(t('username_required'));
 			return;
 		}
 		if (inputEmail === '') {
-			setServerError('Email field is required!');
+			setError(t('email_required'));
 			return;
 		}
 		if (inputPassword === '') {
-			setServerError('Password field is required!');
+			setError(t('password_required'));
 			return;
 		}
 
@@ -47,29 +49,29 @@ function Register() {
 		})
 			.unwrap()
 			.then(() => navigate('/login'))
-			.catch((error) => setServerError(error.data.detail));
+			.catch((error) => setError(error.data.detail));
 	};
 
 	return (
 		<div className="grow flex items-center justify-center p-4 flex-col w-full">
 			<div className="bg-gray-800/60 rounded-lg border border-white/20 p-10 w-full max-w-md text-white">
-				<h2 className="text-2xl font-bold text-center mb-6">Register</h2>
+				<h2 className="text-2xl font-bold text-center mb-6">{t('sign_up')}</h2>
 
-				{serverError && <ErrorDiv error={serverError} />}
+				{error && <ErrorDiv error={t(error)} />}
 
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<InputField
 						type={'text'}
 						name={'username'}
-						label={'Username'}
-						placeholder={'username'}
+						label={t('username')}
+						placeholder={t('username')}
 						value={inputUsername}
 						onChange={setInputUsername}
 					/>
 					<InputField
 						type={'text'}
 						name={'email'}
-						label={'Email'}
+						label={t('email')}
 						placeholder={'test@example.com'}
 						value={inputEmail}
 						onChange={setInputEmail}
@@ -77,7 +79,7 @@ function Register() {
 					<InputField
 						type="password"
 						name={'password'}
-						label={'Password'}
+						label={t('password')}
 						placeholder={'********'}
 						value={inputPassword}
 						onChange={setInputPassword}
@@ -85,7 +87,7 @@ function Register() {
 					<InputField
 						type="password"
 						name={'confirm_password'}
-						label={'Confirm Password'}
+						label={t('confirm_password')}
 						placeholder={'********'}
 						value={confirmInputPassword}
 						onChange={setConfirmInputPassword}
@@ -96,13 +98,13 @@ function Register() {
 						type="submit"
 						className="w-full py-2 rounded-lg border-1 border-solid border-[transparent] px-5 py-3 font-medium [font-family:inherit] bg-zinc-900 cursor-pointer [transition:border-color_0.25s] hover:border-sky-300 outline-[4px_auto_-webkit-focus-ring-color]"
 					>
-						Register
+						{t('sign_up')}
 					</Button>
 				</form>
 			</div>
 
 			<Link to={'/login'} className="mt-1 text-center">
-				Login
+				{t('login')}
 			</Link>
 		</div>
 	);

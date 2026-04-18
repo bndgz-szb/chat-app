@@ -1,10 +1,12 @@
 import TaskFormModal from '@/components/dashboard/TaskFormModal';
 import { useCreateTaskMutation } from '@/state/apiSlice';
 import type { CreateTaskRequest } from '@/state/requestTypes';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 function ButtonRow() {
 	const [sendCreate] = useCreateTaskMutation();
+	const { t } = useTranslation();
 
 	const handleCreateTask = (
 		updated_task: CreateTaskRequest,
@@ -17,13 +19,12 @@ function ButtonRow() {
 
 	return (
 		<div className="flex p-8 flex-row-reverse gap-5">
-			<div className="rounded-md p-4 bg-gray-900">Szűrés</div>
 			<Link to={'/dashboard/topics'} className="rounded-md p-4 bg-gray-900">
-				Tematikák kezelése
+				{t('topics')}
 			</Link>
 
 			<TaskFormModal
-				buttonText="Feladat létrehozása"
+				buttonText={t('create_task')}
 				buttonStyle="rounded-md p-4 bg-gray-900 normal-case text-base"
 				handleSubmit={handleCreateTask}
 			/>

@@ -1,9 +1,9 @@
 import ErrorDiv from '@/components/utils/ErrorDiv';
-
 import { Button, Modal } from '@mui/material';
 import { useState } from 'react';
 import SuccessDiv from '@/components/utils/SuccessDiv';
 import type { CreateTopicRequest } from '@/state/requestTypes';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
 	buttonText: string;
@@ -20,14 +20,16 @@ function CreateTopicModal({ buttonText, buttonStyle, handleSubmit }: Props) {
 	const [successMessage, setSuccessMessage] = useState<string>('');
 	const [open, setOpen] = useState<boolean>(false);
 	const [topicName, setTopicName] = useState<string>('');
+	const { t } = useTranslation();
 
 	const resetFormState = () => {
 		setTopicName('');
+		setError('');
 	};
 
 	const onClick = () => {
 		if (topicName === '') {
-			setError('A tematika neve kötelező mező!');
+			setError(t('topic_name_required'));
 			return;
 		}
 
@@ -62,12 +64,12 @@ function CreateTopicModal({ buttonText, buttonStyle, handleSubmit }: Props) {
 			<Modal open={open} onClose={onClose}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-md bg-white text-black">
-						{successMessage && <SuccessDiv message={successMessage} />}
-						{error && <ErrorDiv error={error} />}
+						{successMessage && <SuccessDiv message={t(successMessage)} />}
+						{error && <ErrorDiv error={t(error)} />}
 
 						<div>
 							<label htmlFor="topic-name" className="block mb-1">
-								Tematika neve
+								{t('topic_name')}
 							</label>
 							<input
 								type="text"
@@ -75,7 +77,7 @@ function CreateTopicModal({ buttonText, buttonStyle, handleSubmit }: Props) {
 								id="topic-name"
 								value={topicName}
 								onChange={(e) => setTopicName(e.target.value)}
-								placeholder="Tematika1"
+								placeholder={t('topic')}
 								className="w-full px-4 py-2 rounded-md outline-none border border-1 placeholder-gray-500"
 							/>
 						</div>
@@ -87,7 +89,7 @@ function CreateTopicModal({ buttonText, buttonStyle, handleSubmit }: Props) {
 								className="w-full p-2 rounded-md text-center"
 								onClick={onClose}
 							>
-								Mégsem
+								{t('cancel')}
 							</Button>
 							<Button
 								className="w-full bg-slate-900 text-white p-2 rounded-md text-cente normal-case"

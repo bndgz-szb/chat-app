@@ -7,6 +7,7 @@ import {
 } from '@/state/responseTypes';
 import { Autocomplete, Button, Modal, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ParticipantsModalProps = {
 	allUsers?: Participant[];
@@ -35,6 +36,7 @@ function ParticipantsModal({
 			role: ChatRole.owner,
 		}
 	);
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (members.length === 0) {
@@ -76,14 +78,14 @@ function ParticipantsModal({
 				className="normal-case text-base text-white w-full p-2"
 				onClick={() => setOpen(true)}
 			>
-				Résztvevők módosítása
+				{t('modify_participants')}
 			</Button>
 			<Modal open={open} onClose={() => setOpen(false)}>
 				<div className="absolute inset-0.5 grow flex items-center justify-center p-4 flex-col">
 					<div className="flex flex-col gap-4 rounded-lg p-10 w-full max-w-lg bg-white text-black">
 						<div>
 							<label htmlFor="task-guests" className="block mb-1">
-								Vendég felhasználók
+								{t('guests')}
 							</label>
 							<Autocomplete
 								multiple
@@ -94,8 +96,8 @@ function ParticipantsModal({
 								}
 								id="task-guests"
 								loading={allUsers === undefined}
-								loadingText="Résztvevők betöltése folyamatban..."
-								noOptionsText="Nincs további felhasználó"
+								loadingText={t('loading')}
+								noOptionsText={t('no_options')}
 								options={
 									allUsers
 										? allUsers.filter((user) =>
@@ -108,8 +110,8 @@ function ParticipantsModal({
 								renderInput={(params) => (
 									<TextField
 										{...params}
-										label="Vendég résztvevők"
-										placeholder="Vendég résztvevők"
+										label={t('guests')}
+										placeholder={t('guests')}
 									/>
 								)}
 							/>
@@ -117,7 +119,7 @@ function ParticipantsModal({
 
 						<div>
 							<label htmlFor="task-members" className="block mb-1">
-								Teljes körű felhasználók
+								{t('members')}
 							</label>
 							<Autocomplete
 								multiple
@@ -128,8 +130,8 @@ function ParticipantsModal({
 								}
 								id="task-members"
 								loading={allUsers === undefined}
-								loadingText="Résztvevők betöltése folyamatban..."
-								noOptionsText="Nincs további felhasználó"
+								loadingText={t('loading')}
+								noOptionsText={t('no_options')}
 								options={
 									allUsers
 										? allUsers.filter((user) =>
@@ -142,8 +144,8 @@ function ParticipantsModal({
 								renderInput={(params) => (
 									<TextField
 										{...params}
-										label="Feladat résztvevői"
-										placeholder="Feladat résztvevői"
+										label={t('members')}
+										placeholder={t('members')}
 									/>
 								)}
 							/>
@@ -151,7 +153,7 @@ function ParticipantsModal({
 
 						<div>
 							<label htmlFor="task-admin" className="block mb-1">
-								Admin felhasználó
+								{t('admin')}
 							</label>
 							<Autocomplete
 								multiple
@@ -162,8 +164,8 @@ function ParticipantsModal({
 								renderInput={(params) => (
 									<TextField
 										{...params}
-										label="Admin résztvevő"
-										placeholder="Admin"
+										label={t('admin')}
+										placeholder={t('admin')}
 									/>
 								)}
 							/>
@@ -176,13 +178,13 @@ function ParticipantsModal({
 								className="w-full p-2 rounded-md text-center"
 								onClick={() => setOpen(false)}
 							>
-								Mégsem
+								{t('cancel')}
 							</Button>
 							<Button
 								onClick={handleSubmit}
 								className="w-full bg-slate-900 text-white p-2 rounded-md text-center"
 							>
-								Módosítás
+								{t('modify')}
 							</Button>
 						</div>
 					</div>

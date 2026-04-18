@@ -6,6 +6,7 @@ import { useChatQuery } from '@/state/apiSlice';
 import { selectToken } from '@/state/authSlice';
 import { useAppSelector } from '@/state/hooks';
 import { WebSocketContext } from '@/contexts/WebSocketContext';
+import LoadingDiv from '@/components/utils/LoadingDiv';
 
 interface LocationState {
 	chat_id: number;
@@ -49,7 +50,7 @@ function Chat() {
 			<ChatScreen selectedChatId={selectedChatId} />
 		</div>
 	) : (
-		<div>Loading chats...</div>
+		<LoadingDiv />
 	);
 }
 
