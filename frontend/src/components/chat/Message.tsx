@@ -9,7 +9,7 @@ type Props = {
 function Message({ message, mine }: Props) {
 	const { t } = useTranslation();
 	return mine ? (
-		<div className="ml-auto w-auto bg-blue-400 rounded-lg justify-self-end py-2 px-3 wrap-normal">
+		<div className="ml-auto w-auto max-w-9/10 bg-blue-400 rounded-lg justify-self-end py-2 px-3 wrap-normal">
 			<p className="text-gray-950">{t('you')}</p>
 			{message.content}
 			<p className="text-right text-gray-600">
@@ -17,7 +17,7 @@ function Message({ message, mine }: Props) {
 			</p>
 		</div>
 	) : (
-		<div className="mr-auto w-auto bg-stone-400 rounded-lg justify-self-end py-2 px-3 wrap-normal">
+		<div className="mr-auto w-auto max-w-9/10 bg-stone-400 rounded-lg justify-self-end py-2 px-3 wrap-normal">
 			<p className="text-gray-950">{message.sender_username}</p>
 			{message.content}
 			<p className="text-right text-gray-600">
