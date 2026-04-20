@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
+import { FormControl, InputLabel, MenuItem } from '@mui/material';
 
 type languageOption = { language: string; code: string };
 
@@ -16,9 +18,9 @@ const LanguageSelector = () => {
 	// Set the initial language from i18next's detected or default language
 	const [language, setLanguage] = useState(i18next.language);
 
-	const { i18n } = useTranslation();
+	const { i18n, t } = useTranslation();
 
-	const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+	const handleLanguageChange = (e: SelectChangeEvent) => {
 		const selectedLanguage = e.target.value;
 		setLanguage(selectedLanguage);
 		i18next.changeLanguage(selectedLanguage); // Update language in i18next
@@ -29,19 +31,42 @@ const LanguageSelector = () => {
 	}, [i18n, i18n.language]);
 
 	return (
-		<select
-			id="language"
-			value={language}
-			onChange={handleLanguageChange}
-			className="p-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50
-        dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:focus:border-indigo-400 dark:focus:ring-indigo-700 dark:focus:ring-opacity-50"
-		>
-			{languageOptions.map(({ language, code }, key) => (
-				<option value={code} key={key}>
-					{language}
-				</option>
-			))}
-		</select>
+		<FormControl margin="normal">
+			<InputLabel
+				id="language-selector"
+				sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}
+			>
+				{t('language')}
+			</InputLabel>
+			<Select
+				labelId="language-selector-label"
+				id="language-selector"
+				value={language}
+				label="Language"
+				onChange={handleLanguageChange}
+				sx={{
+					color: 'white',
+					'& .MuiOutlinedInput-notchedOutline': {
+						borderColor: 'white',
+					},
+					'&:hover .MuiOutlinedInput-notchedOutline': {
+						borderColor: 'white',
+					},
+					'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+						borderColor: 'white',
+					},
+					'& .MuiSvgIcon-root': {
+						color: 'white',
+					},
+				}}
+			>
+				{languageOptions.map(({ language, code }, key) => (
+					<MenuItem value={code} key={key}>
+						{language}
+					</MenuItem>
+				))}
+			</Select>
+		</FormControl>
 	);
 };
 
