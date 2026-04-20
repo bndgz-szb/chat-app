@@ -20,7 +20,7 @@ function Analytics() {
 	const { data } = useAnalyticsQuery();
 	const { t } = useTranslation();
 
-	const customTooltip = (o: TooltipContentProps) => {
+	const customPieTooltip = (o: TooltipContentProps) => {
 		const { active, payload } = o;
 		if (active && payload && payload.length) {
 			const d = payload[0].payload;
@@ -37,6 +37,29 @@ function Analytics() {
 					</div>
 					<div>
 						{t('total_messages')}: {d.total_messages}
+					</div>
+				</div>
+			);
+		}
+		return null;
+	};
+	const customLineTooltip = (o: TooltipContentProps) => {
+		const { active, payload } = o;
+		if (active && payload && payload.length) {
+			const d = payload[0].payload;
+			return (
+				<div
+					style={{
+						background: 'white',
+						border: '1px solid #ccc',
+						padding: '8px',
+					}}
+				>
+					<div>
+						<strong>{d.day}</strong>
+					</div>
+					<div>
+						{t('messages')}: {d.messages}
 					</div>
 				</div>
 			);
@@ -77,7 +100,7 @@ function Analytics() {
 											<XAxis dataKey="day" />
 											<YAxis />
 											<Line type="monotone" dataKey="messages" />
-											<Tooltip />
+											<Tooltip content={customLineTooltip} />
 										</LineChart>
 										<PieChart className="w-full h-75" responsive>
 											<Pie
@@ -92,7 +115,7 @@ function Analytics() {
 													`${name} ${((percent ?? 1) * 100).toFixed(0)}%`
 												}
 											/>
-											<Tooltip content={customTooltip} />
+											<Tooltip content={customPieTooltip} />
 										</PieChart>
 									</div>
 								</div>

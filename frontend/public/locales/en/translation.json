@@ -52,6 +52,7 @@
 	"error": "There's been an error",
 	"loading": "Loading...",
 	"total_messages": "Total messages",
+	"messages": "Messages this day",
 	"username": "Username",
 	"confirm_password": "Confirm Password",
 	"password": "Password",

@@ -52,6 +52,7 @@
 	"error": "Hiba történt",
 	"loading": "Betöltés folyamatban...",
 	"total_messages": "Összes üzenet",
+	"messages": "Üzenetek száma",
 	"username": "Felhasználónév",
 	"confirm_password": "Jelszó megerősítése",
 	"password": "Jelszó",
