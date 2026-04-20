@@ -11,7 +11,7 @@ const languageOptions: languageOption[] = [
 		language: 'English',
 		code: 'en',
 	},
-	{ language: 'Hungarian', code: 'hu' },
+	{ language: 'Magyar', code: 'hu' },
 ];
 
 const LanguageSelector = () => {
