@@ -67,7 +67,7 @@ def attach_topic(session: Session, task: Task, topic_id: int) -> None:
 
 def remove_topic(session: Session, task: Task, topic_id: int) -> None:
     # if task doesn't have topic attached, nothing happens
-    session.scalar(
+    session.execute(
         delete(TaskTopic)
         .where(TaskTopic.task_id == task.id, TaskTopic.topic_id == topic_id)
     )
