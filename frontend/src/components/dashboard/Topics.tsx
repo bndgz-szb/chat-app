@@ -35,18 +35,18 @@ function Topics() {
 		};
 
 	return data ? (
-		<div className="flex flex-col gap-4 p-4 self-start">
+		<div className="flex flex-col gap-4 p-4 self-start w-screen overflow-y-scroll grow">
 			<CreateTopicModal
 				buttonText={t('create_topic')}
-				buttonStyle={'rounded-md bg-black text-white p-2 w-fit normal-case'}
+				buttonStyle={'rounded-md bg-black text-white w-full lg:w-fit p-2 w-fit normal-case'}
 				handleSubmit={handleCreateTopic}
 			/>
 
-			<div className="text-white text-lg font-bold">{t('topics')}</div>
-			<div className="flex flex-row gap-2 flex-wrap">
+			<div className="text-white text-lg font-bold text-center lg:text-left">{t('topics')}</div>
+			<div className="flex flex-col lg:flex-row gap-2 flex-wrap">
 				{data.map((topic) => (
 					<div
-						className="flex gap-1 rounded-md text-white bg-black p-2 items-center"
+						className="flex gap-1 rounded-md text-white bg-black p-2 justify-center"
 						key={topic.id}
 					>
 						<div className="h-full self-center">{topic.name} </div>

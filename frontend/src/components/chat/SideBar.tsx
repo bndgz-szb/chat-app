@@ -9,7 +9,9 @@ type Props = {
 
 function SideBar({ onChatSelect, selectedChatId, listOfChats }: Props) {
 	return (
-		<div className="w-1/5 bg-gray-800 outline-1 outline-solid outline-gray-900 overflow-y-scroll p-4">
+		<div
+			className={`${selectedChatId !== -1 ? 'hidden' : ''} w-screen max-h-screen fixed lg:block lg:static z-10 lg:z-0 lg:w-1/5 bg-gray-800 outline-1 outline-solid outline-gray-900 overflow-y-scroll p-4 text-center lg:text-left`}
+		>
 			{listOfChats.map((chat) => (
 				<UserChat
 					key={chat.id}

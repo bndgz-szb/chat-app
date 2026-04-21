@@ -51,12 +51,12 @@ function Tasks() {
 		};
 
 	return (
-		<div className="flex flex-row p-8 gap-4 flex-wrap">
+		<div className="flex flex-col lg:flex-row p-8 gap-4 flex-wrap w-screen">
 			{data ? (
 				data.map((task) => (
 					<div
 						key={task.id}
-						className="flex flex-col min-h-60 w-55 rounded-xl bg-white text-black p-4 justify-between gap-2"
+						className="flex flex-col min-h-60 w-9/10 max-w-md lg:w-55 rounded-xl bg-white text-black p-4 justify-between self-center lg:self-auto gap-2"
 					>
 						<div className="flex flex-col gap-2">
 							<div className="text-center font-bold text-lg">{task.name}</div>

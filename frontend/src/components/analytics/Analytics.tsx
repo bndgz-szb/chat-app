@@ -68,7 +68,7 @@ function Analytics() {
 	};
 
 	return (
-		<Card className="bg-white w-5xl p-4 my-8 overflow-y-scroll">
+		<Card className="bg-white w-9/10 lg:w-5xl p-4 my-8 overflow-y-scroll">
 			<CardContent>
 				<div className="flex flex-col gap-8">
 					{data ? (
@@ -90,8 +90,10 @@ function Analytics() {
 
 							return (
 								<div className="flex flex-col" key={task.name}>
-									<h2 className="m-4 text-xl font-bold">{task.name}</h2>
-									<div className="flex justify-between">
+									<h2 className="m-4 text-xl font-bold text-center lg:text-left">
+										{task.name}
+									</h2>
+									<div className="flex flex-col md:flex-row justify-between">
 										<LineChart
 											className="w-full h-75"
 											data={task.messagesByDays}

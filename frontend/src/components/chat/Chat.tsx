@@ -22,6 +22,8 @@ function Chat() {
 	useEffect(() => {
 		if (locationState) {
 			handleChatSelect(locationState.chat_id);
+		} else {
+			handleChatSelect(-1);
 		}
 	}, []);
 
@@ -47,7 +49,10 @@ function Chat() {
 				selectedChatId={selectedChatId}
 				listOfChats={data}
 			/>
-			<ChatScreen selectedChatId={selectedChatId} />
+			<ChatScreen
+				selectedChatId={selectedChatId}
+				unSelectChat={() => handleChatSelect(-1)}
+			/>
 		</div>
 	) : (
 		<LoadingDiv />

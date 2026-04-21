@@ -4,12 +4,14 @@ import { selectUser } from '@/state/authSlice';
 import { selectMessageHistory } from '@/state/chatSlice';
 import { useAppSelector } from '@/state/hooks';
 import { useContext, useState } from 'react';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 type Props = {
 	selectedChatId: number;
+	unSelectChat: () => void;
 };
 
-function ChatScreen({ selectedChatId }: Props) {
+function ChatScreen({ selectedChatId, unSelectChat }: Props) {
 	const [message, setMessage] = useState<string>('');
 	const username = useAppSelector(selectUser);
 	const { sendMessage } = useContext(WebSocketContext);
@@ -23,9 +25,14 @@ function ChatScreen({ selectedChatId }: Props) {
 	};
 
 	return (
-		<div className="flex flex-col-reverse w-4/5 max-w-4/5 bg-stone-800 p-8 overflow-y-scroll">
+		<div className="flex flex-col-reverse w-screen lg:max-w-4/5 bg-stone-800 p-8 overflow-y-scroll">
+			<ArrowBackIosIcon
+				fontSize="large"
+				className="fixed top-1/5 left-5 lg:hidden"
+				onClick={unSelectChat}
+			/>
 			<input
-				className="fixed bottom-5 right-12 border rounded-xl px-4 py-2 w-15/20"
+				className="fixed bottom-5 right-5 lg:right-12 border rounded-xl px-4 py-2 w-9/10 lg:w-15/20"
 				type="text"
 				placeholder="Aa"
 				value={message}

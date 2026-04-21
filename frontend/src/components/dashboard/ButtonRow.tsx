@@ -18,8 +18,8 @@ function ButtonRow() {
 	};
 
 	return (
-		<div className="flex p-8 flex-row-reverse gap-5">
-			<Link to={'/dashboard/topics'} className="rounded-md p-4 bg-gray-900">
+		<div className="flex p-8 flex-col lg:flex-row-reverse gap-5">
+			<Link to={'/dashboard/topics'} className="rounded-md p-4 bg-gray-900 w-fit">
 				{t('topics')}
 			</Link>
 
