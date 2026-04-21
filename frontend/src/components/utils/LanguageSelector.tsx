@@ -9,7 +9,7 @@ type languageOption = { language: string; code: string };
 const languageOptions: languageOption[] = [
 	{
 		language: 'English',
-		code: 'en',
+		code: 'en-US',
 	},
 	{ language: 'Magyar', code: 'hu' },
 ];
