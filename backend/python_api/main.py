@@ -3,8 +3,30 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from python_api.routers import *
 
+tags_metadata = [
+	{
+        "name": "Users",
+        "description": "Endpoints related to the user table"
+    },
+	{
+		"name": "Tasks",
+		"description": "Endpoints related to the task table"
+    },
+	{
+		"name": "Topics",
+		"description": "Endpoints related to the topic table"
+    },
+	{
+		"name": "Chat",
+		"description": "Endpoints related to the chat feature"
+    },
+	{
+		"name": "Admin",
+		"description": "Endpoints only accessible to the admin"
+    }
+]
 
-app = FastAPI()
+app = FastAPI(openapi_tags=tags_metadata)
 
 app.add_middleware(
     CORSMiddleware,

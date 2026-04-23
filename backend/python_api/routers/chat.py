@@ -22,7 +22,7 @@ authenticated_router = APIRouter(route_class=AuthRoute)
 
 
 # TODO fix response model
-@authenticated_router.get("/chat", response_model=None)
+@authenticated_router.get("/chat", response_model=None, tags=["Chat"])
 def chat(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)]
@@ -32,7 +32,7 @@ def chat(
     return get_chats_for_user(session, user.id)
 
 
-@authenticated_router.get("/message-history", response_model=None)
+@authenticated_router.get("/message-history", response_model=None, tags=["Chat"])
 def message_history(
     chat_id: int,
     user: Annotated[User | None, Depends(get_current_user)],
@@ -63,7 +63,7 @@ def message_history(
     return messages
 
 
-@authenticated_router.post("/message", response_model=None)
+@authenticated_router.post("/message", response_model=None, tags=["Chat"])
 def send_message(
     message: UnicastMessage,
     user: Annotated[User | None, Depends(get_current_user)],

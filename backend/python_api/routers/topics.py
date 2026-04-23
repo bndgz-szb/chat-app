@@ -15,12 +15,12 @@ unauthenticated_router = APIRouter()
 authenticated_router = APIRouter(route_class=AuthRoute)
 
 
-@authenticated_router.get('/topics', response_model=None)
+@authenticated_router.get('/topics', response_model=None, tags=["Topics"])
 def topics(session: Annotated[Session, Depends(get_session)]) -> Sequence[Topic]:
     return get_all_topics(session)
 
 
-@authenticated_router.post('/create-topic')
+@authenticated_router.post('/create-topic', tags=["Topics"])
 def create_topic_endpoint(
     request: CreateTopicRequest,
     session: Annotated[Session, Depends(get_session)]
@@ -36,7 +36,7 @@ def create_topic_endpoint(
     return "Topic created successfully"
 
 
-@authenticated_router.delete('/delete-topic')
+@authenticated_router.delete('/delete-topic', tags=["Topics"])
 def delete_topic_endpoint(
     request: DeleteTopicRequest,
     session: Annotated[Session, Depends(get_session)]

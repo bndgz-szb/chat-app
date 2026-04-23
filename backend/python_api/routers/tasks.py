@@ -28,7 +28,7 @@ unauthenticated_router = APIRouter()
 authenticated_router = APIRouter(route_class=AuthRoute)
 
 
-@unauthenticated_router.get("/dashboard", response_model=None)
+@unauthenticated_router.get("/dashboard", response_model=None, tags=["Tasks"])
 def dashboard(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)]
@@ -53,7 +53,7 @@ def dashboard(
     return result
 
 
-@authenticated_router.post('/create-task')
+@authenticated_router.post('/create-task', tags=["Tasks"])
 def create_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
@@ -90,7 +90,7 @@ def create_task_endpoint(
     return "Task created successfully"
 
 
-@authenticated_router.put('/update-task')
+@authenticated_router.put('/update-task', tags=["Tasks"])
 def update_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
@@ -129,7 +129,7 @@ def update_task_endpoint(
     return "Task has been modified successfully"
 
 
-@authenticated_router.delete('/delete-task')
+@authenticated_router.delete('/delete-task', tags=["Tasks"])
 def delete_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],

@@ -21,12 +21,12 @@ unauthenticated_router = APIRouter()
 authenticated_router = APIRouter(route_class=AuthRoute)
 
 
-@authenticated_router.get("/token")
+@authenticated_router.get("/token", tags=["Users"])
 def validate_token() -> Literal[True]:
     return True
 
 
-@authenticated_router.get('/users', response_model=None)
+@authenticated_router.get('/users', response_model=None, tags=["Users"])
 def all_users(
     session: Annotated[Session, Depends(get_session)]
 ) -> List[UserResponse]:
@@ -38,7 +38,7 @@ def all_users(
     return result
 
 
-@authenticated_router.get('/task-participants', response_model=None)
+@authenticated_router.get('/task-participants', response_model=None, tags=["Users"])
 def task_participants(
     task_id: int,
     session: Annotated[Session, Depends(get_session)]
@@ -55,7 +55,7 @@ def task_participants(
     return result
 
 
-@unauthenticated_router.post("/register")
+@unauthenticated_router.post("/register", tags=["Users"])
 def register(
     data: RegisterRequest,
     session: Annotated[Session, Depends(get_session)]
@@ -83,7 +83,7 @@ def register(
     return "Account successfully registered."
 
 
-@unauthenticated_router.post("/login")
+@unauthenticated_router.post("/login", tags=["Users"])
 def login(
     data: LoginRequest,
     session: Annotated[Session, Depends(get_session)]

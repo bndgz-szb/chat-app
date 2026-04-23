@@ -11,7 +11,7 @@ from python_api.auth import AuthRoute, credentials_exception, get_current_user
 admin_router = APIRouter(route_class=AuthRoute)
 
 
-@admin_router.get('/analytics')
+@admin_router.get('/analytics', tags=["Admin"])
 def get_analytics(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)]
