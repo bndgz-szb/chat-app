@@ -26,7 +26,7 @@ def validate_token() -> Literal[True]:
     return True
 
 
-@authenticated_router.get('/users', response_model=None, tags=["Users"])
+@authenticated_router.get('/users', tags=["Users"])
 def all_users(
     session: Annotated[Session, Depends(get_session)]
 ) -> List[UserResponse]:
@@ -38,7 +38,7 @@ def all_users(
     return result
 
 
-@authenticated_router.get('/task-participants', response_model=None, tags=["Users"])
+@authenticated_router.get('/task-participants', tags=["Users"])
 def task_participants(
     task_id: int,
     session: Annotated[Session, Depends(get_session)]
@@ -59,7 +59,7 @@ def task_participants(
 def register(
     data: RegisterRequest,
     session: Annotated[Session, Depends(get_session)]
-) -> str:
+) -> Literal["Account successfully registered."]:
     validate_email(data.email)
     validate_password(data.password)
     user = get_user_by_username(session, data.username)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List, Annotated
+from typing import List, Annotated, Literal
 from sqlalchemy.orm import Session
 
 from db.models import User, ChatRole
@@ -12,7 +12,7 @@ from db.crud.task import (
     get_tasks_with_topics, create_task,
     attach_topic, get_task_by_id, delete_task, update_task
 )
-from python_api.response_types import TaskWithTopic
+from python_api.response_types import TaskWithTopic, TopicResponse
 from python_api.request_types import (
     CreateTaskRequest, DeleteTaskRequest, UpdateTaskRequest
 )
@@ -28,7 +28,7 @@ unauthenticated_router = APIRouter()
 authenticated_router = APIRouter(route_class=AuthRoute)
 
 
-@unauthenticated_router.get("/dashboard", response_model=None, tags=["Tasks"])
+@unauthenticated_router.get("/dashboard", tags=["Tasks"])
 def dashboard(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)]
@@ -47,7 +47,10 @@ def dashboard(
             "name": task.name,
             "created_by": task.created_by if user is not None else None,
             "done": task.done,
-            "topics": task.topics,
+            "topics": list(map(
+                lambda topic: TopicResponse(id=topic.id, name=topic.name),
+                task.topics
+            )),
             "chat_id": task.chat_id if task.chat_id in chat_ids else None
         })
     return result
@@ -58,7 +61,7 @@ def create_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     request: CreateTaskRequest
-) -> str:
+) -> Literal["Task created successfully"]:
     if user is None:
         raise credentials_exception()
     validate_task_name(session, request)
@@ -95,7 +98,7 @@ def update_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     request: UpdateTaskRequest
-) -> str:
+) -> Literal["Task has been modified successfully"]:
     if user is None:
         raise credentials_exception()
     task = get_task_by_id(session, request.task_id)
@@ -134,7 +137,7 @@ def delete_task_endpoint(
     user: Annotated[User | None, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     request: DeleteTaskRequest
-) -> str:
+) -> Literal["Task and its chat has been successfully deleted"]:
     if user is None:
         raise credentials_exception()
     task = get_task_by_id(session, request.task_id)

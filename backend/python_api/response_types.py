@@ -3,6 +3,10 @@ from typing import List
 
 from db.models import Topic
 
+@dataclass
+class TopicResponse:
+    id: int
+    name: str
 
 @dataclass
 class LoginResponse():
@@ -18,7 +22,7 @@ class TaskWithTopic():
     name: str
     created_by: int | None
     done: bool
-    topics: List[Topic]
+    topics: List[TopicResponse]
     chat_id: int | None
 
 
