@@ -11,6 +11,3 @@ task_topic_tablename = "task_topic"
 
 class Base(DeclarativeBase):
     pass
-
-# class Session(Base):
-    # TODO
