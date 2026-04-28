@@ -17,7 +17,7 @@ if API_URL == "":
     raise Exception("Don't forget to create .env file")
 T = TypeVar("T")
 
-
+# ChatGPT generated method
 def assert_has_keys(data: dict, model: Type[T]) -> None:
     if not is_dataclass(model):
         raise TypeError(f"{model} must be a dataclass")

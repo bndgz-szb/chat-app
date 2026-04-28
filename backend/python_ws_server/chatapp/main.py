@@ -5,6 +5,9 @@ import websockets
 from python_ws_server.chatapp.handlers import handle_auth
 from python_ws_server.chatapp.global_variables import CONNECTIONS, SHUTDOWN
 
+# ChatGPT generated shutdown related lines (almost whole file)
+# for faster container shutdown on Ctrl+C
+
 
 def shutdown():
     print("Setting shutdown event")
