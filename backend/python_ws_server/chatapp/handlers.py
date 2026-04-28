@@ -1,7 +1,6 @@
 import json
 import requests
 import os
-from sqlalchemy.orm import Session
 from typing import Type, TypeVar, Dict
 from dataclasses import fields, is_dataclass
 from dotenv import load_dotenv

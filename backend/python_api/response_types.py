@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import List
 
-from db.models import Topic
 
 @dataclass
 class TopicResponse:
     id: int
     name: str
+
 
 @dataclass
 class LoginResponse():
