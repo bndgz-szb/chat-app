@@ -4,7 +4,7 @@ import type {
 	ServerToClientMessage,
 	UnicastMessage,
 } from '@/resources/ServerMessages';
-import { selectToken, selectUserId } from '@/state/authSlice';
+import { logout, selectToken, selectUserId } from '@/state/authSlice';
 import { appendMessage } from '@/state/chatSlice';
 import { useAppDispatch, useAppSelector } from '@/state/hooks';
 import { useRef } from 'react';
@@ -50,6 +50,9 @@ function useWebSocket(): WebSocketContextInterface {
 					break;
 				case 'error':
 					console.error(`error: ${parsed.error}`);
+					if (parsed.error === 'Could not validate credentials') {
+						dispatch(logout());
+					}
 					break;
 				case 'history':
 					dispatch(setMessageHistory({ messageHistory: parsed.messages }));

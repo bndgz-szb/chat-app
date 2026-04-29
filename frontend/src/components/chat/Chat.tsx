@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SideBar from '@/components/chat/SideBar';
 import ChatScreen from '@/components/chat/ChatScreen';
 import { useChatQuery } from '@/state/apiSlice';
@@ -18,6 +18,7 @@ function Chat() {
 	const { sendHello, connect } = useContext(WebSocketContext);
 	const token = useAppSelector(selectToken);
 	const locationState = useLocation().state as LocationState;
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (locationState) {
@@ -36,6 +37,12 @@ function Chat() {
 			});
 		}
 	}, [isSuccess, connect]);
+
+	useEffect(() => {
+		if (token === '') {
+			navigate('/login');
+		}
+	}, [token, navigate]);
 
 	function handleChatSelect(chat_id: number): void {
 		setSelectedChatId(chat_id);
