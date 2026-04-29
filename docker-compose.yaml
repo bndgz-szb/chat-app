@@ -62,7 +62,6 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydatabase_test
-    restart: always
 
 volumes:
   db-data:
