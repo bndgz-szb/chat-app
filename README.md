@@ -83,6 +83,9 @@ API_URL="http://backend-api:8000"
 
 ### Database
 I will give examples as to how to set up the database with the given compose environment.
+
+**Note:** This might take a while on the first run
+
 First, start all the containers (from the project root):
 ```bash
 docker compose up --build
@@ -91,22 +94,21 @@ docker compose up --build
 Next, the tables need to be created in the database. For this, connect to the backend-ws docker container, and run the migration(s) from there.
 Example command:
 ```bash
-docker compose run --rm --name name backend-ws "alembic upgrade head"
+docker compose run --rm --name name backend-ws alembic upgrade head
 ```
 
 Now that the database has tables, they need to be filled with data. There is a seeder in this project, that generates example data to try out the features with.
 Example command:
 ```bash
-docker compose run --rm --name name backend-api "python -um db.seeder.py"
+docker compose run --rm --name name backend-api python -um db.seeder
 ```
-(This command might give a warning saying it can't find the seeder file, despite successfully running it.)
 
 ## Testing
 There are integration tests written for the API at backend/python_api/tests.
 
 Example command for running these:
 ```bash
-docker compose run --rm --name name backend-api "pytest"
+docker compose run --rm --name name backend-api pytest
 ```
 
 **Note**: The tests require the test database to be running (the db-test service in the compose).
