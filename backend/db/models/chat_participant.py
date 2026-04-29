@@ -27,4 +27,8 @@ class ChatParticipant(Base):
     )
 
     def __repr__(self) -> str:
-        return f"ChatParticipant(chat_id={self.chat_id!r}, user_id={self.user_id!r}, role={self.role!r}, joined_at={self.joined_at!r})"
+        return (
+            f"ChatParticipant(chat_id={self.chat_id!r}, "
+            f"user_id={self.user_id!r}, role={self.role!r}, "
+            f"joined_at={self.joined_at!r})"
+        )

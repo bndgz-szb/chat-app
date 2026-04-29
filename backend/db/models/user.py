@@ -10,7 +10,7 @@ class User(Base):
 
     id = mapped_column(Integer, primary_key=True)
     username = mapped_column(String(50), unique=True, nullable=False)
-    email = mapped_column(String(50), unique=True, nullable=False)  # validated
+    email = mapped_column(String(50), unique=True, nullable=False)
     password = mapped_column(String(254), nullable=False)  # hashed
     admin = mapped_column(Boolean, default=False, nullable=False)
 
@@ -20,4 +20,7 @@ class User(Base):
     messages: Mapped[List["Message"]] = relationship(back_populates="sender")
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, username={self.username!r}, email={self.email!r}, admin={self.admin!r})"
+        return (
+            f"User(id={self.id!r}, username={self.username!r}, "
+            f"email={self.email!r}, admin={self.admin!r})"
+        )

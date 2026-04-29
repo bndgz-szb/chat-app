@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from typing import Sequence, Annotated, Literal
 from sqlalchemy.orm import Session
 
-from db.models import Topic
 from db.session import get_session
 from db.crud.topic import (
     get_all_topics, create_topic, delete_topic, get_topic_by_name

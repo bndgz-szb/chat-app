@@ -38,11 +38,15 @@ function Topics() {
 		<div className="flex flex-col gap-4 p-4 self-start w-screen overflow-y-scroll grow">
 			<CreateTopicModal
 				buttonText={t('create_topic')}
-				buttonStyle={'rounded-md bg-black text-white w-full lg:w-fit p-2 w-fit normal-case'}
+				buttonStyle={
+					'rounded-md bg-black text-white w-full lg:w-fit p-2 w-fit normal-case'
+				}
 				handleSubmit={handleCreateTopic}
 			/>
 
-			<div className="text-white text-lg font-bold text-center lg:text-left">{t('topics')}</div>
+			<div className="text-white text-lg font-bold text-center lg:text-left">
+				{t('topics')}
+			</div>
 			<div className="flex flex-col lg:flex-row gap-2 flex-wrap">
 				{data.map((topic) => (
 					<div

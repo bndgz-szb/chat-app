@@ -87,8 +87,12 @@ def test_delete_attached_topic(
         json={"topic_id": topic.id}
     )
     assert response.status_code == 400
-    assert response.json() == {"detail": "Could not delete topic."
-                               " Make sure it is not attached to any tasks."}
+    assert response.json() == {
+        "detail": (
+            "Could not delete topic."
+            " Make sure it is not attached to any tasks."
+        )
+    }
 
 
 def test_delete_topic(db_session, test_client, admin_header):

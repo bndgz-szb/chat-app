@@ -15,7 +15,7 @@ def shutdown():
 
 
 async def main():
-    async with websockets.serve(handle_auth, "0.0.0.0", 8765) as server:
+    async with websockets.serve(handle_auth, "0.0.0.0", 8765):
         print("WebSocket server started.")
         await SHUTDOWN.wait()
         print("Shutdown signal received, closing connections...")

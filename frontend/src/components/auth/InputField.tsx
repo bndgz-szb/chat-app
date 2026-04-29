@@ -7,7 +7,14 @@ type Props = {
 	onChange: (name: string) => void;
 };
 
-const InputField = ({ type, name, label, value, onChange, placeholder }: Props) => {
+const InputField = ({
+	type,
+	name,
+	label,
+	value,
+	onChange,
+	placeholder,
+}: Props) => {
 	return (
 		<div>
 			<label htmlFor={name} className="block mb-1">

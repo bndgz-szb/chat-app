@@ -19,7 +19,7 @@ function Login() {
 	const { t } = useTranslation();
 
 	useEffect(() => {
-		if (username !== '') navigate('/dashboard', { replace: true }); // TODO validate token against api
+		if (username !== '') navigate('/dashboard', { replace: true });
 	}, [username, navigate]);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

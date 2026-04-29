@@ -54,7 +54,9 @@ def test_message_history_outsider(db_session, test_client, admin_header):
     assert response.json() == {"detail": "User isn't part of chat"}
 
 
-def test_message_history_owner(test_client, admin_header, db_session, admin_user):
+def test_message_history_owner(
+        test_client, admin_header, db_session, admin_user
+):
     chat = create_chat(db_session)
     db_session.commit()
     assign_user(db_session, chat.id, admin_user.id, ChatRole.OWNER)

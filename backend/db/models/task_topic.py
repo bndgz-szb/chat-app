@@ -13,4 +13,6 @@ class TaskTopic(Base):
         f"{topic_tablename}.id"), primary_key=True)
 
     def __repr__(self) -> str:
-        return f"TaskTopic(task_id={self.task_id!r}, topic_id={self.topic_id!r})"
+        return (
+            f"TaskTopic(task_id={self.task_id!r}, topic_id={self.topic_id!r})"
+        )

@@ -7,7 +7,9 @@ from python_api.auth import get_password_hash
 from python_api.tests.conftest import UNHASHED_TEST_USER_PASSWORD
 
 
-def prep_user(session: Session, username: str, email: str, admin: bool) -> User:
+def prep_user(
+        session: Session, username: str, email: str, admin: bool
+) -> User:
     user = User(
         username=username,
         password=get_password_hash(UNHASHED_TEST_USER_PASSWORD),

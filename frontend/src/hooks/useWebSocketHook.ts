@@ -50,7 +50,6 @@ function useWebSocket(): WebSocketContextInterface {
 					break;
 				case 'error':
 					console.error(`error: ${parsed.error}`);
-					// TODO logout if credentials are invalid
 					break;
 				case 'history':
 					dispatch(setMessageHistory({ messageHistory: parsed.messages }));

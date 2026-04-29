@@ -22,4 +22,8 @@ class Message(Base):
     chat: Mapped["Chat"] = relationship(back_populates="messages")
 
     def __repr__(self) -> str:
-        return f"Message(id={self.id!r}, chat_id={self.chat_id!r}, sender_id={self.sender_id!r}, content={self.content!r}, sent_at={self.sent_at!r})"
+        return (
+            f"Message(id={self.id!r}, chat_id={self.chat_id!r}, "
+            f"sender_id={self.sender_id!r}, content={self.content!r}, "
+            f"sent_at={self.sent_at!r})"
+        )

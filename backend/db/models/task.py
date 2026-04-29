@@ -2,7 +2,9 @@ from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, Boolean, ForeignKey, String
 
-from db.db import Base, task_tablename, chat_tablename, task_topic_tablename, user_tablename
+from db.db import (
+    Base, task_tablename, chat_tablename, task_topic_tablename, user_tablename
+)
 
 
 class Task(Base):
@@ -23,4 +25,7 @@ class Task(Base):
         secondary=task_topic_tablename, back_populates="tasks")
 
     def __repr__(self) -> str:
-        return f"Task(id={self.id!r}, chat_id={self.chat_id!r}, done={self.done!r})"
+        return (
+            f"Task(id={self.id!r}, chat_id={self.chat_id!r}, "
+            f"done={self.done!r})"
+        )
