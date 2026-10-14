@@ -1,8 +1,17 @@
 # Chat webapp BSc thesis
 
-This is a BSc thesis that i developed with the help of the internet + ChatGPT. Everything is containerized with docker compose, front-end and back-end files are mounted. A volume is created for the database.
+## Introduction
 
-There is no complex networking set up, so only the host pc is available to message itself on different accounts. There are no security measures, everything is sent/stored in plain text (the user passwords are stored hashed). The websocket messages are in JSON format.
+This is the program part of my BSc thesis that I developed with the help of the internet (documentations and forums) + ChatGPT (very little help in some frontend layouts and some basic methods in backend, every instance of AI generated code should be marked with comments). The main goal of the program was for me to try out different technologies and try to make them work together as best as I can.
+
+Tech stack:
+- React + Redux with TypeScript (frontend)
+- Python using the websockets, FastAPI, SQLAlchemy libraries (backend)
+- PostgreSQL (database)
+- Docker Compose
+
+Everything is containerized with Docker Compose, in a way that frontend and backend files are mounted to minimize container size. A volume is created for the database.
+There is no complex networking set up, therefore only the host PC is available to message itself on different accounts. There are no security measures, everything is sent/stored in plain text (the user passwords are stored hashed). The WebSocket messages are in JSON format.
 
 ---
 
